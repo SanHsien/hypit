@@ -1,0 +1,11 @@
+{
+  "repo": "https://github.com/hypit-ai/hypit.git",
+  "branch": "main",
+  "reviewed_through": "a45224c32da6e25bd641e403920ab17d48838417",
+  "reviewed_release": "v0.2.7",
+  "reviewed_date": "2026-09-19",
+  "reviewed_pr_through": 318,
+  "reviewed_issue_through": 316,
+  "track": "commit",
+  "decision_log": "docs/fork/DECISIONS.md"
+}
