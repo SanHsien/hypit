@@ -12,7 +12,7 @@ No new upstream commits. Nothing to review.
 ## Fork status
 
 - 共同 baseline：`a45224c`（已審視至此）
-- 本 fork `HEAD`：`a45224c3`，baseline 之後 **ahead 0**
+- 本 fork `HEAD`：`cfeaa648`，baseline 之後 **ahead 1**
 - upstream tip：`a45224c3`，baseline 之後 **behind 0**
 
 這兩個數字每次 commit 都會變，所以由本檢查當場算出，不寫進文件。
