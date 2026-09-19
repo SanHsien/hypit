@@ -159,7 +159,7 @@ Agent 會檢查環境，索要這條影片需要的憑據，生成素材並構�
 
 ## 貢獻指南
 
-歡迎提交 Pull Request，文件、示例和翻譯與程式碼同樣重要。可以認領一個已有的 issue，也可以為你想做的事新開一個，我們會協助你把它合並進來。環境準備、CI 會跑的檢查和 Pull Request 流程見 [CONTRIBUTING.zh-CN.md](./CONTRIBUTING.zh-CN.md)。
+歡迎提交 Pull Request，文件、示例和翻譯與程式碼同樣重要。可以認領一個已有的 issue，也可以為你想做的事新開一個，我們會協助你把它合並進來。環境準備、CI 會跑的檢查和 Pull Request 流程見 [CONTRIBUTING.md](./CONTRIBUTING.md)。
 
 建立元件是正常的影片製作工作，元件通常留在擁有它的影片專案中。所有者希望分享時，可以把同一份包作為版本化 tarball 直接交付，也可以釋出到自己的 npm scope 或私有 registry。希望某個元件由 Hypit 官方 Distribution 維護時，先透過 issue 說明它解決的共同產品需求；官方收錄與普通的社群分享是兩件事。
 

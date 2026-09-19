@@ -168,7 +168,7 @@ Star us, and you will receive all release notifications from GitHub without any 
 
 Pull requests are welcome, and documentation, examples and translations count as much as code. Pick
 up an open issue or open one for what you want to work on, and we will help you land it.
-[CONTRIBUTING.md](./CONTRIBUTING.md) has the setup, the checks CI runs and the pull request flow.
+[CONTRIBUTING.en.md](./CONTRIBUTING.en.md) has the setup, the checks CI runs and the pull request flow.
 
 Creating a component is ordinary video-production work, and the component normally stays with the
 video project that owns it. When its owner wants to share it, the same package can be handed off as
