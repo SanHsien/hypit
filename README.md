@@ -26,6 +26,8 @@
   <a href="./LICENSE"><img alt="License" src="https://img.shields.io/badge/License-Apache--2.0%20with%20conditions-E3B341?style=flat-square"></a>
 </p>
 
+> **這是 [`hypit-ai/hypit`](https://github.com/hypit-ai/hypit) 的 Windows 專屬維護型 fork**，沿用 MIT License 與完整 Git 歷史。產品框架、短影音模板與組件模型跟隨上游；**本 fork 僅維護 Windows 版本（Windows 11 + PowerShell 為唯一官方支援環境）**，移除 POSIX / Linux / macOS 等跨平台冗餘腳本，並建立專屬 Windows 開發／驗收 gate 及上游自動化追蹤。差異見 [`FORK.md`](FORK.md)，決策細節見 [`docs/fork/DECISIONS.md`](docs/fork/DECISIONS.md)。
+
 ## Hypit
 
 Hypit 為 AI Agent（Claude Code、Codex 等）提供了一套製作影片的語言和系統。給它一條影片，Agent 就能把它復刻成一份完整的 workflow：畫面、字幕、B-roll、特效，全部錨定在詞上，而不是秒上。

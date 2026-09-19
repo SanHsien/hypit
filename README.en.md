@@ -26,6 +26,8 @@
   <a href="./LICENSE"><img alt="License" src="https://img.shields.io/badge/License-Apache--2.0%20with%20conditions-E3B341?style=flat-square"></a>
 </p>
 
+> **This is a Windows-only maintenance fork of [`hypit-ai/hypit`](https://github.com/hypit-ai/hypit)** under the MIT License. Core video schemas, templates, and runtime models track upstream; **this fork strictly maintains and supports Windows environments only (Windows 11 + PowerShell)**, removing non-Windows redundant scripts while providing dedicated Windows verification gates and upstream tracking. See [`FORK.md`](FORK.md) and [`docs/fork/DECISIONS.md`](docs/fork/DECISIONS.md).
+
 ## Hypit
 
 Hypit gives AI agents (Claude Code, Codex...) a language and system to create video. Drop in a video, and your agent clones it as a complete workflow: footage, captions, B-roll and effects, all anchored to words instead of seconds.
