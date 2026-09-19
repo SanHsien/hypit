@@ -1,19 +1,19 @@
 ---
-title: 测试
-description: 测试运行器、测试模式与环境门控的测试。
+title: 測試
+description: 測試執行器、測試模式與環境門控的測試。
 ---
 
-## 测试运行器
+## 測試執行器
 
-Hypit 使用 Node.js 内置的测试运行器（`node:test`），而不是 Jest、Vitest 或 Mocha。
+Hypit 使用 Node.js 內建的測試執行器（`node:test`），而不是 Jest、Vitest 或 Mocha。
 
 ```bash
-pnpm test          # 包测试 + boundary 测试
+pnpm test          # 包測試 + boundary 測試
 ```
 
-测试文件位于 `packages/<name>/test/`，扩展名为 `.test.ts`。它们通过 glob `packages/*/test/**/*.test.ts` 被发现。
+測試檔案位於 `packages/<name>/test/`，副檔名為 `.test.ts`。它們透過 glob `packages/*/test/**/*.test.ts` 被發現。
 
-## 编写测试
+## 編寫測試
 
 ```typescript
 import assert from "node:assert/strict";
@@ -29,17 +29,17 @@ describe("someFunction", () => {
 });
 ```
 
-## 准入规则
+## 准入規則
 
-默认测试集只保留三类测试：可观察合同、架构边界，以及可能破坏产物、重复付费调用或让运行环境不安全的失败模式。同一事实只在其归属层测试一次；跨包装配使用一个已提交的完整图夹具，不在每个上层重复搭建半条视频链路。
+預設測試集只保留三類測試：可觀察合同、架構邊界，以及可能破壞產物、重複付費呼叫或讓執行環境不安全的失敗模式。同一事實只在其歸屬層測試一次；跨包裝配使用一個已提交的完整圖夾具，不在每個上層重複搭建半條影片鏈路。
 
-不要为了让每个包看起来都有覆盖率而写测试，也不要重复比对 Manifest 数组、保留已经删除的预发布参数或数据库形态、把纯文档 UI helper 塞进系统测试。组件注册本身会拒绝 Manifest 与实现漂移。过时行为删除时，其测试也一起删除，不把测试集当作项目历史档案。
+不要為了讓每個包看起來都有覆蓋率而寫測試，也不要重複比對 Manifest 陣列、保留已經刪除的預釋出引數或資料庫形態、把純文件 UI helper 塞進系統測試。元件註冊本身會拒絕 Manifest 與實現漂移。過時行為刪除時，其測試也一起刪除，不把測試集當作專案歷史檔案。
 
-## 测试模式
+## 測試模式
 
-### 纯编译测试
+### 純編譯測試
 
-最常见的模式。编译一份 Author Source 或 Run Source，然后对生成的图、导出、Record 或计划步骤做断言。绝不调用外部服务。
+最常見的模式。編譯一份 Author Source 或 Run Source，然後對生成的圖、匯出、Record 或計劃步驟做斷言。絕不呼叫外部服務。
 
 ```typescript
 test("compiles the expected exports", async () => {
@@ -50,37 +50,37 @@ test("compiles the expected exports", async () => {
 });
 ```
 
-### Provider 测试
+### Provider 測試
 
-在可控的服务 fixture 上验证请求映射、媒体传输与任务推进，包括失败行为。
-[项目 Provider 示例](https://github.com/hypit-ai/hypit/tree/main/examples/provider-package)
-包含一个生命周期测试，会收集返回的图片且不产生生成费用。真实调用使用选定服务和明确的花费范围；仅有可用密钥并不构成授权。
+在可控的服務 fixture 上驗證請求對映、媒體傳輸與任務推進，包括失敗行為。
+[專案 Provider 示例](https://github.com/hypit-ai/hypit/tree/main/examples/provider-package)
+包含一個生命週期測試，會收集返回的圖片且不產生生成費用。真實呼叫使用選定服務和明確的花費範圍；僅有可用金鑰並不構成授權。
 
-### 架构边界
+### 架構邊界
 
-包边界由 package manifest、公开入口和共享合同表达；测试只验证边界上可观察的行为。
-仓库不再把源码文本正则当作依赖分析或架构审查的替代品。
+包邊界由 package manifest、公開入口和共享合同表達；測試只驗證邊界上可觀察的行為。
+倉庫不再把原始碼文字正則當作依賴分析或架構審查的替代品。
 
-不得提交客户或品牌 fixture、凭据痕迹、付费产物、工作站绝对路径与一次性交付脚本。
-通用的真实调用测试需要显式启用，不能提交密钥，且在未启用时不能产生费用。
+不得提交客戶或品牌 fixture、憑據痕跡、付費產物、工作站絕對路徑與一次性交付指令碼。
+通用的真實呼叫測試需要顯式啟用，不能提交金鑰，且在未啟用時不能產生費用。
 
-## 受环境开关控制的测试
+## 受環境開關控制的測試
 
-| 命令 | 测试内容 | 前置条件 |
+| 命令 | 測試內容 | 前置條件 |
 |---|---|---|
-| `pnpm test:whisperx-service` | Python WhisperX 服务 | Python 3.13、uv、frozen sync |
-| `pnpm test:image-opencv` | OpenCV 图像变换 | 服务自带的解释器，位于 `services/image-opencv/.venv`；要用别的解释器就设 `HYPIT_OPENCV_PYTHON` |
+| `pnpm test:whisperx-service` | Python WhisperX 服務 | Python 3.13、uv、frozen sync |
+| `pnpm test:image-opencv` | OpenCV 影象變換 | 服務自帶的直譯器，位於 `services/image-opencv/.venv`；要用別的直譯器就設 `HYPIT_OPENCV_PYTHON` |
 
-要运行本地 HyperFrames 浏览器渲染测试，先在当前 shell 环境中设置 `HYPIT_BROWSER_TESTS=1`，再从仓库根目录执行以下命令。需要可用的 Chrome、ffmpeg 和 ffprobe。
+要執行本地 HyperFrames 瀏覽器渲染測試，先在當前 shell 環境中設定 `HYPIT_BROWSER_TESTS=1`，再從倉庫根目錄執行以下命令。需要可用的 Chrome、ffmpeg 和 ffprobe。
 
 ```sh
 node --import tsx --test packages/provider-hyperframes-local/test/provider.test.ts
 ```
 
-## 测试 fixtures
+## 測試 fixtures
 
-测试夹具放在 `packages/<name>/test/fixtures/`。它们是普通的 `.svml`、`.svs` 和 `.svrun` 文件，用于覆盖特定的编译路径。
+測試夾具放在 `packages/<name>/test/fixtures/`。它們是普通的 `.svml`、`.svs` 和 `.svrun` 檔案，用於覆蓋特定的編譯路徑。
 
-`examples/` 目录同时充当集成级别的夹具：
-- `examples/interview/`、`examples/podcast/`、`examples/ranking-football/` — 包含 Source、Run 和素材的完整视频项目。
-- `examples/minimal-author-package/` — 带有 Surface 预览的完整组件包。
+`examples/` 目錄同時充當整合級別的夾具：
+- `examples/interview/`、`examples/podcast/`、`examples/ranking-football/` — 包含 Source、Run 和素材的完整影片專案。
+- `examples/minimal-author-package/` — 帶有 Surface 預覽的完整元件包。

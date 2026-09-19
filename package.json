@@ -149,7 +149,6 @@
     "examples/minimal-author-package/packages/*/src/**/*",
     "examples/minimal-author-package/packages/*/preview/**/*",
     "README.md",
-    "README.zh-CN.md",
     "LICENSE",
     "examples/semantic-composition/README.md",
     "examples/semantic-composition/packages/*/src/**/*",

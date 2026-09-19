@@ -1,11 +1,11 @@
 ---
-title: 媒体与生成
-description: 声明媒体资源并使用 Seedance 生成视频。
+title: 媒體與生成
+description: 宣告媒體資源並使用 Seedance 生成影片。
 ---
 
-本页介绍用于声明静态资源和生成新媒体的组件——这些是流入下游时序和 Track 阶段的原始素材。
+本頁介紹用於宣告靜態資源和生成新媒體的元件——這些是流入下游時序和 Track 階段的原始素材。
 
-此处展示的每个组件在使用前都必须通过包标识符导入：
+此處展示的每個元件在使用前都必須透過包識別符號匯入：
 
 ```svml
 <import as="media" from="@hypit/media@1"/>
@@ -17,37 +17,37 @@ description: 声明媒体资源并使用 Seedance 生成视频。
 
 ## media:Image
 
-声明一个来自本地文件的内容寻址图片资源。
+宣告一個來自本地檔案的內容定址圖片資源。
 
 ```svml
 <media:Image id="presenter" src="./assets/presenter.png"/>
 ```
 
-| 属性 | 必填 | 说明 |
+| 屬性 | 必填 | 說明 |
 |---|---|---|
-| `id` | 是 | 组件的唯一标识符 |
-| `src` | 是 | 图片文件路径，相对于 `.svml` 源文件 |
+| `id` | 是 | 元件的唯一識別符號 |
+| `src` | 是 | 圖片檔案路徑，相對於 `.svml` 原始檔 |
 
-该图片在下游通过 `{presenter}` 引用——例如，作为 `seedance:ReferenceVideo` 中的角色参考或作为 B-roll 来源。
+該圖片在下游透過 `{presenter}` 引用——例如，作為 `seedance:ReferenceVideo` 中的角色參考或作為 B-roll 來源。
 
 ## media:Audio
 
-声明一个来自本地文件的内容寻址音频资源。
+宣告一個來自本地檔案的內容定址音訊資源。
 
 ```svml
 <media:Audio id="presenter-voice" src="./assets/presenter-voice.mp3"/>
 ```
 
-| 属性 | 必填 | 说明 |
+| 屬性 | 必填 | 說明 |
 |---|---|---|
-| `id` | 是 | 唯一标识符 |
-| `src` | 是 | 音频文件路径，相对于 `.svml` 源文件 |
+| `id` | 是 | 唯一識別符號 |
+| `src` | 是 | 音訊檔案路徑，相對於 `.svml` 原始檔 |
 
-通常用作 `seedance:ReferenceVideo` 的语音音色参考。
+通常用作 `seedance:ReferenceVideo` 的語音音色參考。
 
-## 时长是字面量
+## 時長是字面量
 
-生成片段的长度由作者决定，直接写在需要它的元素上。先量稿子，再写数字：
+生成片段的長度由作者決定，直接寫在需要它的元素上。先量稿子，再寫數字：
 
 ```bash
 hypit measure main.svml --segment hook --language en --pace normal --rounding round
@@ -60,11 +60,11 @@ hypit measure main.svml --segment hook --language en --pace normal --rounding ro
 </seedance:ReferenceVideo>
 ```
 
-`hypit measure` 按口播策略——`language`、`pace`（英语 `slow = 4.2`、`normal = 4.6`、`fast = 5.0` 音节/秒）或数值 `rate`、`rounding`——统计 Segment 台词的读音单位，不调用任何外部服务。请求时长在 Build 开始前已经明确。用估时结果调整稿子并选择模型支持的时长；实际词时间由生成表演后的语义处理提供。
+`hypit measure` 按口播策略——`language`、`pace`（英語 `slow = 4.2`、`normal = 4.6`、`fast = 5.0` 音節/秒）或數值 `rate`、`rounding`——統計 Segment 臺詞的讀音單位，不呼叫任何外部服務。請求時長在 Build 開始前已經明確。用估時結果調整稿子並選擇模型支援的時長；實際詞時間由生成表演後的語義處理提供。
 
 ## text:Value
 
-一个可复用的字面 `Text` 值。它与模型无关，可以进入 Seedance、GPT Image 或任何声明的文字端口。
+一個可複用的字面 `Text` 值。它與模型無關，可以進入 Seedance、GPT Image 或任何宣告的文字埠。
 
 ```svml
 <import as="text" from="@hypit/text@1"/>
@@ -76,19 +76,19 @@ hypit measure main.svml --segment hook --language en --pace normal --rounding ro
 </text:Value>
 ```
 
-| 属性 | 必填 | 说明 |
+| 屬性 | 必填 | 說明 |
 |---|---|---|
-| `id` | 是 | 唯一标识符 |
+| `id` | 是 | 唯一識別符號 |
 
-元素主体就是精确的 Text 值。`text:Render` 也能用模板和显式图输入产出同一类型。
+元素主體就是精確的 Text 值。`text:Render` 也能用模板和顯式圖輸入產出同一型別。
 
-## Seedance 三种调用形状
+## Seedance 三種呼叫形狀
 
-Seedance 只暴露模型能力，不暴露“口播”“B-roll”等创作用途。`standard`、`fast`、`mini`
-和 `2.5` 选择精确模型；调用形状则独立分为三种。三者都消费完整的普通 `Text` Prompt，并输出 `{id.video}`。
+Seedance 只暴露模型能力，不暴露“口播”“B-roll”等創作用途。`standard`、`fast`、`mini`
+和 `2.5` 選擇精確模型；呼叫形狀則獨立分為三種。三者都消費完整的普通 `Text` Prompt，並輸出 `{id.video}`。
 
-Seedance 2.5 复用同样的 Surface，而不是由 Runtime 把别的模型偷偷替换成 2.5。它的精确合同支持 480p/720p/1080p，最多 30 张参考图、10 段参考视频、10 段参考音频；时长可写 `-1`
-交给模型选择，也可明确写 4–30 秒的整数：
+Seedance 2.5 複用同樣的 Surface，而不是由 Runtime 把別的模型偷偷替換成 2.5。它的精確合同支援 480p/720p/1080p，最多 30 張參考圖、10 段參考影片、10 段參考音訊；時長可寫 `-1`
+交給模型選擇，也可明確寫 4–30 秒的整數：
 
 ```svml
 <seedance:ReferenceVideo id="long-take" model="2.5"
@@ -100,18 +100,18 @@ Seedance 2.5 复用同样的 Surface，而不是由 Runtime 把别的模型偷�
 
 ### seedance:TextVideo
 
-纯 Prompt 生成。只有这种形状允许 `web-search`：
+純 Prompt 生成。只有這種形狀允許 `web-search`：
 
 ```svml
 <seedance:TextVideo id="ambient" model="mini"
   prompt={ambient-direction} duration="5" web-search="false"/>
 ```
-对于反复出现的人物、产品或场景，先制作参考图能给视频模型明确的视觉方向。多个 Take 可以复用这些参考，再由 Script 与 action Prompt 指导各段表演。当场景可以直接描述、不需要保持特定视觉身份时，也可以使用 TextVideo。
+對於反覆出現的人物、產品或場景，先製作參考圖能給影片模型明確的視覺方向。多個 Take 可以複用這些參考，再由 Script 與 action Prompt 指導各段表演。當場景可以直接描述、不需要保持特定視覺身份時，也可以使用 TextVideo。
 
 
 ### seedance:FrameVideo
 
-必须给首帧，可以额外给尾帧：
+必須給首幀，可以額外給尾幀：
 
 ```svml
 <seedance:FrameVideo id="transition" model="fast"
@@ -122,7 +122,7 @@ Seedance 2.5 复用同样的 Surface，而不是由 Runtime 把别的模型偷�
 
 ### seedance:ReferenceVideo
 
-多模态参考生成。至少需要一个 `Reference` 子元素，可以显式接入图片、视频和音频：
+多模態參考生成。至少需要一個 `Reference` 子元素，可以顯式接入圖片、影片和音訊：
 
 ```svml
 <seedance:ReferenceVideo id="alice-take" model="mini"
@@ -134,18 +134,18 @@ Seedance 2.5 复用同样的 Surface，而不是由 Runtime 把别的模型偷�
 </seedance:ReferenceVideo>
 ```
 
-每个参考图片／视频必须填写 `person-reference="true|false"`：参考素材含人物填 true，不含填 false。
-漏填会报错，音频不得填写。首帧必须填写 `first-frame-person-reference`，提供尾帧时还须填写 `last-frame-person-reference`。
-选定的 Provider 负责把这项事实交给服务的素材准备流程；服务 API 没有对应字段时，Provider 接受这项声明但不传输。
+每個參考圖片／影片必須填寫 `person-reference="true|false"`：參考素材含人物填 true，不含填 false。
+漏填會報錯，音訊不得填寫。首幀必須填寫 `first-frame-person-reference`，提供尾幀時還須填寫 `last-frame-person-reference`。
+選定的 Provider 負責把這項事實交給服務的素材準備流程；服務 API 沒有對應欄位時，Provider 接受這項宣告但不傳輸。
 
-舞蹈、身体动作或运镜可以由参考视频提供运动依据，再用参考图指定新的形象与场景。
-围绕需要保留的动作选取片段，并核对模型与服务的参考视频时长上限；它和要生成的视频时长是两回事。
+舞蹈、身體動作或運鏡可以由參考影片提供運動依據，再用參考圖指定新的形象與場景。
+圍繞需要保留的動作選取片段，並核對模型與服務的參考影片時長上限；它和要生成的影片時長是兩回事。
 
-这个低层组件并不知道它被用来做口播；用途只存在于传入的 Text 中。公共属性包括
+這個低層元件並不知道它被用來做口播；用途只存在於傳入的 Text 中。公共屬性包括
 `id`、`model`、`prompt`、`duration`、`resolution`、
-`aspect-ratio`、`generate-audio`；`duration` 是模型范围内的整秒字面量，事先用 `hypit measure` 量好。
+`aspect-ratio`、`generate-audio`；`duration` 是模型範圍內的整秒字面量，事先用 `hypit measure` 量好。
 
-可以直接抽取前一段生成视频里的音频，并通过普通图边给后续片段当作参考。这个操作不会把音频提升成语音证据，也不会凭空附加说话人语义：
+可以直接抽取前一段生成影片裡的音訊，並透過普通圖邊給後續片段當作參考。這個操作不會把音訊提升成語音證據，也不會憑空附加說話人語義：
 
 ```svml
 <mediaop:ExtractAudio id="voice-from-opening"
@@ -158,19 +158,19 @@ Seedance 2.5 复用同样的 Surface，而不是由 Runtime 把别的模型偷�
 </seedance:ReferenceVideo>
 ```
 
-同一个媒体操作包还提供 `Transform`（按顺序截取、变速）和 `ExtractFrame`（首帧、尾帧、指定帧或指定时间取图）。本地 FFmpeg 实现这些精确 Need；也可以选择其他兼容的 Runtime Endpoint，作者图保持不变。
+同一個媒體操作包還提供 `Transform`（按順序擷取、變速）和 `ExtractFrame`（首幀、尾幀、指定幀或指定時間取圖）。本地 FFmpeg 實現這些精確 Need；也可以選擇其他相容的 Runtime Endpoint，作者圖保持不變。
 
-## Seedance 语义 Kit
+## Seedance 語義 Kit
 
-`@hypit/seedance-kits` 包含七个纯数据 Text Template。Kit 不是模型包装器：先用通用
-`text:Render` 生成 prompt，再把该 Text 与真实媒体引用显式接入低层 Seedance Surface。
+`@hypit/seedance-kits` 包含七個純資料 Text Template。Kit 不是模型包裝器：先用通用
+`text:Render` 生成 prompt，再把該 Text 與真實媒體引用顯式接入低層 Seedance Surface。
 
-直接从已安装的包导入选中的公开 Kit Source。包管理器或当前 Distribution 管理实际安装版本，
-Source Closure 沿着这个显式包导入读取内容。如果共享措辞不适合当前作品，也可以在项目里创作并导入自己的 Kit。
+直接從已安裝的包匯入選中的公開 Kit Source。包管理器或當前 Distribution 管理實際安裝版本，
+Source Closure 沿著這個顯式包匯入讀取內容。如果共享措辭不適合當前作品，也可以在專案裡創作並匯入自己的 Kit。
 
-创作前阅读
+創作前閱讀
 [`@hypit/seedance-kits` 指南](https://github.com/hypit-ai/hypit/blob/main/packages/seedance-kits/README.md)
-和 [所选 Kit 源文件](https://github.com/hypit-ai/hypit/tree/main/packages/seedance-kits/kits)，判断它的镜头假设和措辞是否适合当前表演。也可以直接编写 prompt Text，或创作项目自己的 Kit。提示词语言按所选模型决定，对白使用实际需要说出的语言。
+和 [所選 Kit 原始檔](https://github.com/hypit-ai/hypit/tree/main/packages/seedance-kits/kits)，判斷它的鏡頭假設和措辭是否適合當前表演。也可以直接編寫 prompt Text，或創作專案自己的 Kit。提示詞語言按所選模型決定，對白使用實際需要說出的語言。
 
 ```svml
 <import as="text" from="@hypit/text@1"/>
@@ -194,23 +194,23 @@ Source Closure 沿着这个显式包导入读取内容。如果共享措辞不�
 </seedance:ReferenceVideo>
 ```
 
-项目 Recipe 选择模板声明的轴；显式 `text:Param` 可以覆盖 Recipe。按格式选择 Kit，再提供它声明的动态 slot 与有序参考：
+專案 Recipe 選擇模板宣告的軸；顯式 `text:Param` 可以覆蓋 Recipe。按格式選擇 Kit，再提供它宣告的動態 slot 與有序參考：
 
-| 格式 | Kit | 动态 slot | 有序参考 |
+| 格式 | Kit | 動態 slot | 有序參考 |
 |---|---|---|---|
-| 单人口播 | `speaker-v1` | `dialogue`；可选 `action` | image 1 = 人物/场景；audio 1 = 声音 |
-| 无声 B-roll | `broll-v1` | `story` | 一张或多张作者声明图片 |
-| 双人 Podcast | `podcast-v1` | `dialogue`；可选 `action` | image 1/2 = A/B 视角；audio 1/2 = A/B 声音 |
-| 视频通话 | `call-v1` | `dialogue`；可选 `action` | image 1/2 = 相反通话布局；audio 1/2 = A/B 声音 |
-| 街访 | `street-interview-v1` | `dialogue`；可选 `action` | image 1/2/3 = 采访者/受访者/双人视角；audio 1/2 = 采访者/受访者 |
-| 动作迁移 | `motion-reference-v1` | 可选 `direction` | image 1 = 主体；video 1 = 动作参考 |
-| 运镜迁移 | `camera-reference-v1` | 可选 `direction` | image 1 = 主体；video 1 = 运镜参考 |
+| 單人口播 | `speaker-v1` | `dialogue`；可選 `action` | image 1 = 人物/場景；audio 1 = 聲音 |
+| 無聲 B-roll | `broll-v1` | `story` | 一張或多張作者宣告圖片 |
+| 雙人 Podcast | `podcast-v1` | `dialogue`；可選 `action` | image 1/2 = A/B 視角；audio 1/2 = A/B 聲音 |
+| 視訊通話 | `call-v1` | `dialogue`；可選 `action` | image 1/2 = 相反通話佈局；audio 1/2 = A/B 聲音 |
+| 街訪 | `street-interview-v1` | `dialogue`；可選 `action` | image 1/2/3 = 採訪者/受訪者/雙人視角；audio 1/2 = 採訪者/受訪者 |
+| 動作遷移 | `motion-reference-v1` | 可選 `direction` | image 1 = 主體；video 1 = 動作參考 |
+| 運鏡遷移 | `camera-reference-v1` | 可選 `direction` | image 1 = 主體；video 1 = 運鏡參考 |
 
-这些形状仍然清楚地写在 `seedance:ReferenceVideo` 中；Kit 渲染不会隐藏媒体数量与顺序。
+這些形狀仍然清楚地寫在 `seedance:ReferenceVideo` 中；Kit 渲染不會隱藏媒體數量與順序。
 
-## 街访 Prompt 组装
+## 街訪 Prompt 組裝
 
-使用 `street-interview-v1` 复用视角顺序、角色、麦克风、音色和无叠加文字契约。构图、节奏、表演、反应与手势由 SVS Recipe 选择；每段的镜头变化和表演按实际发生顺序直接写在 `action` 中：
+使用 `street-interview-v1` 複用視角順序、角色、麥克風、音色和無疊加文字契約。構圖、節奏、表演、反應與手勢由 SVS Recipe 選擇；每段的鏡頭變化和表演按實際發生順序直接寫在 `action` 中：
 
 ```svml
 <import as="text" from="@hypit/text@1"/>
@@ -240,12 +240,12 @@ Source Closure 沿着这个显式包导入读取内容。如果共享措辞不�
 </seedance:ReferenceVideo>
 ```
 
-对白使用明确的 `A:`/`B:` 顺序：A 是采访者并绑定第一段音频参考，B 是受访者并绑定第二段。固定英文 Prompt 骨架由 Kit 负责，不要在手写 Prompt 中重复一遍。
+對白使用明確的 `A:`/`B:` 順序：A 是採訪者並繫結第一段音訊參考，B 是受訪者並繫結第二段。固定英文 Prompt 骨架由 Kit 負責，不要在手寫 Prompt 中重複一遍。
 
-## 口播 Prompt 组装
+## 口播 Prompt 組裝
 
-口播创作不需要一个特殊的可执行组件。数据化的 `speaker-v1` Template、项目 Recipe 与每段的
-dialogue/action 由普通 Text 模块组装，结果再像其他生成任务一样通过显式 `prompt` 边进入 Seedance。
+口播創作不需要一個特殊的可執行元件。資料化的 `speaker-v1` Template、專案 Recipe 與每段的
+dialogue/action 由普通 Text 模組組裝，結果再像其他生成任務一樣透過顯式 `prompt` 邊進入 Seedance。
 
 ```svml
 <import as="text" from="@hypit/text@1"/>
@@ -271,12 +271,12 @@ dialogue/action 由普通 Text 模块组装，结果再像其他生成任务一�
 </seedance:ReferenceVideo>
 ```
 
-`speaker-v1.svs` 自己选择 Text Template Frontend。`recipes.svs` 提供具名轴值，`dialogue` 与
-`action` 保持为普通图输入。Kit 和 Text 都不选择模型、参考素材或 Provider。
+`speaker-v1.svs` 自己選擇 Text Template Frontend。`recipes.svs` 提供具名軸值，`dialogue` 與
+`action` 保持為普通圖輸入。Kit 和 Text 都不選擇模型、參考素材或 Provider。
 
-## 组合示例
+## 組合示例
 
-一个两段拍摄的设置，量好的时长写成字面量，显式 Text 组装与 Seedance 生成：
+一個兩段拍攝的設定，量好的時長寫成字面量，顯式 Text 組裝與 Seedance 生成：
 
 ```svml
 <import as="media" from="@hypit/media@1"/>
@@ -313,5 +313,5 @@ dialogue/action 由普通 Text 模块组装，结果再像其他生成任务一�
 </seedance:ReferenceVideo>
 ```
 
-每个 `seedance:ReferenceVideo` 产出 `{*.video}`，进入下一阶段的 `time:Timeline`。不同 Take
-可以使用不同参考图，同时共享相同的音色与 Prompt Recipe。
+每個 `seedance:ReferenceVideo` 產出 `{*.video}`，進入下一階段的 `time:Timeline`。不同 Take
+可以使用不同參考圖，同時共享相同的音色與 Prompt Recipe。

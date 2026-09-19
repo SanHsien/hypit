@@ -112,7 +112,7 @@ display spelling. Settle these readings before measuring the Script and requesti
 
 The same distinction helps Chinese copy express numbers and names clearly. For example,
 `今年<2026|二零二六>年` displays the year compactly while specifying how it is said;
-`只要<¥19.9|十九块九>` chooses a conversational price reading. Choose the spoken form for this
+`只要<¥19.9|十九塊九>` chooses a conversational price reading. Choose the spoken form for this
 sentence's meaning and delivery. Measuring the Segment with `--language zh` then uses that spoken
 wording, including the syllables hidden behind its compact numeric display. Caption retains the
 authored simplified or traditional characters; transcription supplies timing rather than rewriting

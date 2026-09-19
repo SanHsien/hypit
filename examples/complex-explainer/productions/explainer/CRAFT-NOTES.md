@@ -59,7 +59,7 @@ the scope of the objects that respond to it.
 ## Keep playing footage distinct from its frame
 
 The same accepted presenter footage appears full-frame, in a circular inset and through a moving
-viewport. The short return to the inset on “我们继续” is a Performance Use applied to existing media.
+viewport. The short return to the inset on “我們繼續” is a Performance Use applied to existing media.
 The camera presentation changes while the source playback continues. The
 [opening system](../../packages/opening-system/README.md) owns these Styles; Main Source owns where
 they are used. Foreground and enlarged background presentations likewise share the same media sample.

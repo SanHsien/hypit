@@ -42,7 +42,6 @@ const stage = await mkdtemp(resolve(tmpdir(), "hypit-npm-"));
 try {
   // Use npm's own file selection; only the package-page README differs from the repository.
   for (const { path } of inventory.files) {
-    if (path === "README.zh-CN.md") continue;
     const target = resolve(stage, path);
     await mkdir(dirname(target), { recursive: true });
     await copyFile(resolve(root, path), target);

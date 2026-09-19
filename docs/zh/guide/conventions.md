@@ -1,57 +1,57 @@
 ---
-title: 代码规范
-description: 命名、模块边界、TypeScript 配置与 wire 数据。
+title: 程式碼規範
+description: 命名、模組邊界、TypeScript 配置與 wire 資料。
 ---
 
-这些规范面向 Hypit 仓库内的工作。项目扩展使用所有者自己的 scope 和公开的 `@hypit/hypit/*` SDK 子路径，见 [包与扩展](./packages.md)。
+這些規範面向 Hypit 倉庫內的工作。專案擴充套件使用所有者自己的 scope 和公開的 `@hypit/hypit/*` SDK 子路徑，見 [包與擴充套件](./packages.md)。
 
 ## 命名
 
-| 项目 | 约定 | 示例 |
+| 專案 | 約定 | 示例 |
 |---|---|---|
-| 包目录 | kebab-case | `packages/speech-alignment/` |
+| 包目錄 | kebab-case | `packages/speech-alignment/` |
 | 包名 | `@hypit/` scope | `@hypit/speech-alignment` |
-| Provider 包 | `provider-` 前缀 | `@studio/provider-images` |
-| TypeScript 文件 | kebab-case | `align.ts` |
-| 导出类型 | PascalCase | `SpeechAlignment` |
-| 导出函数 | camelCase | `createSpeechAlignment` |
+| Provider 包 | `provider-` 字首 | `@studio/provider-images` |
+| TypeScript 檔案 | kebab-case | `align.ts` |
+| 匯出型別 | PascalCase | `SpeechAlignment` |
+| 匯出函式 | camelCase | `createSpeechAlignment` |
 
-## 模块边界
+## 模組邊界
 
-- 包通过 `package.json` 的 exports 声明公开入口；`src/index.ts` 是常见的工作区入口。
-- 内部模块使用显式的 `.js` 扩展名（NodeNext 解析）。
-- 跨包导入使用 `@hypit/*`，绝不跨包边界使用相对路径。
-- 禁止生产依赖形成循环。
+- 包透過 `package.json` 的 exports 宣告公開入口；`src/index.ts` 是常見的工作區入口。
+- 內部模組使用顯式的 `.js` 副檔名（NodeNext 解析）。
+- 跨包匯入使用 `@hypit/*`，絕不跨包邊界使用相對路徑。
+- 禁止生產依賴形成迴圈。
 
 ## TypeScript 配置
 
-根 `tsconfig.json` 通过普通 pnpm 工作区链接检查全部包，不维护中央 `paths` 注册表。每个包必须在自己的
-`dependencies` 或 `devDependencies` 中声明所有跨包导入。
+根 `tsconfig.json` 透過普通 pnpm 工作區連結檢查全部包，不維護中央 `paths` 登錄檔。每個包必須在自己的
+`dependencies` 或 `devDependencies` 中宣告所有跨包匯入。
 
-| 配置项 | 值 |
+| 配置項 | 值 |
 |---|---|
 | Target | ES2023 |
 | Module | NodeNext |
 | Module resolution | NodeNext |
 | `strict` | `true` |
-| `noUncheckedIndexedAccess` | `true` — 索引访问返回 `T \| undefined` |
-| `exactOptionalPropertyTypes` | `true` — `undefined` 必须显式写出 |
+| `noUncheckedIndexedAccess` | `true` — 索引訪問返回 `T \| undefined` |
+| `exactOptionalPropertyTypes` | `true` — `undefined` 必須顯式寫出 |
 
 新增包不需要修改根 TypeScript 配置。
 
-## wire 数据
+## wire 資料
 
-- 所有持久化数据使用 `@1` wire 格式版本。
-- 项目自有的 Module 与 Frontend 身份统一使用逻辑版本字面量 `1`。
-- 包版本通过 npm 或 pnpm 选择物理发行，与逻辑 Module 和 Frontend 接口版本分别表达。
-- 包管理器和 lockfile 负责固定安装版本及其依赖。
-- wire 类型定义在 `@hypit/protocol` 中，且不可变。
-- Nominal Type 由 Module 拥有，不在中心化的联合类型中注册。
-- 类型 schema 使用与 JSON 兼容的结构，而不是 TypeScript 接口。
+- 所有持久化資料使用 `@1` wire 格式版本。
+- 專案自有的 Module 與 Frontend 身份統一使用邏輯版本字面量 `1`。
+- 包版本透過 npm 或 pnpm 選擇物理發行，與邏輯 Module 和 Frontend 介面版本分別表達。
+- 包管理器和 lockfile 負責固定安裝版本及其依賴。
+- wire 型別定義在 `@hypit/protocol` 中，且不可變。
+- Nominal Type 由 Module 擁有，不在中心化的聯合型別中註冊。
+- 型別 schema 使用與 JSON 相容的結構，而不是 TypeScript 介面。
 
-## 错误处理
+## 錯誤處理
 
-- 编译失败时抛出带有描述性信息的错误，其中包含源码位置。
-- 运行时失败在 Build 状态机中记录为 Operation 失败。
-- 服务协议允许的有限传输重试由 Provider 负责。
-- 执行尝试失败会结束 Build；后续工作使用新的 Run 与 Build，显式选择已完成 Output 复用。
+- 編譯失敗時丟擲帶有描述性資訊的錯誤，其中包含原始碼位置。
+- 執行時失敗在 Build 狀態機中記錄為 Operation 失敗。
+- 服務協議允許的有限傳輸重試由 Provider 負責。
+- 執行嘗試失敗會結束 Build；後續工作使用新的 Run 與 Build，顯式選擇已完成 Output 複用。

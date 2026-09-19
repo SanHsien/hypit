@@ -13,7 +13,7 @@ For a coined name or letter-name reading, use
 [Script pronunciation](../../creation/script-and-time.md#choose-the-sound-the-spelling-should-carry):
 `<CSS|see ess ess>` keeps `CSS` on screen while supplying its chosen reading to the performance.
 `<New York|>` instead keeps identical display/speech wording in one complete correspondence;
-`<|再见>` retains the spoken words and their anchors while omitting them from Caption. These forms
+`<|再見>` retains the spoken words and their anchors while omitting them from Caption. These forms
 choose content and correspondence; the Caption family decides their visual treatment. Place `||`
 between complete units when another reading handoff is wanted.
 
@@ -81,7 +81,7 @@ or character count cannot make that choice. Count the display side of Dual Text 
 | Mixed Chinese and English | Read the phrase as a whole. A Latin brand name or number can occupy several Han characters' width; its lexical unit count does not predict that width. |
 
 Fine preserves authored display separators in every writing system. Its `word-gap` sizes those
-separators; a Chinese/Latin or number/letter boundary does not create one. Write `是的 就是这样`
+separators; a Chinese/Latin or number/letter boundary does not create one. Write `是的 就是這樣`
 when that space is intended, and `3D` or `3개월` when the text should stay joined. `letter-spacing`
 adjusts glyph tracking. `<expression|>` groups an expression for caption behavior; it is not needed
 to preserve spelling or spaces.
@@ -100,7 +100,7 @@ Choose `trail` instead of `current` when the already spoken characters should st
 sweeps inside its glyphs. Both follow each unit's own speech time, including uneven delivery and
 pauses. Making a Cue longer changes its reading group, not its character timing.
 
-When a compound, name or short phrase should respond together, author it as `<组件化|>` in Script.
+When a compound, name or short phrase should respond together, author it as `<元件化|>` in Script.
 The omitted spoken side inherits the same words. Fine's existing whole-unit `step` highlighting,
 underline and active box then follow that group's first-to-last speech interval, while each spoken
 character keeps its own Timeline anchors. A Cue can mix these groups with ordinary characters.
@@ -132,8 +132,8 @@ For example, these groupings preserve short ideas in each language:
 </explanation>
 
 <explanation-zh><HOST>
-  一张参考图 || 就能重新设计镜头和节奏，||
-  让字幕和特效 || 为你的产品服务。
+  一張參考圖 || 就能重新設計鏡頭和節奏，||
+  讓字幕和特效 || 為你的產品服務。
 </explanation-zh>
 
 <explanation-ko><HOST>

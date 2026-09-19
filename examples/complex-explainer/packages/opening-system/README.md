@@ -2,7 +2,7 @@
 
 Project components and Performance Styles for an explanation-led video. They share the film's Timeline and Canvas but own independent visual behavior. Connect each `.track` to Film explicitly. They produce no audio.
 
-- **Title**: opening clock and a two-level headline in a pink window card. Existing presenter footage continues beneath it at its original brightness. Its outer Window ends on the authored “开始” Moment in this production. `seconds` is the promise printed on the title, not the estimated duration of the film.
+- **Title**: opening clock and a two-level headline in a pink window card. Existing presenter footage continues beneath it at its original brightness. Its outer Window ends on the authored “開始” Moment in this production. `seconds` is the promise printed on the title, not the estimated duration of the film.
 - **Timer**: a persistent topic plaque, pennant and dot-matrix timer. Its Window's first frame starts the countdown; zero is followed by coral overtime counting upward. `title`, `subtitle`, `seconds`, `flag-color`, `x`, `y`, `width`, `flag-amplitude`, `flag-speed`, `entrance-frames` and `z` are author choices. It does not infer pauses from speech or stop when a Take is absent.
 - **Flag**: an independent low-angle pixel flag. It uses the same deterministic pixel texture treatment as Timer, with its own Window, placement, dimensions and color. No relationship to the opposition boards is inferred. The current Source places it below captions during the first-road explanation. `flag-amplitude` and `flag-speed` keep the folds slow and the logo readable.
 - **Stage**: independent images or normalized videos in a clear foreground viewport, with the same material enlarged, blurred and dimmed behind it. Each Item has its own projected Window. Foreground and background share exact video sampling. An image is held during its Window. Later declared Items paint above earlier ones if they overlap. Empty intervals stay empty. `fit="contain"` preserves the supplied screenshot; `cover` fills and crops. `x`, `y`, `width`, `height` are fractions of Canvas dimensions. `blur` is specified at a reference width of 1080 and scales with Canvas width. `brightness`, `zoom`, `radius` and `z` finish the treatment.
@@ -13,7 +13,7 @@ The visual components accept the shared temporal Window forms: `during`, `at` pl
 <import as="gfx" from="@explainer/opening-system@1"/>
 <gfx:Title id="opening-title" timeline={program.timeline} canvas={canvas} font={display-font}
   start="program.start" end="moment.cue" moment={story.moment.begin}
-  title="Hypit" subtitle="一分钟了解" seconds="60"/>
+  title="Hypit" subtitle="一分鐘瞭解" seconds="60"/>
 <gfx:Timer id="series-timer" timeline={program.timeline} canvas={canvas} font={display-font} logo={flag-logo}
   start="moment.cue" end="program.end" moment={story.moment.begin} title="Hypit"/>
 <gfx:Stage id="coverage" timeline={program.timeline} canvas={canvas} during={story.selection.example}>

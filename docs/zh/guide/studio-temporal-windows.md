@@ -1,61 +1,61 @@
 ---
-title: Studio 中的时间编辑
-description: 区分跟随语义、使用时钟，以及时间编辑实际改变的对象。
+title: Studio 中的時間編輯
+description: 區分跟隨語義、使用時鐘，以及時間編輯實際改變的物件。
 ---
 
-时间表达记录作者的选择。讲解画面可以跟随一句话，闪光可以响应答案，独立动画可以使用影片时钟。
-Studio 修改的是该写法所表达的选择。
+時間表達記錄作者的選擇。講解畫面可以跟隨一句話，閃光可以響應答案，獨立動畫可以使用影片時鐘。
+Studio 修改的是該寫法所表達的選擇。
 
-[Script](../quickstart/script.md) 用 Selection 和 Moment 为语义范围与事件命名。
-Timeline 放置准备好的表演；组件通过这些身份或时钟位置获得 Instant、Window。
-无声动画使用同一种 Timeline，由作者声明完整时长。
+[Script](../quickstart/script.md) 用 Selection 和 Moment 為語義範圍與事件命名。
+Timeline 放置準備好的表演；元件透過這些身份或時鐘位置獲得 Instant、Window。
+無聲動畫使用同一種 Timeline，由作者宣告完整時長。
 
-## 选择需要编辑的关系
+## 選擇需要編輯的關係
 
-| 作者写法 | 移动时改变什么 | 裁剪时改变什么 |
+| 作者寫法 | 移動時改變什麼 | 裁剪時改變什麼 |
 | --- | --- | --- |
-| `during={story.selection.proof}` | 两个共享 Script 锚点移动相同数量的语义停靠点；时长可能变化 | 对应的 Selection 边界 |
-| 事件的 `at={story.moment.reveal}` | 共享 Moment 锚点 | 该写法没有声明持续时间 |
-| 事件的 `at={story.selection.proof} boundary="start"` | 仅 Selection 的起点锚点 | 该写法没有声明持续时间 |
-| `at={story.moment.reveal} for="8f"` | Moment；持续时间保持八帧 | 从尾端改变持续时间；Moment 保持不变 |
-| `until={story.moment.reveal} for="8f"` | Moment；持续时间保持八帧 | 从首端改变持续时间；Moment 保持不变 |
-| `at="2s" for="8f"` | 作者指定的时钟位置 | 从尾端改变持续时间 |
-| `instant="moment.cue + 2f" moment={story.moment.reveal}` | 局部偏移；Moment 保持不变 | 该写法没有声明持续时间 |
-| `start="…" end="…"` | 两个端点表达式移动相同帧数 | 仅对应端点的表达式 |
-| `during={story.segment.opening}` 或 `during="program"` | 跟随结构范围，不提供时间线拖动 | 不提供时间线裁剪 |
+| `during={story.selection.proof}` | 兩個共享 Script 錨點移動相同數量的語義停靠點；時長可能變化 | 對應的 Selection 邊界 |
+| 事件的 `at={story.moment.reveal}` | 共享 Moment 錨點 | 該寫法沒有宣告持續時間 |
+| 事件的 `at={story.selection.proof} boundary="start"` | 僅 Selection 的起點錨點 | 該寫法沒有宣告持續時間 |
+| `at={story.moment.reveal} for="8f"` | Moment；持續時間保持八幀 | 從尾端改變持續時間；Moment 保持不變 |
+| `until={story.moment.reveal} for="8f"` | Moment；持續時間保持八幀 | 從首端改變持續時間；Moment 保持不變 |
+| `at="2s" for="8f"` | 作者指定的時鐘位置 | 從尾端改變持續時間 |
+| `instant="moment.cue + 2f" moment={story.moment.reveal}` | 區域性偏移；Moment 保持不變 | 該寫法沒有宣告持續時間 |
+| `start="…" end="…"` | 兩個端點表示式移動相同幀數 | 僅對應端點的表示式 |
+| `during={story.segment.opening}` 或 `during="program"` | 跟隨結構範圍，不提供時間線拖動 | 不提供時間線裁剪 |
 
-消费组件决定需要 Instant 还是 Window，以及支持哪些写法。事件跟随 Selection 终点时使用
-`boundary="end"`，同样只修改选定边界。
+消費元件決定需要 Instant 還是 Window，以及支援哪些寫法。事件跟隨 Selection 終點時使用
+`boundary="end"`，同樣只修改選定邊界。
 
-## 分清共享语义与局部偏移
+## 分清共享語義與區域性偏移
 
-移动 `at={story.moment.reveal}` 会在 Script 中移动 Moment，所有使用它的组件随后一起跟随。
-使用相同 Moment 的 `instant="moment.cue"` 则暴露一个初始为零的局部偏移；移动它不会改写共享事件。
+移動 `at={story.moment.reveal}` 會在 Script 中移動 Moment，所有使用它的元件隨後一起跟隨。
+使用相同 Moment 的 `instant="moment.cue"` 則暴露一個初始為零的區域性偏移；移動它不會改寫共享事件。
 
-需要有意提前或延后时，写 `instant="moment.cue + 2f"` 并绑定 `moment={story.moment.reveal}`。
-计算表达式不写进 `{story.moment.reveal}` 这样的图值引用中。
+需要有意提前或延後時，寫 `instant="moment.cue + 2f"` 並繫結 `moment={story.moment.reveal}`。
+計算表示式不寫進 `{story.moment.reveal}` 這樣的圖值引用中。
 
-事件与持续时间是两个独立决定。`at/for` 只在尾端提供时长裁剪，`until/for` 只在首端提供时长裁剪。
-另一端不会提供一个同时移动共享事件、再补偿时长的隐藏操作。
+事件與持續時間是兩個獨立決定。`at/for` 只在尾端提供時長裁剪，`until/for` 只在首端提供時長裁剪。
+另一端不會提供一個同時移動共享事件、再補償時長的隱藏操作。
 
-## 保留原文与所选边界
+## 保留原文與所選邊界
 
-词首、词尾和结构边界是不同的语义锚点。停顿可以属于前一句，也可以属于后一句。
-拖动沿不同帧位置上的语义停靠点进行；多个锚点重合时，支持该编辑的 Inspector 可以选择精确身份。
-Take 交叠或重排时，Script 顺序可以与实际时间顺序不同。
+詞首、詞尾和結構邊界是不同的語義錨點。停頓可以屬於前一句，也可以屬於後一句。
+拖動沿不同幀位置上的語義停靠點進行；多個錨點重合時，支援該編輯的 Inspector 可以選擇精確身份。
+Take 交疊或重排時，Script 順序可以與實際時間順序不同。
 
-移动标记保留无关原文、空格、标点、发音和词属性。字幕 Cue 保留来自 Script 的内容及实测词时间。
-在 Script 中修改文案或 Cue 边界，通过 Caption Style 与带时间范围的 Use 修改呈现。
+移動標記保留無關原文、空格、標點、發音和詞屬性。字幕 Cue 保留來自 Script 的內容及實測詞時間。
+在 Script 中修改文案或 Cue 邊界，透過 Caption Style 與帶時間範圍的 Use 修改呈現。
 
-未编辑的表达式保留原单位：`2s` 在帧率变化后仍是两秒，`60f` 则保持六十帧。
-拖动改变的时钟位置或偏移以当前帧率下的整数帧写回。
+未編輯的表示式保留原單位：`2s` 在幀率變化後仍是兩秒，`60f` 則保持六十幀。
+拖動改變的時鐘位置或偏移以當前幀率下的整數幀寫回。
 
-## 编辑项目组件
+## 編輯專案元件
 
-组件的 Companion 把画面实体连接到实际作者输入和已投影的时间。时间形式决定编辑对象，
-组件名称或偶然相同的帧位置不能代替该关系。Script Companion 拥有源码观察和标记移动；
-增加新组件不需要让 Studio 再学习一种 Script 解释方式。
+元件的 Companion 把畫面實體連線到實際作者輸入和已投影的時間。時間形式決定編輯物件，
+元件名稱或偶然相同的幀位置不能代替該關係。Script Companion 擁有原始碼觀察和標記移動；
+增加新元件不需要讓 Studio 再學習一種 Script 解釋方式。
 
-[Studio](../quickstart/preview.md) 介绍编辑界面，[Companion 指南](./studio-companion-architecture.md)
-介绍如何公开实体和控件；包内的[时间编辑参考](https://github.com/hypit-ai/hypit/blob/main/packages/temporal-markup/EDITING.md)
-维护精确实现接口和支持的操作。
+[Studio](../quickstart/preview.md) 介紹編輯介面，[Companion 指南](./studio-companion-architecture.md)
+介紹如何公開實體和控制元件；包內的[時間編輯參考](https://github.com/hypit-ai/hypit/blob/main/packages/temporal-markup/EDITING.md)
+維護精確實現介面和支援的操作。

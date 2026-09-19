@@ -1,44 +1,44 @@
 ---
-title: 包与扩展
-description: 视频项目如何通过普通包选择组件、模型和服务。
+title: 包與擴充套件
+description: 影片專案如何透過普通包選擇元件、模型和服務。
 ---
 
-Hypit 把视频需要什么，与哪些代码和服务完成它，分别表达。新的图形、模型或 API 来源可以由包提供，再由项目选择。每个包拥有自己的接口和实现，执行系统负责运行它们组成的依赖图。
+Hypit 把影片需要什麼，與哪些程式碼和服務完成它，分別表達。新的圖形、模型或 API 來源可以由包提供，再由專案選擇。每個包擁有自己的介面和實現，執行系統負責執行它們組成的依賴圖。
 
-## 各部分的职责
+## 各部分的職責
 
-| 部分 | 职责 | 在哪里选择 |
+| 部分 | 職責 | 在哪裡選擇 |
 | --- | --- | --- |
-| 作者组件 | 将作者输入转成素材请求、视觉行为或其他图输出 | Source 导入 |
-| Model | 定义明确的生成请求与输出 | Source 导入 |
-| Provider Endpoint | 通过 API 或本地工具执行支持的请求 | Runtime Profile |
-| 凭据存储 | 为 Endpoint 解析具名凭据 | Runtime Profile |
-| Result 仓库 | 保留项目的 Build 记录与产物文件 | 项目 Result 配置 |
-| Distribution | 提供可执行应用与官方包 | 安装的 `hypit` 版本 |
+| 作者元件 | 將作者輸入轉成素材請求、視覺行為或其他圖輸出 | Source 匯入 |
+| Model | 定義明確的生成請求與輸出 | Source 匯入 |
+| Provider Endpoint | 透過 API 或本地工具執行支援的請求 | Runtime Profile |
+| 憑據儲存 | 為 Endpoint 解析具名憑據 | Runtime Profile |
+| Result 倉庫 | 保留專案的 Build 記錄與產物檔案 | 專案 Result 配置 |
+| Distribution | 提供可執行應用與官方包 | 安裝的 `hypit` 版本 |
 
-例如，Model 描述要生成的视频，Provider 将请求映射到服务；Ranking 组件描述榜单的行为，渲染器将其贡献绘制到最终编排。两者都通过明确输入与输出参与同一个图。
+例如，Model 描述要生成的影片，Provider 將請求對映到服務；Ranking 元件描述榜單的行為，渲染器將其貢獻繪製到最終編排。兩者都透過明確輸入與輸出參與同一個圖。
 
-## 组件随作品需要组织
+## 元件隨作品需要組織
 
-在适合提取秩序的地方组织空间。Media Track 可以呈现普通视频或图片；项目组件可以把移动的视频视口、标签和流程图作为一个场景协调起来。独立字幕或叠加层仍可分开。共享行为决定哪些内容属于同一个组件。
+在適合提取秩序的地方組織空間。Media Track 可以呈現普通影片或圖片；專案元件可以把移動的影片視口、標籤和流程圖作為一個場景協調起來。獨立字幕或疊加層仍可分開。共享行為決定哪些內容屬於同一個元件。
 
-对于说话视频，Script Selection 与 Moment 让组件跟随表演的含义；作者主导节奏的动画，则可以在声明的时钟上使用秒或帧。[Film 与渲染](../quickstart/composition.md) 介绍这些贡献如何组成作品。
+對於說話影片，Script Selection 與 Moment 讓元件跟隨表演的含義；作者主導節奏的動畫，則可以在宣告的時鐘上使用秒或幀。[Film 與渲染](../quickstart/composition.md) 介紹這些貢獻如何組成作品。
 
-新组件通常放在视频项目的 `packages/` 中，使用所有者自己的 scope，由项目的普通包管理器声明。需要跨项目复用时，所有者可以把同一个组件发布为有版本的 npm 或私有 Registry 包。使用方安装选定版本，并将 lockfile 与项目一起保存。
+新元件通常放在影片專案的 `packages/` 中，使用所有者自己的 scope，由專案的普通包管理器宣告。需要跨專案複用時，所有者可以把同一個元件釋出為有版本的 npm 或私有 Registry 包。使用方安裝選定版本，並將 lockfile 與專案一起儲存。
 
-## 安装与 Source 导入
+## 安裝與 Source 匯入
 
-Skill、可执行 Distribution 和视频项目分别安装与更新。`@hypit/hypit` Distribution 包含官方作者包和公开扩展 API。所选 Runtime Adapter 可以通过 `hypit runtime up` 准备额外服务依赖；可选作者素材可以按 CLI 给出的准确 `hypit packages install` 命令安装。项目组件自己的依赖由项目管理。
+Skill、可執行 Distribution 和影片專案分別安裝與更新。`@hypit/hypit` Distribution 包含官方作者包和公開擴充套件 API。所選 Runtime Adapter 可以透過 `hypit runtime up` 準備額外服務依賴；可選作者素材可以按 CLI 給出的準確 `hypit packages install` 命令安裝。專案元件自己的依賴由專案管理。
 
-Source 使用 `@your-studio/scoreboard@1` 这样的逻辑 Module 地址。npm 安装的包版本决定实际实现，逻辑 `@1` 标识作者接口。视频 Build 使用这些已安装的版本；缺包时会报告安装所需的信息。
+Source 使用 `@your-studio/scoreboard@1` 這樣的邏輯 Module 地址。npm 安裝的包版本決定實際實現，邏輯 `@1` 標識作者介面。影片 Build 使用這些已安裝的版本；缺包時會報告安裝所需的資訊。
 
-## 编写与分享扩展
+## 編寫與分享擴充套件
 
-外部包使用 `@hypit/hypit/author-kit`、`@hypit/hypit/composition`、`@hypit/hypit/model-kit` 或 `@hypit/hypit/endpoint-kit` 等公开子路径。将选定的 `@hypit/hypit` 版本作为开发依赖，把扩展编译为 JavaScript，分发它自己的代码与素材。`package.json` 中的 activation 入口描述它提供的能力；加载选中的扩展时，当前 Distribution 提供公开 Hypit API。
+外部包使用 `@hypit/hypit/author-kit`、`@hypit/hypit/composition`、`@hypit/hypit/model-kit` 或 `@hypit/hypit/endpoint-kit` 等公開子路徑。將選定的 `@hypit/hypit` 版本作為開發依賴，把擴充套件編譯為 JavaScript，分發它自己的程式碼與素材。`package.json` 中的 activation 入口描述它提供的能力；載入選中的擴充套件時，當前 Distribution 提供公開 Hypit API。
 
-- [添加作者包](./author-packages.md)：从随发行包提供的可构建组件开始。
-- [组件结构](./component-anatomy.md)：组件内部各部分的职责。
-- [模型与 Provider](./providers.md)：新模型、服务与凭据的选择。
-- [Runtime](./runtime.md)：Endpoint 和凭据配置。
+- [新增作者包](./author-packages.md)：從隨發行包提供的可構建元件開始。
+- [元件結構](./component-anatomy.md)：元件內部各部分的職責。
+- [模型與 Provider](./providers.md)：新模型、服務與憑據的選擇。
+- [Runtime](./runtime.md)：Endpoint 和憑據配置。
 
-精确 SDK 类型与实现示例留在对应包的 README 和源码中，它们也随 Distribution 分发。
+精確 SDK 型別與實現示例留在對應包的 README 和原始碼中，它們也隨 Distribution 分發。

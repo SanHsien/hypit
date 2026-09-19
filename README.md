@@ -5,22 +5,17 @@
   </picture>
 </p>
 
-<h3 align="center">Clone any viral video with AI agents</h3>
-<p align="center">1 command, 100 variants, 100M views.</p>
+<h3 align="center">讓 AI Agent 復刻任何爆款影片</h3>
+<p align="center">一條命令，100 個變體，1 億播放量。</p>
 
 <p align="center">
   <a href="https://hypit.ai"><strong>Demo</strong></a>
   &nbsp;&bull;&nbsp;
-  <a href="https://hypit.ai/quickstart/"><strong>Quickstart</strong></a>
+  <a href="https://hypit.ai/zh/quickstart/"><strong>快速開始</strong></a>
   &nbsp;&bull;&nbsp;
-  <a href="https://hypit.ai/guide/develop/"><strong>Develop</strong></a>
+  <a href="https://hypit.ai/zh/guide/develop/"><strong>開發指南</strong></a>
   &nbsp;&bull;&nbsp;
-  <a href="./README.zh-CN.md"><strong>简体中文</strong></a>
-</p>
-
-<p align="center">
-  <a href="https://trendshift.io/repositories/229030"><img alt="Trendshift #1 Repository of the Day" src="https://trendshift.io/api/badge/trendshift/repositories/229030/daily"></a>
-  <a href="https://trendshift.io/repositories/229030"><img alt="Trendshift #1 TypeScript Repository of the Day" src="https://trendshift.io/api/badge/trendshift/repositories/229030/daily?language=TypeScript"></a>
+  <a href="./README.en.md"><strong>English</strong></a>
 </p>
 
 <p align="center">
@@ -31,44 +26,33 @@
   <a href="./LICENSE"><img alt="License" src="https://img.shields.io/badge/License-Apache--2.0%20with%20conditions-E3B341?style=flat-square"></a>
 </p>
 
-<p align="center">
-  <a href="https://hypit.ai"><img alt="Visit our website" src="https://img.shields.io/badge/Visit%20our%20website-DF3C68?style=for-the-badge&logo=data:image/svg%2Bxml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI1Ny4wMyAyODcuNDggNDg2Ljk0IDQyNi4wNCI%2BPHBhdGggZmlsbD0iI2ZmZiIgZD0iTTczMy4wMDEsNDYyLjU5MmMtMTEuNDQtMTYuNTEtMzAuMjg1LTI2LjM0NC01MC4zNTMtMjYuMzQ0aC0xNzguNzA1Yy0yMy40OTMsMC00Ny42NzUsMTQuMjM0LTU2LjYyOCwzNS45NjdsLTU0LjA2NSwxNDUuMDUzYy04LjgsMjEuNTIzLTguNjg2LDQ2LjAxMSw0LjI0Nyw2NS4zNTIsMTIuOTksMTkuNDE4LDM3LjAzOCwzMC44OTcsNjAuMzk3LDMwLjg5N2gxNjQuNDljMjcuMDEzLDAsNTEuNDYzLTE2Ljk4OSw2MC45MTQtNDIuMjhsNTYuODAxLTE1Mi4yMjdjNy4wMjEtMTguODI1LDQuMzgxLTM5LjkwOC03LjA1OS01Ni4zOTl2LS4wMzhoLS4wMzh2LjAxOVpNNjMzLjk3OCw2NTIuODEzYy0xLjc5OCw0LjgyMS02LjQ4NSw4LjA3My0xMS42MzIsOC4wNzNoLTE1OS42NWMtOC4zMDMsMC0xMi43OC01LjM1Ny0xNC4zMjktNy42MzNzLTQuNzgzLTguNDc1LTEuNjA3LTE2LjE0N2w0NS42MjgtMTI2LjcyNWM0LjM4MS0xMi4xNDgsMTUuNDU4LTIwLjc5NiwyOC4zNTItMjEuNDY1LjYzMS0uMDM4LDEuMjgyLS4wMzgsMS45NTEtLjAzOGgxNDQuMjY5czIzLjkzMywyLjcxNywxNy43NzMsMjcuOTUxbC01MC43NTUsMTM2LjAwNGgwdi0uMDE5Wk0zNTYuMjUsNjIzLjEyMnMtNDIuNzc3LTIyLjE3My0zMy43ODYtNjIuNDgzbDU2Ljc2Mi0xNTcuMzE2YzkuMTQ1LTI1LjM0OSwzMy4yMTItNDIuMjYxLDYwLjE2OC00Mi4yNjFoMTgxLjc4NWMxMS45NTcsMCwyMy4xNDksNS43OTcsMzAuMDU1LDE1LjU3M2wyNi41NzMsMzcuNjVoLTIxNi4xMjVjLTE2LjY0NCwwLTMxLjU0NywxMC4zNS0zNy4zNDQsMjUuOTYxbC02OC4wODgsMTgyLjg5NWgwdi0uMDE5Wk0yOTIuMDY0LDU0OS41NDNzLTQyLjc5Ny0yMi4xNzMtMzMuNzg2LTYyLjQ4M2w1Ni43NjItMTU3LjMxNmM5LjE2NC0yNS4zNDksMzMuMjMxLTQyLjI2MSw2MC4xNjgtNDIuMjYxaDE3Mi4wMDljMTEuOTU3LDAsMjMuMTQ5LDUuNzk3LDMwLjA1NSwxNS41NzNsMjYuNTczLDM3LjY1aC0yMDYuMzExYy0xNi42NDQsMC0zMS41NDcsMTAuMzUtMzcuMzQ0LDI1Ljk2MWwtNjguMDg4LDE4Mi44OTVoLS4wMzh2LS4wMTlaIi8%2BPC9zdmc%2B"></a>
-  <a href="https://discord.gg/85hnyQnxpn"><img alt="Join our Discord" src="https://img.shields.io/badge/Join%20our%20Discord-5865F2?style=for-the-badge&logo=discord&logoColor=white"></a>
-  <a href="https://t.me/hypitai"><img alt="Join our Telegram" src="https://img.shields.io/badge/Join%20our%20Telegram-26A5E4?style=for-the-badge&logo=telegram&logoColor=white"></a>
-  <a href="https://x.com/hypitai"><img alt="Follow @hypitai on X" src="https://img.shields.io/badge/Follow%20%40hypitai-000000?style=for-the-badge&logo=x&logoColor=white"></a>
-</p>
-
-<p align="center">
-  ⭐ <em>Help more people find Hypit and grow the community. Star this repo!</em>
-</p>
-
 ## Hypit
 
-Hypit gives AI agents (Claude Code, Codex...) a language and system to create video. Drop in a video, and your agent clones it as a complete workflow: footage, captions, B-roll and effects, all anchored to words instead of seconds.
+Hypit 為 AI Agent（Claude Code、Codex 等）提供了一套製作影片的語言和系統。給它一條影片，Agent 就能把它復刻成一份完整的 workflow：畫面、字幕、B-roll、特效，全部錨定在詞上，而不是秒上。
 
-**To be clear:** cloning a video is the fastest way in, not the only one. You can start from our templates, or just describe the video you want and your agent writes the workflow from scratch. Generation models are optional too: a workflow can compile captions, motion graphics and code-rendered visuals into a finished video without calling a generation model or incurring its service charges.
+**需要說明的是：** 復刻影片是最快的入口，但不是唯一的入口。你可以從我們的模板開始，也可以描述你想要的影片，讓 Agent 從零寫出一份 workflow。生成模型同樣不是必需的：字幕、動效和程式碼渲染的畫面，不呼叫生成模型也能編譯成一條成片，因此可以不產生模型服務費用。
 
-![SVML source and live video preview](https://github.com/user-attachments/assets/981c28e8-ddab-4164-85bc-03b5d71275dc)
+![SVML 原始檔與實時影片預覽](https://github.com/user-attachments/assets/981c28e8-ddab-4164-85bc-03b5d71275dc)
 
-<p align="center"><em>SVML source on the left, with the corresponding video rendered live on the right.</em></p>
+<p align="center"><em>左側是 SVML 原始檔，右側實時呈現對應影片。</em></p>
 
-## Install once
+## 只安裝一次
 
 ```bash
 npx skills add hypit-ai/hypit -g
 ```
 
-This installs the Skill. On first use, your agent checks for the Hypit executable and helps prepare
-it if needed. Your video project can live anywhere.
+這條命令安裝 Skill。首次使用時，Agent 會檢查 Hypit 可執行程式，並按需協助安裝。
+影片專案可以放在任意位置。
 
-Hypit is free to use; your Coding Agent and model services have their own accounts and charges.
-HypiHub is our recommended hosted model service. You can also use your own API or local models;
-tell your agent the service name and API documentation so it can set up the appropriate connection.
+Hypit 本身免費使用；Coding Agent 和模型服務各有自己的賬號與費用。
+HypiHub 是我們推薦的託管模型服務，也可以使用你自己的 API 或本地模型。
+把服務名稱和 API 文件告訴 Agent，它會據此配置合適的連線。
 
-[Agent environments and entry partners](./docs/guide/agents.md) ·
-[Model and deployment services](./docs/guide/service-partners.md)
+[Agent 工作環境與入口合作方](./docs/zh/guide/agents.md) ·
+[模型與部署服務](./docs/zh/guide/service-partners.md)
 
-## Examples
+## 示例
 
 ### UGC
 
@@ -76,220 +60,127 @@ tell your agent the service name and API documentation so it can set up the appr
 
 <table>
   <tr>
-    <th width="16%">Reference</th>
+    <th width="16%">參考影片</th>
     <td width="28%"></td>
     <td width="28%"><video src="https://github.com/user-attachments/assets/f573bdac-62da-4b5d-825d-54d5880a7026" controls muted></video></td>
     <td width="28%"></td>
   </tr>
   <tr>
-    <th width="16%">Clones</th>
+    <th width="16%">復刻影片</th>
     <td width="28%"><video src="https://github.com/user-attachments/assets/3ffd9951-e423-4a48-ad8f-5c596627be69" controls muted></video></td>
     <td width="28%"><video src="https://github.com/user-attachments/assets/eb62372d-2464-4a4b-83ee-41e227f99a8e" controls muted></video></td>
     <td width="28%"><video src="https://github.com/user-attachments/assets/9ba050f6-355d-460c-b684-7344cf49c051" controls muted></video></td>
   </tr>
   <tr>
-    <td colspan="4"><p><b>"GOAT DEBATE"</b> — a 20-second football tier list that puts Ronaldo in D and Messi in S. Two Seedance 2 Mini 720p trolling A-rolls, a 2K goth girl portrait and ten 1K brain-rot B-rolls by GPT Image 2, WhisperX word alignment, a sound-synced ranking board, color-box karaoke captions, buttery-smooth animation and catchy background music, concurrently rendered in 64 headless Chromium processes.</p><p>Three clones included: swap the narrator to banana cat, flip the rankings and Ronaldo becomes GOAT, or replace all players with tech founders — same viral structure, different viral video.</p><p>Total cost: <b>$1.15</b>.</p></td>
+    <td colspan="4"><p><b>“GOAT DEBATE”</b>——一條 20 秒的足球 Tier List，把 Ronaldo 排進 D 級，把 Messi 排進 S 級。A-roll 是兩段 Seedance 2 Mini 生成的 720p 吐槽片段，B-roll 是 GPT Image 2 生成的一張 2K 哥特女孩肖像和十張 1K 腦腐圖；WhisperX 負責逐詞對齊，排行榜跟著音效逐條落位，再配上彩色詞盒卡拉 OK 字幕、絲滑的動畫和抓耳的背景音樂，最後由 64 個無頭 Chromium 程序併發渲染。</p><p>上面給出了三個復刻版本：把解說員換成香蕉貓；翻轉排名，讓 Ronaldo 成為 GOAT；把所有球員換成科技公司創始人。同一套爆款結構，可以產出完全不同的爆款影片。</p><p>總成本：<b>$1.15</b>。</p></td>
   </tr>
 </table>
 
-### Podcast
+### 播客
 
 [Generation source](examples/podcast/reference.svml) · [Run and production notes](examples/podcast/README.md)
 
 <table>
   <tr>
-    <th width="16%">Reference</th>
+    <th width="16%">參考影片</th>
     <td width="28%"></td>
     <td width="28%"><video src="https://github.com/user-attachments/assets/22df72b8-4831-4eb6-957d-676ae9b04f2d" controls muted></video></td>
     <td width="28%"></td>
   </tr>
   <tr>
-    <th width="16%">Clones</th>
+    <th width="16%">復刻影片</th>
     <td width="28%"><video src="https://github.com/user-attachments/assets/9c14c5ae-bd12-4961-9d57-a46d3a2154c6" controls muted></video></td>
     <td width="28%"><video src="https://github.com/user-attachments/assets/f44c653b-f520-4715-9530-4c2f42114387" controls muted></video></td>
     <td width="28%"><video src="https://github.com/user-attachments/assets/92f9bf8b-4f83-4d9b-a0e8-ca27fab2cc94" controls muted></video></td>
   </tr>
   <tr>
-    <td colspan="4"><p><b>"DAILY CREATINE"</b> — an 18-second podcast clip where a muscle barbie forces creatine on a skinny college kid. Three confrontational A-rolls and an aspirational lifestyle B-roll by Seedance 2 Mini 720p, two 2K AI character portraits and three 1K montage panels by GPT Image 2, WhisperX word alignment, split-screen interview layout, speaker-aware karaoke captions, a product-handoff moment and background music, concurrently rendered in 64 headless Chromium processes.</p><p>Three clones included: swap both hosts to Pepe and Doge arguing about doggy arms, replace the creatine with retinol where a pretty boy roasts a tomboy's pores, or ditch the physical product for a CheatGPT app where a himbo jock out-GPAs a PhD student — same podcast format, three ad verticals.</p><p>Total cost: <b>$1.07</b>.</p></td>
+    <td colspan="4"><p><b>“DAILY CREATINE”</b>——一條 18 秒的播客片段，肌肉芭比向一個瘦弱的大學生強推肌酸。A-roll 是 Seedance 2 Mini 生成的三段 720p 對峙鏡頭，外加一段展示理想生活方式的 B-roll；影象是 GPT Image 2 生成的兩張 2K AI 角色肖像和三張 1K 蒙太奇畫面。WhisperX 負責逐詞對齊，再配上分屏訪談版式、區分說話人的卡拉 OK 字幕、產品遞出的瞬間和背景音樂，最後由 64 個無頭 Chromium 程序併發渲染。</p><p>上面給出了三個復刻版本：把兩位主播換成 Pepe 和 Doge，爭論狗狗手臂；把肌酸換成視黃醇，讓漂亮男孩吐槽假小子的毛孔；把實體產品換成 CheatGPT 應用，讓頭腦簡單的體育生績點碾壓博士生。同一套播客形式，三個廣告垂類。</p><p>總成本：<b>$1.07</b>。</p></td>
   </tr>
 </table>
 
-### Street Interview
+### 街頭採訪
 
 [Generation source](examples/interview/reference.svml) · [Run and production notes](examples/interview/README.md)
 
 <table>
   <tr>
-    <th width="16%">Reference</th>
+    <th width="16%">參考影片</th>
     <td width="28%"></td>
     <td width="28%"><video src="https://github.com/user-attachments/assets/666ad535-3231-44fb-b9bc-271817ae79de" controls muted></video></td>
     <td width="28%"></td>
   </tr>
   <tr>
-    <th width="16%">Clones</th>
+    <th width="16%">復刻影片</th>
     <td width="28%"><video src="https://github.com/user-attachments/assets/c39a0425-2dcb-4709-b894-6a9423d351e3" controls muted></video></td>
     <td width="28%"><video src="https://github.com/user-attachments/assets/8f71552c-0ad1-4d29-8c4e-3b937ab7c887" controls muted></video></td>
     <td width="28%"><video src="https://github.com/user-attachments/assets/d9cab2e7-e08b-48ef-8d25-bc28ca9efc17" controls muted></video></td>
   </tr>
   <tr>
-    <td colspan="4"><p><b>"NICE RIDE"</b> — a 26-second street interview where a mob wife drops three rules for making her first million. Three A-rolls by Seedance 2 Mini 720p, one 2K AI character portrait by GPT Image 2, WhisperX word alignment, head-tracked speaker-colored captions driven by face bounding boxes from Google Video Intelligence and YOLOv8 AnimeFace, a sound-synced emoji reveal board with color flashes and reveal sound effects, plus background music, concurrently rendered in 64 headless Chromium processes.</p><p>Three clones included: swap hosts to Wojak and Chad, translate everything to Spanish with exactly the same punchlines, or swap the Lambo for an F1 car where Ada explains to Leon how driving Uber led to an accidental Grand Prix win — same three-stage reveal, distinct street-interview remixes.</p><p>Total cost: <b>$1.09</b>.</p></td>
+    <td colspan="4"><p><b>“NICE RIDE”</b>——一條 26 秒的街頭採訪，黑幫太太分享賺到第一個一百萬的三條規則。三段由 Seedance 2 Mini 生成的 720p A-roll，一張由 GPT Image 2 生成的 2K AI 角色肖像；WhisperX 負責逐詞對齊，再利用 Google Video Intelligence 和 YOLOv8 AnimeFace 提供的人臉邊界框，驅動跟隨人臉的說話人專屬彩色字幕；配合跟音效同步的表情符號揭示板、彩色閃爍、揭示音效和背景音樂，最後由 64 個無頭 Chromium 程序併發渲染。</p><p>上面給出了三個復刻版本：把主播換成 Wojak 和 Chad；把所有內容翻譯成西班牙語，同時保持完全相同的 punchline；或者把蘭博基尼換成 F1 賽車，讓 Ada 向 Leon 解釋自己如何因為開 Uber 意外贏得大獎賽。同樣的三階段揭示結構，三種不同的街頭採訪混剪。</p><p>總成本：<b>$1.09</b>。</p></td>
   </tr>
 </table>
 
-## Use the Hypit skill
+## 使用 Hypit skill
 
-The `/hypit` skill is available to coding agents. Start a session in any empty or existing project
-directory and ask it to create videos for you:
-
-```text
-/hypit Clone this video: /path/to/video.mp4, and replace the ranking content with a comparison of Hypit (official website: hypit.ai) with other AI video products.
-```
-
-Or start without a reference video:
+程式設計 Agent 可以直接使用 `/hypit` skill。在任意空目錄或現有專案目錄中開啟會話，讓 Agent 為你建立影片：
 
 ```text
-/hypit Make a ranking video that puts Hypit in S tier.
+/hypit 復刻這個影片：/path/to/video.mp4，把排行榜內容換成 Hypit（官網：hypit.ai）與其他 AI 影片產品的對比。
 ```
 
-Your agent can check the environment, request the credentials the video needs, generate the material, and build the finished composition.
+也可以不提供參考影片，直接從描述開始：
 
-### **👉 [Get 100 FREE AI Avatars with unique voices](https://drive.google.com/drive/u/2/folders/18J9Fz7mkU3OQNJ-2Res3eIyFQ2cemIK5)**
+```text
+/hypit 做一個 ranking 影片，把 Hypit 排到 S 級。
+```
 
-## Why Hypit
+Agent 會檢查環境，索要這條影片需要的憑據，生成素材並構建成片。
 
-- **Clone any video:** drop in a video, get the whole workflow — footage, captions, B-roll, effects. Not a script breakdown.
-- **One workflow, 100 variants:** reuse the composition and existing material; generate the parts that change.
-- **Pluggable components:** swap the host without touching the captions. Use the library, fork it, or write your own.
-- **Open source:** no Hypit seat pricing, per-render fees or added watermark. Model-service usage is billed by the service you choose.
+### **👉 [免費獲得 100 個擁有獨特音色的 AI 人物形象](https://drive.google.com/drive/u/2/folders/18J9Fz7mkU3OQNJ-2Res3eIyFQ2cemIK5)**
 
-## What Hypit Can Build
+## 為什麼選擇 Hypit
 
-Drop in a video and your agent clones the whole workflow — or describe what you want and it writes one from scratch. Either way you get an editable, re-runnable composition, not a one-off render.
+- **真的能 Clone：** 丟一條影片進來，拿到整份 workflow —— 畫面、字幕、B-roll、特效。不是拆解指令碼。
+- **一份 workflow，100 個變體：** 複用編排和已有素材，需要變化的部分再生成。
+- **可插拔元件：** 換主播不動字幕。用元件庫、fork 一個，或自己寫。
+- **開源：** Hypit 不按人頭或渲染次數收費，也不新增水印。模型服務費用由你選擇的服務方收取。
 
-- **Paid social ads** — clone a winning ad from the Meta Ad Library, swap in your product, ship 50 hook variants the same day. When it fatigues in two weeks, re-run with fresh openings; the body never changes.
-- **Viral clones** — any TikTok, Reel, or Short becomes a template. Swap the host, the hook, the product, the language, the aspect ratio.
-- **TikTok Shop and affiliate videos** — one format that converts, a new SKU every day. Swap the product, the price, the CTA; the structure that worked stays untouched.
-- **AI UGC and talking heads** — narration, word-level captions, B-roll, comment stickers, beat-synced cuts, all wired automatically.
-- **Podcast and interview clips** — split-screen layouts, speaker-aware captions, reaction overlays.
-- **Code-rendered videos** — visuals driven entirely by front-end code, rendered locally without generation API calls.
-- **Localized versions** — the same video in ten languages. Rewrite a line and the timing re-flows itself.
+## Hypit 能構建什麼
 
-## Stay Tuned with Us
+丟一條影片進來，Agent 把整套 workflow 克隆下來；或者直接描述你想要的影片，讓它從零寫一份。拿到的都是可編輯、可重跑的工作流，而不是一次性的成片。
 
-Star us, and you will receive all release notifications from GitHub without any delay!
+- **資訊流廣告** —— 從 Meta 廣告庫拉一條正在跑的廣告，克隆成 workflow，換上你的產品，當天發出 50 個 Hook 變體。兩週後創意衰退，換一批開頭重跑，主體一個字不動。
+- **復刻爆款** —— 任何 TikTok、Reels、Shorts 都能變成模板：換主播、換 Hook、換產品、換語言、換畫幅。
+- **帶貨影片** —— 一個跑通的格式，每天換一個 SKU。換產品、換價格、換 CTA，轉化率跑出來的結構原封不動。
+- **AI UGC 與口播** —— 配音、詞級字幕、B-roll、評論區貼紙、卡點剪輯，全部自動掛好。
+- **播客與採訪切片** —— 分屏佈局、區分說話人的字幕、反應特效。
+- **程式碼渲染的影片** —— 畫面完全由前端程式碼驅動，本地渲染，無需呼叫生成模型 API。
+- **多語言版本** —— 同一條影片十種語言。改一句臺詞，時間軸自己重排。
 
-![Stay tuned with us](https://github.com/user-attachments/assets/cc929974-96b8-4166-b81d-008e130b0f24)
+## 貢獻指南
 
-## How to Contribute
+歡迎提交 Pull Request，文件、示例和翻譯與程式碼同樣重要。可以認領一個已有的 issue，也可以為你想做的事新開一個，我們會協助你把它合並進來。環境準備、CI 會跑的檢查和 Pull Request 流程見 [CONTRIBUTING.zh-CN.md](./CONTRIBUTING.zh-CN.md)。
 
-Pull requests are welcome, and documentation, examples and translations count as much as code. Pick
-up an open issue or open one for what you want to work on, and we will help you land it.
-[CONTRIBUTING.md](./CONTRIBUTING.md) has the setup, the checks CI runs and the pull request flow.
+建立元件是正常的影片製作工作，元件通常留在擁有它的影片專案中。所有者希望分享時，可以把同一份包作為版本化 tarball 直接交付，也可以釋出到自己的 npm scope 或私有 registry。希望某個元件由 Hypit 官方 Distribution 維護時，先透過 issue 說明它解決的共同產品需求；官方收錄與普通的社群分享是兩件事。
 
-Creating a component is ordinary video-production work, and the component normally stays with the
-video project that owns it. When its owner wants to share it, the same package can be handed off as
-a versioned tarball or published under the owner's npm scope or private registry. Proposals for a
-component maintained in Hypit's official Distribution begin with an issue describing the shared
-product need; official inclusion is separate from normal community sharing.
-
-The [Development Guide](https://hypit.ai/guide/develop/) covers the prerequisites, the daily
-commands and the repository layout.
+[開發指南](https://hypit.ai/zh/guide/develop/)說明了前置條件、日常命令和倉庫結構。
 
 <table>
   <tr>
-    <td>Bug reports</td>
-    <td><a href="https://github.com/hypit-ai/hypit/issues/new?template=bug_report.yml">Open an issue</a></td>
+    <td>缺陷回報</td>
+    <td><a href="https://github.com/SanHsien/hypit/issues">提交 issue</a></td>
   </tr>
   <tr>
-    <td>Feature requests</td>
-    <td><a href="https://github.com/hypit-ai/hypit/issues/new?template=feature_request.yml">Open an issue</a></td>
-  </tr>
-  <tr>
-    <td>Questions</td>
-    <td><a href="https://discord.gg/85hnyQnxpn">Discord</a> or <a href="https://t.me/hypitai">Telegram</a></td>
+    <td>功能建議</td>
+    <td><a href="https://github.com/SanHsien/hypit/issues">提交 issue</a></td>
   </tr>
 </table>
 
-## Launch Partners
+## 來源宣告與致敬 (Credits)
 
-<table>
-  <tr>
-    <td width="220" align="center">
-      <a href="https://watcha.cn">
-        <picture>
-          <source media="(prefers-color-scheme: dark)" srcset="./docs/public/watcha-dark.png">
-          <img alt="Watcha" src="./docs/public/watcha-light.png" width="170">
-        </picture>
-      </a>
-    </td>
-    <td><a href="https://watcha.cn">Watcha</a> is an innovative ecosystem and community built for AI builders, connecting great products with high-quality users to turn every Demo into reality. Starting from AI product discovery and genuine feedback, Watcha provides product publishing, distribution, and reputation tracking to support builders from launch to early adoption.</td>
-  </tr>
-  <tr>
-    <td width="220" align="center">
-      <a href="https://tokendance.space/?utm_source=hypit">
-        <picture>
-          <source media="(prefers-color-scheme: dark)" srcset="./docs/public/tokendance-dark.png">
-          <img alt="TokenDance" src="./docs/public/tokendance-light.png" width="165">
-        </picture>
-      </a>
-    </td>
-    <td><a href="https://tokendance.space/?utm_source=hypit">TokenDance</a> offers builders a unified multi-model gateway with optimized inference costs. Through programs like the Billion-Token Subsidy and the Developer Program, TokenDance helps early-stage builders cut costs so they can focus on product validation and growth.</td>
-  </tr>
-  <tr>
-    <td width="220" align="center">
-      <a href="https://autoclaw.z.ai"><img alt="AutoClaw" src="./docs/public/autoclaw.png" width="180"></a>
-    </td>
-    <td><a href="https://autoclaw.z.ai">AutoClaw</a> is Z.ai’s desktop AI assistant for work, deeply optimized for GLM models and integrated with specialized knowledge bases and workflows for legal, finance, design, and more.</td>
-  </tr>
-  <tr>
-    <td width="220" align="center">
-      <a href="https://openagents.org/blog/posts/2026-09-08-pilot-user-program-zh-hypit"><img alt="OpenAgents" src="./docs/public/openagents.png" width="180"></a>
-    </td>
-    <td><a href="https://openagents.org">OpenAgents Workspace</a> is a product that helps you manage AI agents, allowing you to invoke agents running on any device (whether on a mobile phone or computer) anytime, anywhere. Agents can collaborate within the platform to help you complete tasks and boost efficiency. It currently supports integration with over 20 types of agents, including Claude, Codex, OpenClaw, and Hermes.</td>
-  </tr>
-  <tr>
-    <td width="220" align="center">
-      <a href="https://monid.ai?fpr=alvin-45480b">
-        <picture>
-          <source media="(prefers-color-scheme: dark)" srcset="./docs/public/monid-logo-white.svg">
-          <img alt="Monid" src="./docs/public/monid-logo-blue.svg" width="150">
-        </picture>
-      </a>
-    </td>
-    <td><a href="https://monid.ai?fpr=alvin-45480b">Monid</a> is the OpenRouter for agent tools: one key, one wallet, hundreds of tools, billed per call. Hypit can route Seedance video, images, speech and word-level transcription to Monid.</td>
-  </tr>
-  <tr>
-    <td width="220" align="center">
-      <a href="https://www.hiapi.ai/invite/hypit"><img alt="HiAPI" src="./docs/public/hiapi.png" width="165"></a>
-    </td>
-    <td><a href="https://www.hiapi.ai/invite/hypit">HiAPI</a> is a unified API platform for AI image, video, audio, and language models. Connect GPT Image 2.5, Seedance 2.0, Veo 3.1, Kling, Wan, and other popular models through one platform. Pay as you go with no monthly fee, with free trial credits available for new users.</td>
-  </tr>
-  <tr>
-    <td width="220" align="center">
-      <a href="https://api.pollo.ai/?utm_source=hypit"><img alt="Pollo API" src="./docs/public/pollo.jpg" width="120"></a>
-    </td>
-    <td><a href="https://api.pollo.ai/?utm_source=hypit">Pollo API</a> gives developers access to 300+ AI image and video models through a single API, with competitive rates. One API key connects you to multiple model providers and scales from 10 to 10,000+ requests.</td>
-  </tr>
-</table>
+本專案 Fork 自 [`hypit-ai/hypit`](https://github.com/hypit-ai/hypit)，原始專案採用 [MIT License](./LICENSE)。
+感謝原作者團隊開發並開源 Hypit 程式化剪輯與 AI 短影音生成框架。
 
-## ⭐ Star History
+## 許可證
 
-<a href="https://www.star-history.com/?repos=hypit-ai%2Fhypit&type=date&legend=top-left">
- <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=hypit-ai/hypit&type=date&theme=dark&logscale&legend=top-left" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=hypit-ai/hypit&type=date&logscale&legend=top-left" />
-   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=hypit-ai/hypit&type=date&logscale&legend=top-left" />
- </picture>
-</a>
-
-## Contributors
-
-<a href="https://github.com/hypit-ai/hypit/graphs/contributors">
-  <img alt="Contributors" src="https://contrib.rocks/image?repo=hypit-ai/hypit">
-</a>
-
-## License
-
-Hypit is released under the [Hypit Open Source License](./LICENSE). The videos and other outputs you create belong to you; third-party models and services may have their own terms.
-
-Partnership Community: [LINUX DO](https://linux.do/)
+Hypit 採用 [Hypit 開源許可證 (MIT)](./LICENSE)。你創作的影片和其他產出歸你所有；第三方模型與服務可能另有條款。

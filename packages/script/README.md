@@ -80,15 +80,15 @@ or the shared left side in `<display text|>`. Write `\@` if an at-sign must be s
 tokens and omits them from Caption. `||` is an authored Caption Cue Break and must occur between
 complete Alignment Units.
 
-`<组件化|>` is shorthand for `<组件化|组件化>`, using the same exported Caption Alignment Unit.
+`<元件化|>` is shorthand for `<元件化|元件化>`, using the same exported Caption Alignment Unit.
 It groups the displayed expression without merging its individual speech Tokens or time anchors.
-For example, `把<动效|><组件化|>。|| 之后<直接复用|>。` authors groups inside two Cues.
+For example, `把<動效|><元件化|>。|| 之後<直接複用|>。` authors groups inside two Cues.
 Use groups where the expression should be treated together; ordinary prose needs no extra markup.
 Caption Styles choose whether to highlight, reveal or keep the text steady.
 
 In a shared side, markers and display attributes do not enter either text projection. Its speech
 Tokens retain offsets into the actually written left-hand text, so Studio can move an anchor inside
-`<组@{beat!}件化|>` without expanding the shorthand. Attributes still annotate the preceding display
+`<組@{beat!}件化|>` without expanding the shorthand. Attributes still annotate the preceding display
 word, not the whole group. Whitespace-only speech is omitted; a group with no spoken text on either
 side is invalid. This adds no new public value type or protocol version.
 
@@ -138,7 +138,7 @@ provide timed correspondence for `API` and is rejected; punctuation and markers 
 Script preserves the normalized display spelling independently of speech tokenization. Ordinary
 whitespace runs become one space; leading/trailing whitespace in a Turn and padding at the edges
 of a Dual Text side are omitted. No language-specific rule removes a Chinese space or inserts a
-space between numeric and Korean/Latin tokens. `是的 就是这样`, `3개월`, `3 개월`, `3D` and `3 D`
+space between numeric and Korean/Latin tokens. `是的 就是這樣`, `3개월`, `3 개월`, `3D` and `3 D`
 therefore remain distinct as authored. Source newlines are prose formatting, not Caption Cue breaks.
 Use `||` for Cues and a family's layout controls for visual rows.
 
@@ -156,7 +156,7 @@ display; surrounding prose whitespace remains prose. All control sigils belong i
 `@{beat!}` is a Moment, whereas `@{part}!` opens a Selection followed by a literal exclamation mark.
 Names match `[a-z][a-z0-9_-]{0,63}`; whitespace and nesting inside a marker are invalid.
 A marker cannot split a speech Token or separate it from attached punctuation: place
-`@{beat!}“测试”`, not `“@{beat!}测试”`. `hello{emphasis}` is a postfix display attribute; `@{part}`
+`@{beat!}“測試”`, not `“@{beat!}測試”`. `hello{emphasis}` is a postfix display attribute; `@{part}`
 is consumed as one marker and cannot be mistaken for that attribute. Write a literal `@{part}` as
 `\@\{part\}`.
 

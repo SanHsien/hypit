@@ -1,45 +1,45 @@
 ---
 title: 在你的 Agent 中使用 Hypit
-description: 选择与 Agent 协作的入口，安装 Hypit，并让视频项目持续可用。
+description: 選擇與 Agent 協作的入口，安裝 Hypit，並讓影片專案持續可用。
 ---
 
-Hypit 为 Agent 提供视频制作知识与执行工具。你与 Agent 沟通，它读写项目、制作素材并运行编排。
-选择哪个 Agent，与选择哪些[模型和部署服务](./service-partners.md)来制作素材，是两件事。
+Hypit 為 Agent 提供影片製作知識與執行工具。你與 Agent 溝通，它讀寫專案、製作素材並執行編排。
+選擇哪個 Agent，與選擇哪些[模型和部署服務](./service-partners.md)來製作素材，是兩件事。
 
-## 从你的工作环境开始
+## 從你的工作環境開始
 
-Claude Code 和 Codex 是常用入口。在 Agent 中打开视频项目，通过它支持的 Skill 安装方式安装 Hypit。
-使用 skills CLI 时，命令为：
+Claude Code 和 Codex 是常用入口。在 Agent 中開啟影片專案，透過它支援的 Skill 安裝方式安裝 Hypit。
+使用 skills CLI 時，命令為：
 
 ```bash
 npx skills add hypit-ai/hypit -g
 ```
 
-随后 Agent 可以找到或安装 `@hypit/hypit` 可执行程序。把参考视频或创作要求交给它，说明想要的结果。
-[快速开始](../quickstart.md) 介绍实际制作过程。这里列出的是使用方式；合作关系在下方单独标明。
+隨後 Agent 可以找到或安裝 `@hypit/hypit` 可執行程式。把參考影片或創作要求交給它，說明想要的結果。
+[快速開始](../quickstart.md) 介紹實際製作過程。這裡列出的是使用方式；合作關係在下方單獨標明。
 
-终端、桌面应用或浏览器都可以是入口。真正影响制作的是背后的工作环境：能否访问项目文件、
-执行 Hypit 与所选工具，以及把作品展示给你。使用远程 Agent 时，将素材交给它实际运行的环境，
-通过该环境的预览转发或文件交付查看作品。远程机器的 localhost 地址，并不是你电脑上的预览地址。
+終端、桌面應用或瀏覽器都可以是入口。真正影響製作的是背後的工作環境：能否訪問專案檔案、
+執行 Hypit 與所選工具，以及把作品展示給你。使用遠端 Agent 時，將素材交給它實際執行的環境，
+透過該環境的預覽轉發或檔案交付檢視作品。遠端機器的 localhost 地址，並不是你電腦上的預覽地址。
 
-项目和生成素材应当在会话或临时环境结束后仍然可用。Agent 可以说明文件保存位置，打开 Studio
-供你查看时间线、调整属性，也可以打开 Comments，按具体时刻留下意见。审阅编排与导出视频是不同的操作。
+專案和生成素材應當在會話或臨時環境結束後仍然可用。Agent 可以說明檔案儲存位置，開啟 Studio
+供你檢視時間線、調整屬性，也可以開啟 Comments，按具體時刻留下意見。審閱編排與匯出影片是不同的操作。
 
 ## Agent 入口合作方：OpenAgents
 
 [OpenAgents](https://openagents.org/) 是 Hypit 的 Agent 入口合作方。它的
-[Launcher 与工作区文档](https://openagents.org/docs/en/launcher/what-is-launcher)
-介绍了如何管理 Coding Agent，并将其连接到共享工作区。
+[Launcher 與工作區文件](https://openagents.org/docs/en/launcher/what-is-launcher)
+介紹瞭如何管理 Coding Agent，並將其連線到共享工作區。
 
-在你通过它运行的 Agent 工作环境中使用 Hypit。Hypit Skill 的维护源是仓库的
-[`skills/hypit/`](https://github.com/hypit-ai/hypit/tree/main/skills/hypit) 目录；安装时包含引用页与支持文件。
-具体入口和安装选项遵循 OpenAgents 当前提供的方法，制作仍使用同一套 Hypit 工具与项目文件。
-Skill 由所选安装渠道更新，可执行程序通过自己的包安装更新；模型服务账户另外选择。
+在你透過它執行的 Agent 工作環境中使用 Hypit。Hypit Skill 的維護源是倉庫的
+[`skills/hypit/`](https://github.com/hypit-ai/hypit/tree/main/skills/hypit) 目錄；安裝時包含引用頁與支援檔案。
+具體入口和安裝選項遵循 OpenAgents 當前提供的方法，製作仍使用同一套 Hypit 工具與專案檔案。
+Skill 由所選安裝渠道更新，可執行程式透過自己的包安裝更新；模型服務賬戶另外選擇。
 
-## 接入其他 Agent 环境
+## 接入其他 Agent 環境
 
-集成方可以提供 Skill 的读取与安装、项目文件和命令执行能力，以及预览和成片的访问方式。
-它沿用 Hypit 已有接口，不需要为每个 Agent 创造另一套视频语法或 Provider。
-从环境实际开放的能力出发，把作品保存在哪里、能保存多久、怎样查看交代清楚。
+整合方可以提供 Skill 的讀取與安裝、專案檔案和命令執行能力，以及預覽和成片的訪問方式。
+它沿用 Hypit 已有介面，不需要為每個 Agent 創造另一套影片語法或 Provider。
+從環境實際開放的能力出發，把作品儲存在哪裡、能儲存多久、怎樣檢視交代清楚。
 
-素材生成的接入见[模型与 Provider](./providers.md)和[模型与部署服务合作方](./service-partners.md)。
+素材生成的接入見[模型與 Provider](./providers.md)和[模型與部署服務合作方](./service-partners.md)。

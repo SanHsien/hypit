@@ -1,10 +1,10 @@
 ---
-title: Film 与渲染
-description: 将 Track 组合为 Film 并渲染为视频。
+title: Film 與渲染
+description: 將 Track 組合為 Film 並渲染為影片。
 ---
 
-Film 是最终的组装阶段。它接收所有对等的 Track，对其进行验证，并生成一个
-Composition。然后渲染器将该 Composition 编译为 MP4 视频。
+Film 是最終的組裝階段。它接收所有對等的 Track，對其進行驗證，並生成一個
+Composition。然後渲染器將該 Composition 編譯為 MP4 影片。
 
 ```svml
 <import as="space" from="@hypit/spatial@1"/>
@@ -14,8 +14,8 @@ Composition。然后渲染器将该 Composition 编译为 MP4 视频。
 
 ## film:Film
 
-将选定的 VisualTrack 和 AudioTrack 组装为单一的 Composition。每份视觉贡献保留自己的
-定时呈现和绘制顺序；声音通过选定的 AudioTrack 加入。
+將選定的 VisualTrack 和 AudioTrack 組裝為單一的 Composition。每份視覺貢獻保留自己的
+定時呈現和繪製順序；聲音透過選定的 AudioTrack 加入。
 
 ```svml
 <space:Canvas id="vertical" width="1080" height="1920"/>
@@ -34,100 +34,100 @@ Composition。然后渲染器将该 Composition 编译为 MP4 视频。
 </film:Film>
 ```
 
-| 属性 | 必填 | 说明 |
+| 屬性 | 必填 | 說明 |
 |---|---|---|
-| `id` | 是 | 唯一标识符 |
-| `canvas` | 是 | 与 Track 布局共享的显式 CanvasSpace |
-| `timeline` | 是 | 完整时间轴及其中的素材放置和语义锚点 |
-| `appearance` | 是 | SVS Film Recipe——画布清除颜色 |
+| `id` | 是 | 唯一識別符號 |
+| `canvas` | 是 | 與 Track 佈局共享的顯式 CanvasSpace |
+| `timeline` | 是 | 完整時間軸及其中的素材放置和語義錨點 |
+| `appearance` | 是 | SVS Film Recipe——畫布清除顏色 |
 
 ### film:Track
 
-每个 `<film:Track>` 子元素向 Composition 添加一个 Track 来源：
+每個 `<film:Track>` 子元素向 Composition 新增一個 Track 來源：
 
-| 属性 | 必填 | 说明 |
+| 屬性 | 必填 | 說明 |
 |---|---|---|
-| `source` | 是 | 来自任何上游组件的 VisualTrack 或 AudioTrack |
+| `source` | 是 | 來自任何上游元件的 VisualTrack 或 AudioTrack |
 
-常见的 Track 来源：
+常見的 Track 來源：
 
-| 来源 | 类型 | 来自 |
+| 來源 | 型別 | 來自 |
 |---|---|---|
-| `{performance.visual}` | VisualTrack | `performance:Track`——已有表演的画面呈现 |
-| `{voice.audio}` | AudioTrack | `sound:Track`——已有声音的呈现 |
-| `{captions.track}` | VisualTrack | Caption 样式族 Track——定时字幕 |
-| `{cards.visual}` | VisualTrack | `media-track:Track`——Media 叠加层或 B-roll |
-| `{titles.track}` | VisualTrack | `text:Track`——文字叠加层 |
+| `{performance.visual}` | VisualTrack | `performance:Track`——已有表演的畫面呈現 |
+| `{voice.audio}` | AudioTrack | `sound:Track`——已有聲音的呈現 |
+| `{captions.track}` | VisualTrack | Caption 樣式族 Track——定時字幕 |
+| `{cards.visual}` | VisualTrack | `media-track:Track`——Media 疊加層或 B-roll |
+| `{titles.track}` | VisualTrack | `text:Track`——文字疊加層 |
 
-### Track 堆叠
+### Track 堆疊
 
-Film 收集对等的 Track。每个 Track 可以包含多个独立定时、独立排序的呈现，称为 Present。
-许多组件通过 Recipe 的 `stack-order` 暴露绘制顺序：较低的值在后面，较高的值在前面。
-调整 Film 子元素的书写顺序不会改变这一绘制顺序。
+Film 收集對等的 Track。每個 Track 可以包含多個獨立定時、獨立排序的呈現，稱為 Present。
+許多元件透過 Recipe 的 `stack-order` 暴露繪製順序：較低的值在後面，較高的值在前面。
+調整 Film 子元素的書寫順序不會改變這一繪製順序。
 
-典型的堆叠顺序：
+典型的堆疊順序：
 
-| stack-order | 内容 |
+| stack-order | 內容 |
 |---|---|
-| 10 | 示例口播视觉（作者显式选择，不是内置默认值） |
-| 40 | Media 叠加层 |
+| 10 | 示例口播視覺（作者顯式選擇，不是內建預設值） |
+| 40 | Media 疊加層 |
 | 70 | 字幕 |
-| 90 | 文字叠加层 |
+| 90 | 文字疊加層 |
 
-不同组件的 Present 可以交错排列。每个 Present 内部又拥有自己的元素树：多个视频、文字
-和图形可以共享布局、遮罩或协同运动。项目组件可以用 HTML/CSS 浏览器程序实现这样的场景，
-独立字幕或覆盖画面仍可以作为对等贡献。根据共同的表现关系分组，尺寸和素材类型不决定边界。
+不同元件的 Present 可以交錯排列。每個 Present 內部又擁有自己的元素樹：多個影片、文字
+和圖形可以共享佈局、遮罩或協同運動。專案元件可以用 HTML/CSS 瀏覽器程式實現這樣的場景，
+獨立字幕或覆蓋畫面仍可以作為對等貢獻。根據共同的表現關係分組，尺寸和素材型別不決定邊界。
 
-**输出：** `{main.composition}`——完整的 Composition，传递给渲染器。
+**輸出：** `{main.composition}`——完整的 Composition，傳遞給渲染器。
 
 ## render:Video
 
-通过 HyperFrames 渲染器将 Composition 编译为最终视频。
+透過 HyperFrames 渲染器將 Composition 編譯為最終影片。
 
 ```svml
 <render:Video id="final" composition={main.composition} timeline={speech.timeline}/>
 ```
 
-| 属性 | 必填 | 说明 |
+| 屬性 | 必填 | 說明 |
 |---|---|---|
-| `id` | 是 | 唯一标识符 |
-| `composition` | 是 | 来自 `film:Film` 的 Composition |
-| `timeline` | 是 | 完整时间轴及其中的素材放置和语义锚点 |
+| `id` | 是 | 唯一識別符號 |
+| `composition` | 是 | 來自 `film:Film` 的 Composition |
+| `timeline` | 是 | 完整時間軸及其中的素材放置和語義錨點 |
 
 渲染器：
 
-1. 将 Composition 编译为 `HyperframesDocument`——每一帧的 HTML 表示
-2. 通过 Chrome/Chromium 渲染每一帧
-3. 将帧序列编码为视频
-4. 混合音频 Track
-5. 将视频和音频混合封装为最终的 MP4
+1. 將 Composition 編譯為 `HyperframesDocument`——每一幀的 HTML 表示
+2. 透過 Chrome/Chromium 渲染每一幀
+3. 將幀序列編碼為影片
+4. 混合音訊 Track
+5. 將影片和音訊混合封裝為最終的 MP4
 
-**输出：** `{final.video}`——以普通内容寻址 `BlobArtifact` 表示的最终视频。这是最常见的
-Build Target，也可以直接接到媒体裁切、音频/帧提取或模型参考输入等后续 Blob 消费者。
+**輸出：** `{final.video}`——以普通內容定址 `BlobArtifact` 表示的最終影片。這是最常見的
+Build Target，也可以直接接到媒體裁切、音訊/幀提取或模型參考輸入等後續 Blob 消費者。
 
-## 完全由组件绘制的影片
+## 完全由元件繪製的影片
 
-对于口播作品，Script 的 Selection 和 Moment 保留话语与呈现之间的关系。聊天动画或图解
-也可以自行安排阅读节奏：声明影片时钟，让场景组件、Film 和 Render 使用它。
+對於口播作品，Script 的 Selection 和 Moment 保留話語與呈現之間的關係。聊天動畫或圖解
+也可以自行安排閱讀節奏：宣告影片時鐘，讓場景元件、Film 和 Render 使用它。
 
 ```svml
 <import as="time" from="@hypit/timeline-author@1"/>
 <time:Clock id="animation-clock" frame-rate="30"/>
 <time:Timeline id="animation" clock={animation-clock} end="8s"/>
-<!-- scene.track 由使用同一时钟的组件产生。 -->
+<!-- scene.track 由使用同一時鐘的元件產生。 -->
 <film:Film id="main" canvas={canvas} timeline={animation.timeline} appearance={recipes.film.main}>
   <film:Track source={scene.track}/>
 </film:Film>
 <render:Video id="final" composition={main.composition} timeline={animation.timeline}/>
 ```
 
-场景事件可以采用作者指定的秒数或帧数。在口播编排中，同一种表现也可以跟随投影后的 Script
-事件。组件直接绘制画面，声明时长无需背景图片或静音表演；未选择 AudioTrack 时，交付视频无声。
+場景事件可以採用作者指定的秒數或幀數。在口播編排中，同一種表現也可以跟隨投影后的 Script
+事件。元件直接繪製畫面，宣告時長無需背景圖片或靜音表演；未選擇 AudioTrack 時，交付影片無聲。
 
-## 完整的管线流程
+## 完整的管線流程
 
-从 Script 到渲染视频的完整数据流。下面的 Source 是删节示意；可运行的完整项目见
-`examples/podcast/`，本节末尾的命令针对该项目。
+從 Script 到渲染影片的完整資料流。下面的 Source 是刪節示意；可執行的完整專案見
+`examples/podcast/`，本節末尾的命令針對該專案。
 
 ### Author Source (`main.svml`)
 
@@ -189,7 +189,7 @@ Build Target，也可以直接接到媒体裁切、音频/帧提取或模型参�
   <space:Frame id="card-frame" within={vertical}
     left="10%" top="20%" right="90%" bottom="70%"/>
 
-  <!-- 3. Timing：先归一化并对齐 Segment，再装配 -->
+  <!-- 3. Timing：先歸一化並對齊 Segment，再裝配 -->
   <pipeline:Normalize id="take-media" source={take.video}
     video="primary-moving" audio="default" span-authority="video" clock={clock}/>
   <pipeline:Normalize id="motion-media" source={motion.video}
@@ -247,9 +247,9 @@ Build Target，也可以直接接到媒体裁切、音频/帧提取或模型参�
 </svml>
 ```
 
-`right` 与 `bottom` 是绝对的边位置，不是内缩量。一个占父级中间 80% 的 Frame 写作 `left="10%" right="90%"`，而不是 `left="10%" right="10%"`——后者解出的宽度为零，会被拒绝。
+`right` 與 `bottom` 是絕對的邊位置，不是內縮量。一個佔父級中間 80% 的 Frame 寫作 `left="10%" right="90%"`，而不是 `left="10%" right="10%"`——後者解出的寬度為零，會被拒絕。
 
-### 样式表 (`recipes.svs`)
+### 樣式表 (`recipes.svs`)
 
 ```svs
 <?svml using="@hypit/svs@1"?>
@@ -291,7 +291,7 @@ Build Target，也可以直接接到媒体裁切、音频/帧提取或模型参�
 </svrun>
 ```
 
-### 编译与验证
+### 編譯與驗證
 
 ```bash
 hypit check examples/podcast/reference.svml
@@ -299,5 +299,5 @@ hypit check examples/podcast/reference.svml
 hypit plan examples/podcast/reference.svrun
 ```
 
-`check` 编译 Author Graph——验证所有导入、类型和图的边，而不调用任何外部服务。`plan`
-还会额外编译 Run Source 并输出冻结的 BuildPlan，展示调度器将发出的每个 Operation。在花费资金之前请先检查计划。
+`check` 編譯 Author Graph——驗證所有匯入、型別和圖的邊，而不呼叫任何外部服務。`plan`
+還會額外編譯 Run Source 並輸出凍結的 BuildPlan，展示排程器將發出的每個 Operation。在花費資金之前請先檢查計劃。

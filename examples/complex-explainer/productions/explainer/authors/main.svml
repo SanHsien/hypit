@@ -171,7 +171,7 @@
   <pipeline:Normalize id="swap-vehicle-media" source={assets.swap-vehicle} clock={assets.clock} video="primary-moving" audio="none" span-authority="video"/>
 
   <!-- Opening chrome and independent montage -->
-  <gfx:Title id="opening-title" timeline={program.timeline} canvas={assets.canvas} font={assets.display-font} start="program.start" end="moment.cue" moment={copy.story.moment.begin} bounce-at={copy.story.moment.opening-brand} color="#fa67aa" title-y="0.58" title="Hypit" subtitle="一分钟了解" seconds="60"/>
+  <gfx:Title id="opening-title" timeline={program.timeline} canvas={assets.canvas} font={assets.display-font} start="program.start" end="moment.cue" moment={copy.story.moment.begin} bounce-at={copy.story.moment.opening-brand} color="#fa67aa" title-y="0.58" title="Hypit" subtitle="一分鐘瞭解" seconds="60"/>
   <gfx:Flag id="road-flag" x="0.035" width="0.93" height="0.21" y="0.752" timeline={program.timeline} canvas={assets.canvas} logo={assets.flag-logo} start="moment.cue" moment={copy.story.moment.road-overview} end-source={copy.story.segment.timing-cost} end="segment.end"/>
   <gfx:Flag id="closing-road-flag" x="0.035" width="0.93" height="0.21" y="0.752" timeline={program.timeline} canvas={assets.canvas} logo={assets.flag-logo} start-source={copy.story.segment.synthesis} start="segment.start" end-source={copy.story.segment.closing} end="segment.start"/>
   <gfx:Timer flag-amplitude="0.06" logo={assets.flag-logo} id="series-timer" timeline={program.timeline} canvas={assets.canvas} font={assets.display-font} start="moment.cue" end="program.end" moment={copy.story.moment.begin} stop-at={copy.story.moment.outro-overtime} flag-color="#fa67aa" title="Hypit" subtitle="VIDEO FRAMEWORK" seconds="60"/>
@@ -279,7 +279,7 @@
     <linecaption:Use style={caption-base}/>
     <linecaption:Use during={copy.story.segment.opening} style={hidden-captions}/>
   </linecaption:Track>
-  <launch:PosterTitle id="montage-label" timeline={program.timeline} canvas={assets.canvas} font={assets.display-font} segment={copy.story.segment.opening} start="segment.end+14f" end="segment.end+45f" text="Hypit" subtitle="复刻任何爆款视频" y="0.165" size="180" subtitle-size="46" subtitle-gap="35"/>
+  <launch:PosterTitle id="montage-label" timeline={program.timeline} canvas={assets.canvas} font={assets.display-font} segment={copy.story.segment.opening} start="segment.end+14f" end="segment.end+45f" text="Hypit" subtitle="復刻任何爆款影片" y="0.165" size="180" subtitle-size="46" subtitle-gap="35"/>
 
   <!-- Coordinated scenes: supplied media plus semantic events -->
   <webscene:Introduction id="intro-scene" timeline={program.timeline} canvas={assets.canvas} font={assets.display-font} during={copy.story.segment.introduction} page={web-hypit-media.media} code={code-demo-media.media} readme={readme-demo-media.media} codex={assets.icon-codex} claude={assets.icon-claude} reference-ranking={reference-ranking-media.media} reference-podcast={reference-podcast-media.media} reference-interview={reference-interview-media.media} hypit-ranking={hypit-ranking-media.media} hypit-podcast={hypit-podcast-media.media} hypit-interview={hypit-interview-media.media}>

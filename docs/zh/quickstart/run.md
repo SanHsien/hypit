@@ -1,18 +1,18 @@
 ---
-title: Run Source 与 Build
-description: 声明 Build 目标、复用结果以及配置运行时环境。
+title: Run Source 與 Build
+description: 宣告 Build 目標、複用結果以及配置執行時環境。
 ---
 
-Author Source 定义视频本身。Run Source 从中挑选最终目标，以及是否用明确的 Candidate 来满足它们。
-官方 Distribution 提供 Local Runtime；它的 Profile 声明执行这份计划可用的凭据、Provider Endpoint 与服务。
+Author Source 定義影片本身。Run Source 從中挑選最終目標，以及是否用明確的 Candidate 來滿足它們。
+官方 Distribution 提供 Local Runtime；它的 Profile 宣告執行這份計劃可用的憑據、Provider Endpoint 與服務。
 
-先为项目选择一次 Runtime：
+先為專案選擇一次 Runtime：
 
 ```bash
 hypit runtime use hypit.runtime.json
 ```
 
-日常制作只需要这条短路径：
+日常製作只需要這條短路徑：
 
 ```bash
 hypit plan build.svrun
@@ -20,52 +20,52 @@ hypit build build.svrun --follow
 hypit get <build-id> --output final.video --to output/final.mp4
 ```
 
-快速开始只需全局安装一次 Distribution。此后本页所有命令都直接写作 `hypit`，在任何独立视频项目中都一样。
+快速開始只需全域性安裝一次 Distribution。此後本頁所有命令都直接寫作 `hypit`，在任何獨立影片專案中都一樣。
 
-只有 `build` 会真正提交工作。`plan` 展示选中的工作；`check` 用于编辑源码，`doctor` 用于配置和排查部署。它们都安全，但不是每次 Build 前必须重复的仪式。
+只有 `build` 會真正提交工作。`plan` 展示選中的工作；`check` 用於編輯原始碼，`doctor` 用於配置和排查部署。它們都安全，但不是每次 Build 前必須重複的儀式。
 
-当项目包含多份 Author、Recipe 和 Run Source 时，一种顺手的目录约定是：
+當專案包含多份 Author、Recipe 和 Run Source 時，一種順手的目錄約定是：
 
 ```text
 my-video/
-  package.json              项目边界
+  package.json              專案邊界
   authors/
     main.svml               一份 Author 入口
-    alternate.svml          确有需要时的另一份 Author 入口
+    alternate.svml          確有需要時的另一份 Author 入口
   recipes/
-    visual.svs              视觉 Recipe
+    visual.svs              視覺 Recipe
     generation.svs          生成 Recipe
   runs/
-    images.svrun            一种执行意图
-    takes.svrun             另一种执行意图
-    final.svrun             最终交付意图
-  assets/                   项目自己的输入素材
-  kits/                     可选的项目内 Recipe Kit
-  packages/                 作品需要时创建的项目本地 Author 包
-  output/                   显式导出给人或其他工具的副本
-  hypit.runtime.json        执行环境
-  hypit.results.json        可选的 Result 仓库选择
-  .hypit/                   自动产生的本地 Runtime 与 Result 数据
+    images.svrun            一種執行意圖
+    takes.svrun             另一種執行意圖
+    final.svrun             最終交付意圖
+  assets/                   專案自己的輸入素材
+  kits/                     可選的專案內 Recipe Kit
+  packages/                 作品需要時建立的專案本地 Author 包
+  output/                   顯式匯出給人或其他工具的副本
+  hypit.runtime.json        執行環境
+  hypit.results.json        可選的 Result 倉庫選擇
+  .hypit/                   自動產生的本地 Runtime 與 Result 資料
 ```
 
-这只是方便人整理内容的推荐，绝不是强制的项目格式。小项目可以把多份 `.svml`、`.svs` 和
-`.svrun` 直接平铺在根目录，其他项目也可以采用不同分组。Hypit 只服从 Source import、
-`<author source="…">`、CLI 参数和 `get --to` 中明确写出的路径，不要求这些名字，也不会特殊识别
-`authors/`、`recipes/`、`runs/`、`assets/` 或 `output/`。每份 Run 选择一份 Author 入口，而这份
-Author Source 的闭包可以显式导入多份 Author 或 Recipe Source。受管理的 Result 仓库与它们分开，
-零配置时仍位于 `.hypit/results`。
+這只是方便人整理內容的推薦，絕不是強制的專案格式。小專案可以把多份 `.svml`、`.svs` 和
+`.svrun` 直接平鋪在根目錄，其他專案也可以採用不同分組。Hypit 只服從 Source import、
+`<author source="…">`、CLI 引數和 `get --to` 中明確寫出的路徑，不要求這些名字，也不會特殊識別
+`authors/`、`recipes/`、`runs/`、`assets/` 或 `output/`。每份 Run 選擇一份 Author 入口，而這份
+Author Source 的閉包可以顯式匯入多份 Author 或 Recipe Source。受管理的 Result 倉庫與它們分開，
+零配置時仍位於 `.hypit/results`。
 
-Run Source 与 Runtime Profile 不会悄悄改写视频。创作性的模型选择仍然留在 Author Source，或它显式导入的包里。
+Run Source 與 Runtime Profile 不會悄悄改寫影片。創作性的模型選擇仍然留在 Author Source，或它顯式匯入的包裡。
 
-## Run Source 语法
+## Run Source 語法
 
-每个 `.svrun` 文件都以其处理指令开头：
+每個 `.svrun` 檔案都以其處理指令開頭：
 
 ```svml
 <?svml using="@hypit/run-markup@1"?>
 ```
 
-### 最简 Run Source
+### 最簡 Run Source
 
 ```svml
 <?svml using="@hypit/run-markup@1"?>
@@ -76,32 +76,32 @@ Run Source 与 Runtime Profile 不会悄悄改写视频。创作性的模型选�
 </svrun>
 ```
 
-| 元素 | 说明 |
+| 元素 | 說明 |
 |---|---|
-| `<svrun>` | 根元素，唯一属性是 `version="1"` |
+| `<svrun>` | 根元素，唯一屬性是 `version="1"` |
 | `<author>` | 必需。`source` 指向 `.svml` Author Source |
-| `<target>` | 一个需要得到的公开 Logical Output |
+| `<target>` | 一個需要得到的公開 Logical Output |
 
 ### Target
 
-Target 表达这次 Build 的最终意图，通常是成片或另一个真正的交付物；它不是“要保存哪些东西”的列表。编译器只执行通向 Target 的路线，而这条路上真正完成的每个公开 Author Output 都会自动进入同一个 Build Result。内部 Operation 值不进入 Result。
+Target 表達這次 Build 的最終意圖，通常是成片或另一個真正的交付物；它不是“要儲存哪些東西”的列表。編譯器只執行通向 Target 的路線，而這條路上真正完成的每個公開 Author Output 都會自動進入同一個 Build Result。內部 Operation 值不進入 Result。
 
-### 多个 Target
+### 多個 Target
 
-可以在一次 Build 中请求多个输出：
+可以在一次 Build 中請求多個輸出：
 
 ```svml
 <target output="final.video"/>
 <target output="captions.track"/>
 ```
 
-只有一次执行确实存在多个最终目标时才写多个 Target。不同运行意图写成不同的 `.svrun` 文件即可，它们可以共同指向同一个 Author Source。
+只有一次執行確實存在多個最終目標時才寫多個 Target。不同執行意圖寫成不同的 `.svrun` 檔案即可，它們可以共同指向同一個 Author Source。
 
-## 复用结果
+## 複用結果
 
-Hypit 没有隐式缓存。复用结果是显式的运行图编写：把某个旧 Build Result 里的一个具名 Output 声明为零输入 Candidate，再通过 Satisfaction 边连接到当前输出。
+Hypit 沒有隱式快取。複用結果是顯式的執行圖編寫：把某個舊 Build Result 裡的一個具名 Output 宣告為零輸入 Candidate，再透過 Satisfaction 邊連線到當前輸出。
 
-生成图片或 Take 一完成，就能在下一份 `.svrun` 中用 `build-record` 与 `satisfy` 显式复用，并在启动付费下游工作前检查 plan。
+生成圖片或 Take 一完成，就能在下一份 `.svrun` 中用 `build-record` 與 `satisfy` 顯式複用，並在啟動付費下游工作前檢查 plan。
 
 ```svml
 <?svml using="@hypit/run-markup@1"?>
@@ -126,22 +126,22 @@ Hypit 没有隐式缓存。复用结果是显式的运行图编写：把某个�
 </svrun>
 ```
 
-### 查找可复用输出
+### 查詢可複用輸出
 
-按照输出在项目本地 Build Result 中的名字查询：
+按照輸出在專案本地 Build Result 中的名字查詢：
 
 ```bash
 hypit history hook-take.video
 ```
 
-`history` 只查询明确给出的那个公开 Author Output。只声明但没有运行出来的输出和内部 Operation 值不会混入结果。如果忘了旧名字，先浏览 Build，再检查可能的 Result：
+`history` 只查詢明確給出的那個公開 Author Output。只宣告但沒有執行出來的輸出和內部 Operation 值不會混入結果。如果忘了舊名字，先瀏覽 Build，再檢查可能的 Result：
 
 ```bash
 hypit builds
 hypit inspect <build-id>
 ```
 
-输出名是某个 Build Result 内供人查找的名字；`build + output` 这对地址已经足够精确。假如当前源码把 `hook-take.video` 改名为 `opening-shot.video`，`<build-record>` 仍写历史旧名，`<satisfy>` 写当前新名：
+輸出名是某個 Build Result 內供人查詢的名字；`build + output` 這對地址已經足夠精確。假如當前原始碼把 `hook-take.video` 改名為 `opening-shot.video`，`<build-record>` 仍寫歷史舊名，`<satisfy>` 寫當前新名：
 
 ```svml
 <build-record id="approved-opening"
@@ -149,125 +149,125 @@ hypit inspect <build-id>
 <satisfy output="opening-shot.video" candidate="approved-opening"/>
 ```
 
-Hypit 永远不会猜测两个名字代表同一份作者意图。每次执行 `build` 都会得到新的 Build id 和独立 Result 目录，即使源码完全没变。后续 Run 只有明确写出旧 Build id 与 Output 时才复用；若旧 Output 本身继续转发到更老的 Result，就沿显式关系向前解析，不把文件复制进新 Result。
-转发只适用于完整的公开 Output；结构化 JSON 不能在内部递归指向另一个 Output。历史值若只是新 Fragment 的一项输入，Fragment 产生的新 Output 仍属于当前 Result，但其内部的媒体继续引用原文件；新 JSON 结构不要求复制已有图片、视频或音频。
+Hypit 永遠不會猜測兩個名字代表同一份作者意圖。每次執行 `build` 都會得到新的 Build id 和獨立 Result 目錄，即使原始碼完全沒變。後續 Run 只有明確寫出舊 Build id 與 Output 時才複用；若舊 Output 本身繼續轉發到更老的 Result，就沿顯式關係向前解析，不把檔案複製進新 Result。
+轉發只適用於完整的公開 Output；結構化 JSON 不能在內部遞迴指向另一個 Output。歷史值若只是新 Fragment 的一項輸入，Fragment 產生的新 Output 仍屬於當前 Result，但其內部的媒體繼續引用原檔案；新 JSON 結構不要求複製已有圖片、影片或音訊。
 
 ### build-record
 
-声明一个由先前 Build Result 的具名 Output 支持的零输入 Candidate：
+宣告一個由先前 Build Result 的具名 Output 支援的零輸入 Candidate：
 
-| 属性 | 说明 |
+| 屬性 | 說明 |
 |---|---|
-| `id` | 此 Run Source 内的本地 Candidate 标识符 |
-| `build` | 先前 Build 自动分配的 id |
-| `output` | 该 Build Result 中的公开 Output 名 |
+| `id` | 此 Run Source 內的本地 Candidate 識別符號 |
+| `build` | 先前 Build 自動分配的 id |
+| `output` | 該 Build Result 中的公開 Output 名 |
 
 ### satisfy
 
-将 Candidate 连接到逻辑输出：
+將 Candidate 連線到邏輯輸出：
 
-| 属性 | 说明 |
+| 屬性 | 說明 |
 |---|---|
-| `output` | 要满足的逻辑输出 |
-| `candidate` | 由 `build-record`、`file`、`value` 或 Fragment 导出声明的 Candidate 标识符 |
+| `output` | 要滿足的邏輯輸出 |
+| `candidate` | 由 `build-record`、`file`、`value` 或 Fragment 匯出宣告的 Candidate 識別符號 |
 
-Planner 会同时读取完整 Author Graph 与 Run Graph：裁剪所选 Candidate 替代掉的默认 Operation，同时保留该 Candidate 自身仍然消费的 Author Output。这是一次新的 Build，而非旧 Build 的延续。复用生成视频时，归一化和语义准备仍在下游；复用已经准备好的 SemanticTake 时，也保留这些结果。字幕、MG 和渲染只在仍被所选路线需要时计算。选择哪个 Output，取决于哪些内容应该保留不变。
+Planner 會同時讀取完整 Author Graph 與 Run Graph：裁剪所選 Candidate 替代掉的預設 Operation，同時保留該 Candidate 自身仍然消費的 Author Output。這是一次新的 Build，而非舊 Build 的延續。複用生成影片時，歸一化和語義準備仍在下游；複用已經準備好的 SemanticTake 時，也保留這些結果。字幕、MG 和渲染只在仍被所選路線需要時計算。選擇哪個 Output，取決於哪些內容應該保留不變。
 
-Core 不再给 Candidate 标注 `exact` 或 `substitute`。选择 Candidate 本身就是这次运行的明确实现决定。系统校验类型兼容性，但不猜测创作等价性，也不把这种判断作为冗余元信息沿整条图传播。
+Core 不再給 Candidate 標註 `exact` 或 `substitute`。選擇 Candidate 本身就是這次執行的明確實現決定。系統校驗型別相容性，但不猜測創作等價性，也不把這種判斷作為冗餘元資訊沿整條圖傳播。
 
-### 使用已有文件
+### 使用已有檔案
 
-本地文件就是最简单的零输入 Candidate：
+本地檔案就是最簡單的零輸入 Candidate：
 
 ```svml
 <file id="approved-opening" type="@hypit/artifact@1#BlobArtifact" from="./approved-opening.mp4" media-type="video/mp4"/>
 <satisfy output="opening-shot.video" candidate="approved-opening"/>
 ```
 
-文件相对于 `.svrun` 读取。如果它在 Target 路线上成为已完成的公开 Output，Result 保存明确的外部文件引用，不会为每次 Build 复制一份文件。引用保持实时性：替换文件会改变后续读取，删除文件会使依赖不可用。用户提供的图片、录制的视频使用相同机制。
+檔案相對於 `.svrun` 讀取。如果它在 Target 路線上成為已完成的公開 Output，Result 儲存明確的外部檔案引用，不會為每次 Build 複製一份檔案。引用保持實時性：替換檔案會改變後續讀取，刪除檔案會使依賴不可用。使用者提供的圖片、錄製的影片使用相同機制。
 
 ## Runtime Profile
 
-官方视频 Distribution 已经选择 Local Runtime。它的 Profile 通过逻辑 `use` 名称选择 Credential
-Store 与 Endpoint，并配置 Endpoint 容量等部署参数；它不选择 Runtime Host，也不定义 Source
-Workspace、Author 包或项目 Result Repository。
+官方影片 Distribution 已經選擇 Local Runtime。它的 Profile 透過邏輯 `use` 名稱選擇 Credential
+Store 與 Endpoint，並配置 Endpoint 容量等部署引數；它不選擇 Runtime Host，也不定義 Source
+Workspace、Author 包或專案 Result Repository。
 
 ```bash
 hypit runtime init
 hypit paths
 ```
 
-`runtime init` 会写入视频 Distribution 提供的起始 `hypit.runtime.json` 并完成选择。它不覆盖
-已有文件，不安装任何东西、不连接服务，也不启动 Worker。项目已有明确 Profile 时，使用
-`hypit runtime use <profile>`；该命令只写入 `.hypit/runtime`。
+`runtime init` 會寫入影片 Distribution 提供的起始 `hypit.runtime.json` 並完成選擇。它不覆蓋
+已有檔案，不安裝任何東西、不連線服務，也不啟動 Worker。專案已有明確 Profile 時，使用
+`hypit runtime use <profile>`；該命令只寫入 `.hypit/runtime`。
 
-`runtime use` 只写入 `.hypit/runtime`，不会启动 Worker、创建 Runtime 数据或修改已安装
-包。Profile 结构和完整边界见 [Runtime](../guide/runtime.md)。
-CLI 必须先确定项目：显式 `--workspace` 直接给出边界；否则使用当前目录向上的最近
-`package.json`，普通创作目录没有该文件时就以当前目录为边界。随后只读取这个项目自己的
-`.hypit/runtime`。它不会按约定文件名猜 Profile，也不会从父目录继承另一个项目的选择。
-## 配置所选凭据
+`runtime use` 只寫入 `.hypit/runtime`，不會啟動 Worker、建立 Runtime 資料或修改已安裝
+包。Profile 結構和完整邊界見 [Runtime](../guide/runtime.md)。
+CLI 必須先確定專案：顯式 `--workspace` 直接給出邊界；否則使用當前目錄向上的最近
+`package.json`，普通創作目錄沒有該檔案時就以當前目錄為邊界。隨後只讀取這個專案自己的
+`.hypit/runtime`。它不會按約定檔名猜 Profile，也不會從父目錄繼承另一個專案的選擇。
+## 配置所選憑據
 
-`check` 与 `plan` 不会请求在线 Provider。没有所选 Runtime 的 `plan` 只看图，不需要部署
-凭据；有 Runtime 时，便宜预检会检查本次 Plan 所需凭据是否存在。在运行 `doctor` 或付费/
-外部 `build` 之前，只配置当前 Runtime Profile 实际引用的凭据。先检查已有选择：
+`check` 與 `plan` 不會請求線上 Provider。沒有所選 Runtime 的 `plan` 只看圖，不需要部署
+憑據；有 Runtime 時，便宜預檢會檢查本次 Plan 所需憑據是否存在。在執行 `doctor` 或付費/
+外部 `build` 之前，只配置當前 Runtime Profile 實際引用的憑據。先檢查已有選擇：
 
 ```bash
 hypit auth status hypihub.default
 ```
 
-需要的服务未就绪时，先决定配置它，还是选择其他支持的本地或托管方式。例如 WhisperX 可以在本机或通过 HypiHub 运行。起始 Endpoint 是配置起点，并不代表已经选择某个账户。
+需要的服務未就緒時，先決定配置它，還是選擇其他支援的本地或託管方式。例如 WhisperX 可以在本機或透過 HypiHub 執行。起始 Endpoint 是配置起點，並不代表已經選擇某個賬戶。
 
-选择服务后，再连接其凭据：
+選擇服務後，再連線其憑據：
 
-已选择 HypiHub 账户时：
+已選擇 HypiHub 賬戶時：
 
 ```bash
 hypit auth login hypihub.default
 ```
 
-其他所选 Endpoint 使用它声明的安全输入方式，例如 `hypit auth login images.personal`。
-Provider 说明需要哪种凭据，Profile 选择存储方式；项目 Provider 沿用同一条路径。
-如果使用环境变量存储，则按 Provider 的配置在 Worker 环境中设置。
+其他所選 Endpoint 使用它宣告的安全輸入方式，例如 `hypit auth login images.personal`。
+Provider 說明需要哪種憑據，Profile 選擇儲存方式；專案 Provider 沿用同一條路徑。
+如果使用環境變數儲存，則按 Provider 的配置在 Worker 環境中設定。
 
-不要把凭据写进 Author Source、Run Source、Runtime Profile 源文件或提交内容。`doctor` 会验证所需凭据是否存在，但不会打印秘密值。
+不要把憑據寫進 Author Source、Run Source、Runtime Profile 原始檔或提交內容。`doctor` 會驗證所需憑據是否存在，但不會列印秘密值。
 
-## 查询所选 Run 的费用信息
+## 查詢所選 Run 的費用資訊
 
 ```bash
 hypit pricing reference.svrun
 hypit pricing reference.svrun --json
 ```
 
-所选 Runtime 决定每个请求由哪个 Endpoint 执行。`pricing` 读取对应 Provider 的费率信息，将匹配请求分组，展示已知参数与请求数量。明确声明为本地无 Provider 调用费用的工作汇总显示；未知价格、不支持的请求和价格读取失败继续可见。`--verbose` 补充本地请求细节与原始价格材料。
+所選 Runtime 決定每個請求由哪個 Endpoint 執行。`pricing` 讀取對應 Provider 的費率資訊，將匹配請求分組，展示已知引數與請求數量。明確宣告為本地無 Provider 呼叫費用的工作彙總顯示；未知價格、不支援的請求和價格讀取失敗繼續可見。`--verbose` 補充本地請求細節與原始價格材料。
 
-用报告说明准备怎么花费：所选账户、计划素材、计价单位与适用费率。命令读取价格，不提交生成，也不计算一个保证准确的总价。未来素材的时长可能还未知，估价时保留这部分不确定性。JSON 在 `groups[].requests` 中保留请求参数，在 `groups[].pricingDocuments` 中保留价格来源材料。
+用報告說明準備怎麼花費：所選賬戶、計劃素材、計價單位與適用費率。命令讀取價格，不提交生成，也不計算一個保證準確的總價。未來素材的時長可能還未知，估價時保留這部分不確定性。JSON 在 `groups[].requests` 中保留請求引數，在 `groups[].pricingDocuments` 中保留價格來源材料。
 
-付费调用前，确认账户、工作范围和预算。已有授权覆盖约定内的工作；价格输出与登录成功提供信息，本身不代表同意花费。
+付費呼叫前，確認賬戶、工作範圍和預算。已有授權覆蓋約定內的工作；價格輸出與登入成功提供資訊，本身不代表同意花費。
 
 ## Build 工作流
 
-不要提交凭据、生成媒体、Runtime 状态/数据库或日志。
+不要提交憑據、生成媒體、Runtime 狀態/資料庫或日誌。
 
-### 0. 准备按需依赖
+### 0. 準備按需依賴
 
-使用已发布的 Hypit 命令，无需在 Hypit 源码仓库运行 `pnpm install`。`runtime up` 会读取所选
-Runtime Profile，把其 Adapter 声明的上游 npm 包安装到机器共享目录，并准备外部程序。项目
-自己的组件和 Provider 仍是普通项目依赖，由项目的包管理器安装。只有 Profile 选择 WhisperX、
-OpenCV 等本地 Python 程序时，才需要先安装 [`uv`](https://docs.astral.sh/uv/)。
+使用已釋出的 Hypit 命令，無需在 Hypit 原始碼倉庫執行 `pnpm install`。`runtime up` 會讀取所選
+Runtime Profile，把其 Adapter 宣告的上游 npm 包安裝到機器共享目錄，並準備外部程式。專案
+自己的元件和 Provider 仍是普通專案依賴，由專案的包管理器安裝。只有 Profile 選擇 WhisperX、
+OpenCV 等本地 Python 程式時，才需要先安裝 [`uv`](https://docs.astral.sh/uv/)。
 
-作者侧缺少 Fontsource 等上游包时，`check`/`plan` 会给出精确命令，例如：
+作者側缺少 Fontsource 等上游包時，`check`/`plan` 會給出精確命令，例如：
 
 ```bash
 hypit packages install @fontsource-variable/inter@5.3.0
 ```
 
-`hypit runtime up` 管理依赖、后台 Worker 和外部程序；`build` 不做部署准备。
+`hypit runtime up` 管理依賴、後臺 Worker 和外部程式；`build` 不做部署準備。
 
-#### 把正式视频项目放在 Hypit 仓库之外
+#### 把正式影片專案放在 Hypit 倉庫之外
 
-作者文件不必位于本仓库之下。例如，项目放在 `/work/my-film`，同时复用
-`/opt/hypit` 中已安装的包：
+作者檔案不必位於本倉庫之下。例如，專案放在 `/work/my-film`，同時複用
+`/opt/hypit` 中已安裝的包：
 
 ```bash
 cd /work/my-film
@@ -276,63 +276,63 @@ hypit runtime use hypit.runtime.json
 hypit plan build.svrun
 ```
 
-Workspace 在 Runtime Profile 之前确定；显式 `--workspace` 可以覆盖它，入口 Source 路径和
-Runtime 选择都无权改变这条源码边界。`--package-root` 只定位已经安装的
-`node_modules`；`--asset-root` 只额外授权读取素材字节。
+Workspace 在 Runtime Profile 之前確定；顯式 `--workspace` 可以覆蓋它，入口 Source 路徑和
+Runtime 選擇都無權改變這條原始碼邊界。`--package-root` 只定位已經安裝的
+`node_modules`；`--asset-root` 只額外授權讀取素材位元組。
 
-外部项目通常应提交如下 `.gitignore`：
+外部專案通常應提交如下 `.gitignore`：
 
 ```text
 .hypit/
 output/
 ```
 
-每次 Build 的权威结果位于 `.hypit/results/<UTC-date>/<build-id>/`：`result.json` 记录名字、状态、Target
-和公开 Output，媒体在 `files/`，结构化值在 `values/`。
+每次 Build 的權威結果位於 `.hypit/results/<UTC-date>/<build-id>/`：`result.json` 記錄名字、狀態、Target
+和公開 Output，媒體在 `files/`，結構化值在 `values/`。
 
-这是无需配置的默认 Result 仓库。项目根的 `hypit.results.json` 也可以选择 `@hypit/build-result-s3`；历史命令
-与 `.svrun` 中的 `build-record` 会使用同一个仓库。活跃 Build 的临时 Resource 仍由 Runtime 在本地
+這是無需配置的預設 Result 倉庫。專案根的 `hypit.results.json` 也可以選擇 `@hypit/build-result-s3`；歷史命令
+與 `.svrun` 中的 `build-record` 會使用同一個倉庫。活躍 Build 的臨時 Resource 仍由 Runtime 在本地
 私有管理。
 
-`status`、`builds` 等只读归档命令不会在状态尚不存在时初始化 Runtime 数据库。
+`status`、`builds` 等只讀歸檔命令不會在狀態尚不存在時初始化 Runtime 資料庫。
 
-共享只读素材库不必复制进项目，也不必放宽 Source 边界：
+共享只讀素材庫不必複製進專案，也不必放寬 Source 邊界：
 
 ```bash
 hypit plan /work/my-film/build.svrun --asset-root /work/shared-media
 ```
 
-`--asset-root` 可重复使用，只授权读取素材字节，不允许从那里导入 `.svml/.svs` 源码。该 Host
-选项不进入作者或 Build 身份；真正进入图的是由该文件形成的显式 Resource 值。
+`--asset-root` 可重複使用，只授權讀取素材位元組，不允許從那裡匯入 `.svml/.svs` 原始碼。該 Host
+選項不進入作者或 Build 身份；真正進入圖的是由該檔案形成的顯式 Resource 值。
 
-Runtime Profile 只选择 Credential Store、Endpoint 及其封闭配置。完整结构只在
-[Runtime](../guide/runtime.md) 维护，不在 Quickstart 复制第二份。
+Runtime Profile 只選擇 Credential Store、Endpoint 及其封閉配置。完整結構只在
+[Runtime](../guide/runtime.md) 維護，不在 Quickstart 複製第二份。
 
-### 1. 选择 Runtime
+### 1. 選擇 Runtime
 
 ```bash
 cd examples/podcast
 hypit runtime use hypit.runtime.json
 ```
 
-Author/Run Source 通过 import 选择作者包；官方视频 Distribution 已经选择 Local Runtime，Profile
-只通过 `use` 选择 Credential Store 与 Endpoint。安装、版本与完整性由 npm 或 pnpm 负责。
+Author/Run Source 透過 import 選擇作者包；官方影片 Distribution 已經選擇 Local Runtime，Profile
+只透過 `use` 選擇 Credential Store 與 Endpoint。安裝、版本與完整性由 npm 或 pnpm 負責。
 
-### 2. 诊断环境
+### 2. 診斷環境
 
 ```bash
 hypit doctor
 ```
 
-Doctor 总会校验项目选择的 Result Repository；存在已选或显式传入的 Runtime Profile 时，还会校验全部
-Runtime 角色、Endpoint 配置、凭据是否存在和有界环境探测。它不启动 Worker，也不发付费请求。
+Doctor 總會校驗專案選擇的 Result Repository；存在已選或顯式傳入的 Runtime Profile 時，還會校驗全部
+Runtime 角色、Endpoint 配置、憑據是否存在和有界環境探測。它不啟動 Worker，也不發付費請求。
 
-存在 Profile 时，`doctor` 默认检查整个 Profile，也可以重复 `--endpoint <instance>` 限定服务。
-若只想检查某次 Run 真正需要的环境，请使用带
-所选 Runtime 的 `plan`。未就绪会写入 `preflight` 并令命令非零退出，但 JSON 中仍保留
-冻结计划供检查。
+存在 Profile 時，`doctor` 預設檢查整個 Profile，也可以重複 `--endpoint <instance>` 限定服務。
+若只想檢查某次 Run 真正需要的環境，請使用帶
+所選 Runtime 的 `plan`。未就緒會寫入 `preflight` 並令命令非零退出，但 JSON 中仍保留
+凍結計劃供檢查。
 
-### 3. 检查 Source 与计划
+### 3. 檢查 Source 與計劃
 
 ```bash
 hypit check reference.svml
@@ -342,18 +342,18 @@ hypit check reference.svml
 hypit plan reference.svrun
 ```
 
-花费资金前审查所选工作。默认计划展示 Target、实际需要的外部请求及其已知参数；
-`--verbose` 增加图和 Candidate 选择详情。选择 Runtime 后预检这次计划需要的 Endpoint、
-凭据和外部程序，不启动任何外部工作。
+花費資金前審查所選工作。預設計劃展示 Target、實際需要的外部請求及其已知引數；
+`--verbose` 增加圖和 Candidate 選擇詳情。選擇 Runtime 後預檢這次計劃需要的 Endpoint、
+憑據和外部程式，不啟動任何外部工作。
 
-`plan` 可以完全不带 Runtime；执行过 `hypit runtime use` 后，`plan` 和 `build` 都不必再写
-`--runtime`。`build` 必须能找到所选或显式 Profile。
+`plan` 可以完全不帶 Runtime；執行過 `hypit runtime use` 後，`plan` 和 `build` 都不必再寫
+`--runtime`。`build` 必須能找到所選或顯式 Profile。
 
-选择或改变 Profile 后，用 `runtime up` 安装所选上游依赖、准备本地 Managed Program 并启动
-本地 Worker。它不会启动或探测远程 Endpoint；需要主动只读检查远程能力时使用 `doctor`。
-`build` 只重跑便宜的只读预检；任何依赖或 Program 未就绪都会在提交前失败，绝不在 Build
-中准备它们。若部署已经准备完毕而只有 Worker 停止，`build` 会在耐久提交前启动该 Worker。
-`runtime status` 用于观察，`programs up|status|down` 只管理外部程序。
+選擇或改變 Profile 後，用 `runtime up` 安裝所選上游依賴、準備本地 Managed Program 並啟動
+本地 Worker。它不會啟動或探測遠端 Endpoint；需要主動只讀檢查遠端能力時使用 `doctor`。
+`build` 只重跑便宜的只讀預檢；任何依賴或 Program 未就緒都會在提交前失敗，絕不在 Build
+中準備它們。若部署已經準備完畢而只有 Worker 停止，`build` 會在耐久提交前啟動該 Worker。
+`runtime status` 用於觀察，`programs up|status|down` 只管理外部程式。
 
 ### 4. 提交 Build
 
@@ -361,38 +361,38 @@ hypit plan reference.svrun
 hypit build reference.svrun --title first-cut --follow
 ```
 
-不带 `--follow` 时，Build 在耐久提交后退出，后台 Worker 继续。带 `--follow` 时终端也只是观察者，并会报告 phase / Operation 数量变化；Ctrl-C 不会取消任务。
+不帶 `--follow` 時，Build 在耐久提交後退出，後臺 Worker 繼續。帶 `--follow` 時終端也只是觀察者，並會報告 phase / Operation 數量變化；Ctrl-C 不會取消任務。
 
-任何时候都可以重新接入观察：
+任何時候都可以重新接入觀察：
 
 ```bash
 hypit status <build-id> --watch
 ```
 
-普通的 `status <build-id>` 只打印一次快照。`status --watch` 会在 Result 得到 outcome 时退出；脚本需要限制等待时间时可以加 `--max-wait-ms`。
+普通的 `status <build-id>` 只列印一次快照。`status --watch` 會在 Result 得到 outcome 時退出；指令碼需要限制等待時間時可以加 `--max-wait-ms`。
 
-| 标志 | 说明 |
+| 標誌 | 說明 |
 |---|---|
-| `--runtime` | 单次命令的 Runtime Profile 覆盖；通常用 `runtime use` 选择一次即可 |
-| `--package-root` | 存放已安装包的 Host 目录 |
-| `--workspace` | 显式 Source Workspace 覆盖项 |
-| `--title` | 给这次 Result 一个供人阅读的标题 |
-| `--follow` | 将 Build 进度流式输出到终端 |
+| `--runtime` | 單次命令的 Runtime Profile 覆蓋；通常用 `runtime use` 選擇一次即可 |
+| `--package-root` | 存放已安裝包的 Host 目錄 |
+| `--workspace` | 顯式 Source Workspace 覆蓋項 |
+| `--title` | 給這次 Result 一個供人閱讀的標題 |
+| `--follow` | 將 Build 進度流式輸出到終端 |
 
-每次执行都会创建新的 Build id，即使 Author Source 和 Run Source 完全没变。这是非确定性生成
-所要求的边界：跨 Build 复用只能由 Run Source 里的显式 Candidate 决定。关闭观察终端不会停止
-Worker；但 Build 一旦失去执行上下文，这次尝试就结束，重启 Worker 不会恢复它。已完成的
-Output 和记录下来的任务凭据会保留；后续执行通过新 Build 显式复用已有工作。
+每次執行都會建立新的 Build id，即使 Author Source 和 Run Source 完全沒變。這是非確定性生成
+所要求的邊界：跨 Build 複用只能由 Run Source 裡的顯式 Candidate 決定。關閉觀察終端不會停止
+Worker；但 Build 一旦失去執行上下文，這次嘗試就結束，重啟 Worker 不會恢復它。已完成的
+Output 和記錄下來的任務憑據會保留；後續執行透過新 Build 顯式複用已有工作。
 
-### 5. 检查并获取结果
+### 5. 檢查並獲取結果
 
 ```bash
 hypit inspect <build-id>
 ```
 
-`inspect` 直接读取项目 Result，默认展示 Target、高亮 Output 和失败证据。
-`--output <name>` 精确查看一个 Output；`--verbose` 浏览其他 Output 和任务回执，
-`--limit <count>` 扩展这个详细列表。导出指定 Output 用：
+`inspect` 直接讀取專案 Result，預設展示 Target、高亮 Output 和失敗證據。
+`--output <name>` 精確檢視一個 Output；`--verbose` 瀏覽其他 Output 和任務回執，
+`--limit <count>` 擴充套件這個詳細列表。匯出指定 Output 用：
 
 ```bash
 hypit get <build-id> \
@@ -400,31 +400,31 @@ hypit get <build-id> \
   --to output/final.mp4
 ```
 
-`get` 把一个精确的 `build + output` 地址导出到必填的 `--to` 目的地。Scalar 写成 JSON 文件；
-Resource 原样写成一个文件；Composite 写成一个自足目录，其中 `value.json` 保存它的 Composite 值
-文档，被引用的 Resource 则按 Result 内的相对路径一起写入。目的地必须尚不存在。
+`get` 把一個精確的 `build + output` 地址匯出到必填的 `--to` 目的地。Scalar 寫成 JSON 檔案；
+Resource 原樣寫成一個檔案；Composite 寫成一個自足目錄，其中 `value.json` 儲存它的 Composite 值
+文件，被引用的 Resource 則按 Result 內的相對路徑一起寫入。目的地必須尚不存在。
 
-历史转发会透明地沿显式关系找到更早的 Result。这个过程不会创建 Build、修改 Result，或把
-副本写回 Result 仓库，也不需要 Runtime Profile。查看 Output 用 `inspect`；`get` 只负责显式
-本地导出。Build 的最终输出会为每个文件 Target 打印精确的 `get --output …` 命令。
+歷史轉發會透明地沿顯式關係找到更早的 Result。這個過程不會建立 Build、修改 Result，或把
+副本寫回 Result 倉庫，也不需要 Runtime Profile。檢視 Output 用 `inspect`；`get` 只負責顯式
+本地匯出。Build 的最終輸出會為每個檔案 Target 列印精確的 `get --output …` 命令。
 
-### 6. 在新 Build 中复用
+### 6. 在新 Build 中複用
 
-创建一个引用已完成 Build Output 的新 `.svrun` 文件（参见上文 [复用结果](#复用结果)），然后提交：
+建立一個引用已完成 Build Output 的新 `.svrun` 檔案（參見上文 [複用結果](#複用結果)），然後提交：
 
 ```bash
 hypit build reuse-generated.svrun --follow
 ```
 
-### 7. 诊断或停止本地 Runtime
+### 7. 診斷或停止本地 Runtime
 
 ```bash
 hypit runtime logs
 hypit runtime down
 ```
 
-`runtime down` 停止协调器及其执行进程，保留独立的 Managed Program。未完成的 Build 一旦
-失去执行上下文，就不会在 Worker 重启后恢复；保留其已完成 Output 和任务凭据，通过新 Build
-继续制作。已提交但从未开始的 Build 仍可开始。只有确实要停掉独立程序时才执行 `programs down`。
-要取消某个 Build 的远程工作，应在其执行上下文仍可用时调用 `hypit cancel <build-id>`；
-停止本地进程本身不会取消远程 Provider 任务。
+`runtime down` 停止協調器及其執行程序，保留獨立的 Managed Program。未完成的 Build 一旦
+失去執行上下文，就不會在 Worker 重啟後恢復；保留其已完成 Output 和任務憑據，透過新 Build
+繼續製作。已提交但從未開始的 Build 仍可開始。只有確實要停掉獨立程式時才執行 `programs down`。
+要取消某個 Build 的遠端工作，應在其執行上下文仍可用時呼叫 `hypit cancel <build-id>`；
+停止本地程序本身不會取消遠端 Provider 任務。

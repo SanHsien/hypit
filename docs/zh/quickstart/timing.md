@@ -1,17 +1,17 @@
 ---
-title: 时序与装配
-description: 逐 Take 归一化与语义对齐，然后装配为 Timeline。
+title: 時序與裝配
+description: 逐 Take 歸一化與語義對齊，然後裝配為 Timeline。
 ---
 
-对于说话视频，`Timeline` 把作者的 Script 与实际表演联系起来，是字幕、随词语出现的图形和覆盖画面的自然时间来源。它按 Segment 粒度构建：
+對於說話影片，`Timeline` 把作者的 Script 與實際表演聯絡起來，是字幕、隨詞語出現的圖形和覆蓋畫面的自然時間來源。它按 Segment 粒度構建：
 
-1. 把每个已接受的音视频 Take 归一化到同一个精确帧域；
-2. 将归一化媒体与对应的 Script Segment 对齐，得到自包含的 `SemanticTake`；
-3. 用 `time:Timeline` 按节目顺序装配这些 Semantic Take。
+1. 把每個已接受的音影片 Take 歸一化到同一個精確幀域；
+2. 將歸一化媒體與對應的 Script Segment 對齊，得到自包含的 `SemanticTake`；
+3. 用 `time:Timeline` 按節目順序裝配這些 Semantic Take。
 
-每个 Take 在进入 Timeline assembly 之前就已经具有语义。画面由 Media Track 或项目组件呈现，与这里的语义和音频装配分别表达。
+每個 Take 在進入 Timeline assembly 之前就已經具有語義。畫面由 Media Track 或專案元件呈現，與這裡的語義和音訊裝配分別表達。
 
-纯视觉动画使用同一种 Timeline 声明：指定结束时间，不放入 Take，见 [纯组件绘制的影片](./composition.md)。其事件可以使用秒或帧；说话视频则可以用 Script Selection 和 Moment 驱动相同的视觉行为。
+純視覺動畫使用同一種 Timeline 宣告：指定結束時間，不放入 Take，見 [純元件繪製的影片](./composition.md)。其事件可以使用秒或幀；說話影片則可以用 Script Selection 和 Moment 驅動相同的視覺行為。
 
 ```svml
 <import as="program" from="@hypit/program-space@1"/>
@@ -24,10 +24,10 @@ description: 逐 Take 归一化与语义对齐，然后装配为 Timeline。
 <import as="recipes" source="./recipes.svs"/>
 ```
 
-## 逐 Take 归一化
+## 逐 Take 歸一化
 
-归一化把视频、音频、时长和帧率变成一个明确的 `SynchronizedMedia` 事实。同一条
-Timeline 内的所有 Take 共享作者显式声明的 Clock。
+歸一化把影片、音訊、時長和幀率變成一個明確的 `SynchronizedMedia` 事實。同一條
+Timeline 內的所有 Take 共享作者顯式宣告的 Clock。
 
 ```svml
 <program:Clock id="clock" frame-rate="30"/>
@@ -38,11 +38,11 @@ Timeline 内的所有 Take 共享作者显式声明的 Clock。
   video="primary-moving" audio="default" span-authority="video" clock={clock}/>
 ```
 
-归一化不包含 Script 语义，也不负责转录；它只建立后续语义对齐可以信任的客观媒体事实。
+歸一化不包含 Script 語義，也不負責轉錄；它只建立後續語義對齊可以信任的客觀媒體事實。
 
-## 每个 Segment 产生一个 SemanticTake
+## 每個 Segment 產生一個 SemanticTake
 
-`whisperx:SemanticTake` 测量一段归一化媒体，并把声学证据与唯一一个作者 Segment 对齐：
+`whisperx:SemanticTake` 測量一段歸一化媒體，並把聲學證據與唯一一個作者 Segment 對齊：
 
 ```svml
 <whisperx:SemanticTake id="opening-semantic" narrative={story}
@@ -51,18 +51,18 @@ Timeline 内的所有 Take 共享作者显式声明的 Clock。
   segment={story.segment.answer} media={answer-media.media} language="en"/>
 ```
 
-含有台词的 Segment 必须显式填写 `language`，例如 `en`、`zh` 或 `ko`。使用所选
-WhisperX 服务支持的小写两字母或三字母语言代码。该值原样传递；Hypit 不会根据 Script
-文本或音频自动检测、分流语言。无台词的空 Segment 省略 `language`，直接使用归一化媒体边界。
+含有臺詞的 Segment 必須顯式填寫 `language`，例如 `en`、`zh` 或 `ko`。使用所選
+WhisperX 服務支援的小寫兩字母或三字母語言程式碼。該值原樣傳遞；Hypit 不會根據 Script
+文字或音訊自動檢測、分流語言。無臺詞的空 Segment 省略 `language`，直接使用歸一化媒體邊界。
 
-每个输出都自带归一化媒体、Segment 身份、每个作者词语的局部帧窗口以及该 Segment 的全部
-结构锚点：Segment 有两个锚点，每个词也有两个锚点。声学证据只是这一步的实现输入；下游
-组件看到的是完成后的 `SemanticTake`，而不是第二套 evidence 形状的时间结构。
+每個輸出都自帶歸一化媒體、Segment 身份、每個作者詞語的區域性幀視窗以及該 Segment 的全部
+結構錨點：Segment 有兩個錨點，每個詞也有兩個錨點。聲學證據只是這一步的實現輸入；下游
+元件看到的是完成後的 `SemanticTake`，而不是第二套 evidence 形狀的時間結構。
 
-## 装配 Timeline
+## 裝配 Timeline
 
-`time:Timeline` 默认顺接已经准备好的 Take，也允许通过 `at` 自由放置，提供完整 Timeline。
-Performance 和 Sound 分别呈现其中的画面和声音：
+`time:Timeline` 預設順接已經準備好的 Take，也允許透過 `at` 自由放置，提供完整 Timeline。
+Performance 和 Sound 分別呈現其中的畫面和聲音：
 
 ```svml
 <space:Canvas id="vertical" width="1080" height="1920"/>
@@ -84,21 +84,21 @@ Performance 和 Sound 分别呈现其中的画面和声音：
   </performance:Track>
 ```
 
-| 输出 | 类型 | 含义 |
+| 輸出 | 型別 | 含義 |
 |---|---|---|
-| `{speech.timeline}` | Timeline | 全局语义与帧域真相 |
-| `{voice.audio}` | AudioTrack | Sound 对已有 Take 声音的呈现 |
+| `{speech.timeline}` | Timeline | 全域性語義與幀域真相 |
+| `{voice.audio}` | AudioTrack | Sound 對已有 Take 聲音的呈現 |
 
-Performance 和 Sound 使用同一批素材及源位置。每个 Take 的全局位置由放置起点加局部位置得到。
-第一段省略 `at` 表示从零开始，后续省略则顺接上一段。`at="previous.end+2s"` 留出间隔，
-`at="previous.end-12f"` 表示交叠，也可以写绝对位置。Timeline 的 `end` 默认取所有 Take 的最晚终点；
-`end="content.end+2s"` 留出片尾，`end="30s"` 指定完整时长。位置须落在精确帧上，完整范围须容纳所有 Take。
-零 Take 的 Timeline 需要明确的正时长，空隔不生成占位素材。
+Performance 和 Sound 使用同一批素材及源位置。每個 Take 的全域性位置由放置起點加區域性位置得到。
+第一段省略 `at` 表示從零開始，後續省略則順接上一段。`at="previous.end+2s"` 留出間隔，
+`at="previous.end-12f"` 表示交疊，也可以寫絕對位置。Timeline 的 `end` 預設取所有 Take 的最晚終點；
+`end="content.end+2s"` 留出片尾，`end="30s"` 指定完整時長。位置須落在精確幀上，完整範圍須容納所有 Take。
+零 Take 的 Timeline 需要明確的正時長，空隔不生成佔位素材。
 
-## 消费语义时间
+## 消費語義時間
 
-Selection、Moment 与完整 Segment 始终是 Script 中的作者身份。下游组件只接收一次
-Timeline，并在构建确定性 Track 时把这些身份投影成帧：
+Selection、Moment 與完整 Segment 始終是 Script 中的作者身份。下游元件只接收一次
+Timeline，並在構建確定性 Track 時把這些身份投影成幀：
 
 ```svml
 <media-track:Track id="cards" timeline={speech.timeline} canvas={vertical}>
@@ -126,7 +126,7 @@ Timeline，并在构建确定性 Track 时把这些身份投影成帧：
   composition={main.composition} timeline={speech.timeline}/>
 ```
 
-整段使用 `during={story.segment.answer}`，作者范围使用 Selection，点事件使用 Moment，完整节目使用 `during="program"`。组件统一消费 `timeline={speech.timeline}`。
+整段使用 `during={story.segment.answer}`，作者範圍使用 Selection，點事件使用 Moment，完整節目使用 `during="program"`。元件統一消費 `timeline={speech.timeline}`。
 
 ```text
 prepared Takes → Timeline → Performance / project scene → visual ─┐

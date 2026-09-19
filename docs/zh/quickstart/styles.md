@@ -1,11 +1,11 @@
 ---
-title: SVS 样式表
-description: SVS Recipe 语言——用于影片、字幕、媒体、文本及生成设置的类 CSS 样式表。
+title: SVS 樣式表
+description: SVS Recipe 語言——用於影片、字幕、媒體、文字及生成設定的類 CSS 樣式表。
 ---
 
-SVS（`.svs`）文件使用类 CSS 语法定义可复用的类型化配置值。它们用于配置影片外观、字幕外观、Media 呈现与运动、文本样式、生成设置和字体选择。SVS 中的值称为 **Recipe**——它们是不可变的类型化记录，由消费组件进行验证和解释。
+SVS（`.svs`）檔案使用類 CSS 語法定義可複用的型別化配置值。它們用於配置影片外觀、字幕外觀、Media 呈現與運動、文字樣式、生成設定和字型選擇。SVS 中的值稱為 **Recipe**——它們是不可變的型別化記錄，由消費元件進行驗證和解釋。
 
-## 基本语法
+## 基本語法
 
 ```svs
 <?svml using="@hypit/svs@1"?>
@@ -23,24 +23,24 @@ SVS（`.svs`）文件使用类 CSS 语法定义可复用的类型化配置值。
 </sheet>
 ```
 
-- 处理指令 `<?svml using="@hypit/svs@1"?>` 用于选择 SVS 解析器。
-- `<sheet>` 元素包裹所有声明。`id` 属性成为顶层命名空间。
-- 每个块的格式为 `namespace.name { ... }`，属性以 `;` 结尾的键值对形式书写。
-- 注释使用 `/* ... */`。
+- 處理指令 `<?svml using="@hypit/svs@1"?>` 用於選擇 SVS 解析器。
+- `<sheet>` 元素包裹所有宣告。`id` 屬性成為頂層名稱空間。
+- 每個塊的格式為 `namespace.name { ... }`，屬性以 `;` 結尾的鍵值對形式書寫。
+- 註釋使用 `/* ... */`。
 
-## 导入与引用
+## 匯入與引用
 
-在 `.svml` 源文件中通过命名空间前缀导入 SVS 文件：
+在 `.svml` 原始檔中透過名稱空間字首匯入 SVS 檔案：
 
 ```svml
 <import as="recipes" source="./recipes.svs"/>
 ```
 
-然后通过 `{recipes.film.vertical}`、`{recipes.caption.primary}` 等方式引用各个 Recipe。前缀来自 `as=` 属性；路径来自样式表中的 `namespace.name`。
+然後透過 `{recipes.film.vertical}`、`{recipes.caption.primary}` 等方式引用各個 Recipe。字首來自 `as=` 屬性；路徑來自樣式表中的 `namespace.name`。
 
 ## Film
 
-Film 外观只拥有画布清除颜色。画布尺寸是显式的 `space:Canvas` 图值，帧率来自 Timeline 使用的 Clock。
+Film 外觀只擁有畫布清除顏色。畫布尺寸是顯式的 `space:Canvas` 圖值，幀率來自 Timeline 使用的 Clock。
 
 ```svs
 film.vertical {
@@ -48,11 +48,11 @@ film.vertical {
 }
 ```
 
-| 属性 | 描述 |
+| 屬性 | 描述 |
 |---|---|
-| `background` | 画布清除颜色（十六进制） |
+| `background` | 畫布清除顏色（十六進位制） |
 
-通过 `film:Film` 的 `appearance` 属性引用：
+透過 `film:Film` 的 `appearance` 屬性引用：
 
 ```svml
 <space:Canvas id="vertical" width="1080" height="1920"/>
@@ -61,7 +61,7 @@ film.vertical {
 
 ## Caption Fine
 
-第一种官方 Caption 样式族把规划要求和渲染参数放在同一个 Recipe 中。
+第一種官方 Caption 樣式族把規劃要求和渲染引數放在同一個 Recipe 中。
 
 ```svs
 caption.dialogue {
@@ -79,21 +79,21 @@ caption.dialogue {
 }
 ```
 
-| 属性 | 描述 |
+| 屬性 | 描述 |
 |---|---|
-| `stack-order` | 所有 Track 之间的 Z 轴层叠顺序（值越大越靠前） |
-| `x`、`y` | 位置，以画布比例表示（0–1） |
-| `width` | 宽度，以画布比例表示 |
-| `size` | 字体大小（像素） |
-| `line-height` | 行高倍数 |
-| `align` | 文本对齐方式：`left`、`center`、`right` |
-| `fill` | 文本颜色（十六进制，支持透明度） |
-| `background` | 容器背景颜色（十六进制，支持透明度，如 `#09090BCC`） |
-| `padding` | 容器内边距（像素）（单个值或 `垂直 水平`） |
-| `radius` | 容器圆角半径（像素） |
+| `stack-order` | 所有 Track 之間的 Z 軸層疊順序（值越大越靠前） |
+| `x`、`y` | 位置，以畫布比例表示（0–1） |
+| `width` | 寬度，以畫布比例表示 |
+| `size` | 字型大小（畫素） |
+| `line-height` | 行高倍數 |
+| `align` | 文字對齊方式：`left`、`center`、`right` |
+| `fill` | 文字顏色（十六進位制，支援透明度） |
+| `background` | 容器背景顏色（十六進位制，支援透明度，如 `#09090BCC`） |
+| `padding` | 容器內邊距（畫素）（單個值或 `垂直 水平`） |
+| `radius` | 容器圓角半徑（畫素） |
 
-若要可复现渲染，应在 `.svml` 源码中显式选择已安装的精确字体，并把该 Record 传给 Fine
-Style。字体家族、字重和字形只在这条精确字体边上声明一次：
+若要可復現渲染，應在 `.svml` 原始碼中顯式選擇已安裝的精確字型，並把該 Record 傳給 Fine
+Style。字型家族、字重和字形只在這條精確字型邊上宣告一次：
 
 ```svml
 <fonts:Stack id="caption-font" family="inter" weight="600" style="normal"/>
@@ -101,9 +101,9 @@ Style。字体家族、字重和字形只在这条精确字体边上声明一次
   font={caption-font}/>
 ```
 
-### 按角色设置字幕样式
+### 按角色設定字幕樣式
 
-为不同说话者定义多个字幕 Recipe：
+為不同說話者定義多個字幕 Recipe：
 
 ```svs
 caption.alice {
@@ -129,7 +129,7 @@ caption.bob {
 }
 ```
 
-然后在 Track 中通过 Use 选择呈现样式：
+然後在 Track 中透過 Use 選擇呈現樣式：
 
 ```svml
 <fonts:Stack id="caption-font" family="inter" weight="600" style="normal"/>
@@ -145,8 +145,8 @@ caption.bob {
 
 ## Media Track
 
-Media 将空间位置、框呈现与生命周期运动分开。`SpatialFrame` 负责位置和尺寸；外观 Recipe
-负责素材适配与框材质；可选的 motion Recipe 负责入场、持续和退场。
+Media 將空間位置、框呈現與生命週期運動分開。`SpatialFrame` 負責位置和尺寸；外觀 Recipe
+負責素材適配與框材質；可選的 motion Recipe 負責入場、持續和退場。
 
 ```svs
 media.product {
@@ -174,20 +174,20 @@ motion.product {
 }
 ```
 
-| 属性 | 描述 |
+| 屬性 | 描述 |
 |---|---|
-| `stack-order` | Z 轴层叠顺序 |
+| `stack-order` | Z 軸層疊順序 |
 | `fit` | `contain`、`cover`、`fit-width`、`fit-height`、`native`、`scale-down` 或 `stretch` |
-| `frame-x`、`frame-y` | 放置 Frame 内的对齐点 |
-| `content-x`、`content-y` | 素材内部独立选择的焦点 |
-| `playback` | `once-start`、`hold-start`、`loop-end`、`stretch` 等有时长素材占用方式 |
-| `frame-paint` | 采样素材背后的纯色或渐变 Paint |
-| `clip`、`radius`、`padding` | 框裁切与内缩 |
-| `border-*`、`shadows` | 框自有的边框与有序阴影 |
-| `enter`、`exit` | 生命周期算子；帧数、缓动和方向使用独立属性 |
-| `sustain` | 零个或多个确定性局部运动，例如 `float 12 2 up` |
+| `frame-x`、`frame-y` | 放置 Frame 內的對齊點 |
+| `content-x`、`content-y` | 素材內部獨立選擇的焦點 |
+| `playback` | `once-start`、`hold-start`、`loop-end`、`stretch` 等有時長素材佔用方式 |
+| `frame-paint` | 取樣素材背後的純色或漸變 Paint |
+| `clip`、`radius`、`padding` | 框裁切與內縮 |
+| `border-*`、`shadows` | 框自有的邊框與有序陰影 |
+| `enter`、`exit` | 生命週期運算元；幀數、緩動和方向使用獨立屬性 |
+| `sustain` | 零個或多個確定性區域性運動，例如 `float 12 2 up` |
 
-位置始终是一条显式图边：
+位置始終是一條顯式圖邊：
 
 ```svml
 <space:Frame id="product-frame" within={vertical}
@@ -197,9 +197,9 @@ motion.product {
   appearance={recipes.media.product} motion={recipes.motion.product}/>
 ```
 
-## 文本
+## 文字
 
-文本叠加层外观——排版与 Paint。位置由另一条 `SpatialFrame` 图边提供。
+文字疊加層外觀——排版與 Paint。位置由另一條 `SpatialFrame` 圖邊提供。
 
 ```svs
 text.title {
@@ -212,16 +212,16 @@ text.title {
 }
 ```
 
-| 属性 | 描述 |
+| 屬性 | 描述 |
 |---|---|
-| `stack-order` | Z 轴层叠顺序 |
-| `weight` | 字体粗细 |
-| `size` | 字体大小（像素） |
-| `align` | 文本对齐方式 |
-| `fill` | 文本颜色 |
-| `tracking` | 字间距调整 |
+| `stack-order` | Z 軸層疊順序 |
+| `weight` | 字型粗細 |
+| `size` | 字型大小（畫素） |
+| `align` | 文字對齊方式 |
+| `fill` | 文字顏色 |
+| `tracking` | 字間距調整 |
 
-先与精确字体字节一起编译为 `text:Style`，再由具体放置形式引用：
+先與精確字型位元組一起編譯為 `text:Style`，再由具體放置形式引用：
 
 ```svml
 <fonts:Stack id="title-font" family="inter" weight="900" style="normal"/>
@@ -233,7 +233,7 @@ text.title {
 
 ## Speaker Text Template
 
-这个 Recipe 选择纯数据 `speaker-v1` Text Template 声明的 Prompt 轴。模型、分辨率、参考素材与时长仍是 `seedance:ReferenceVideo` 的显式输入，不藏在 Recipe 里。
+這個 Recipe 選擇純資料 `speaker-v1` Text Template 宣告的 Prompt 軸。模型、解析度、參考素材與時長仍是 `seedance:ReferenceVideo` 的顯式輸入，不藏在 Recipe 裡。
 
 ```svs
 speaker.host {
@@ -245,14 +245,14 @@ speaker.host {
 }
 ```
 
-| 属性 | 描述 |
+| 屬性 | 描述 |
 |---|---|
-| `composition-stability` | 镜头/构图一致性：`flexible-ugc`、`soft-locked`、`strict-locked` |
-| `camera-motion` | 镜头运动：`none`、`subtle-punch-in-return` |
-| `edit-rhythm` | 剪辑风格：`continuous-take`、`pause-trim-jump-cuts` |
-| `performance` | 表演风格：`natural-explainer`、`high-energy-ugc`、`calm-authority`、`reactive-playful` |
-| `gesture` | 手势强度：`restrained`、`compact`、`natural`、`expressive` |
-与 Kit 的 Template 一起由 `text:Render` 引用：
+| `composition-stability` | 鏡頭/構圖一致性：`flexible-ugc`、`soft-locked`、`strict-locked` |
+| `camera-motion` | 鏡頭運動：`none`、`subtle-punch-in-return` |
+| `edit-rhythm` | 剪輯風格：`continuous-take`、`pause-trim-jump-cuts` |
+| `performance` | 表演風格：`natural-explainer`、`high-energy-ugc`、`calm-authority`、`reactive-playful` |
+| `gesture` | 手勢強度：`restrained`、`compact`、`natural`、`expressive` |
+與 Kit 的 Template 一起由 `text:Render` 引用：
 
 ```svml
 <text:Render id="hook-prompt"
@@ -264,8 +264,8 @@ speaker.host {
 
 ## 通用 Text Template Recipe
 
-无需领域包装器也能使用同一优先级。`text:Render` 可以读取任意 SVS Recipe，只投影模板明确声明的属性，并允许显式 `text:Param` 覆盖。这使 Seedance 的 B-roll、Podcast、Call、
-Street Interview 与参考迁移 Kit 可以保持为纯数据，而不进入 Seedance 执行代码。
+無需領域包裝器也能使用同一優先順序。`text:Render` 可以讀取任意 SVS Recipe，只投影模板明確宣告的屬性，並允許顯式 `text:Param` 覆蓋。這使 Seedance 的 B-roll、Podcast、Call、
+Street Interview 與參考遷移 Kit 可以保持為純資料，而不進入 Seedance 執行程式碼。
 
 ```svs
 broll.product-demo {
@@ -277,7 +277,7 @@ broll.product-demo {
 }
 ```
 
-Street Interview、Podcast 与 Call 使用同一套 Recipe 机制，不需要手写固定 Prompt。例如：
+Street Interview、Podcast 與 Call 使用同一套 Recipe 機制，不需要手寫固定 Prompt。例如：
 
 ```svs
 interview.street {
@@ -289,14 +289,14 @@ interview.street {
 }
 ```
 
-`street-interview-v1` 读取这五个轴，每段的镜头变化按作者顺序直接写在 `action` 中。`podcast-v1` 与 `call-v1` 读取同名的 `framing`、
-`edit-language`、`pacing`、`performance`、`reaction` 和 `gesture` 轴，但使用各自的有限值。允许值和默认值以所选 Kit 文件为准。
+`street-interview-v1` 讀取這五個軸，每段的鏡頭變化按作者順序直接寫在 `action` 中。`podcast-v1` 與 `call-v1` 讀取同名的 `framing`、
+`edit-language`、`pacing`、`performance`、`reaction` 和 `gesture` 軸，但使用各自的有限值。允許值和預設值以所選 Kit 檔案為準。
 
-模型、分辨率、时长和参考媒体不是模板策略；它们继续存在于精确模型 Surface 与显式图边中。
+模型、解析度、時長和參考媒體不是模板策略；它們繼續存在於精確模型 Surface 與顯式圖邊中。
 
-## 精确字体声明
+## 精確字型宣告
 
-SVS 描述字体策略，但不选择或打开字体字节。常用开源字体由私有的预发布字体目录显式导入；只有作者图真正引用的字体会进入本次 Build：
+SVS 描述字型策略，但不選擇或開啟字型位元組。常用開源字型由私有的預釋出字型目錄顯式匯入；只有作者圖真正引用的字型會進入本次 Build：
 
 ```svml
 <import as="fonts" from="@hypit/fonts-open@1"/>
@@ -306,25 +306,25 @@ SVS 描述字体策略，但不选择或打开字体字节。常用开源字体�
 </fonts:Stack>
 ```
 
-| 属性 | 描述 |
+| 屬性 | 描述 |
 |---|---|
-| `family` | 字体包有限目录中的字体族 |
-| `weight` | 精确选择的字体粗细 |
-| `style` | `normal` 或该字体族支持的 `italic` |
-| `emoji` | `Stack` 可选的 `color`（COLRv1）或 `mono` 兜底 |
+| `family` | 字型包有限目錄中的字型族 |
+| `weight` | 精確選擇的字型粗細 |
+| `style` | `normal` 或該字型族支援的 `italic` |
+| `emoji` | `Stack` 可選的 `color`（COLRv1）或 `mono` 兜底 |
 
-目录现有 109 个开源字体族，覆盖手写、书法、展示、无衬线、衬线、等宽、CJK、其他文字系统与 Emoji。Fontsource 依赖固定为 `5.3.0`，Chromium 兼容的 COLRv1 Emoji 包另行锁定版本；编译器把已安装字节哈希成内容寻址的字体值，Build 过程不会下载字体，Runtime
-也不猜字体：
+目錄現有 109 個開源字型族，覆蓋手寫、書法、展示、無襯線、襯線、等寬、CJK、其他文字系統與 Emoji。Fontsource 依賴固定為 `5.3.0`，Chromium 相容的 COLRv1 Emoji 包另行鎖定版本；編譯器把已安裝位元組雜湊成內容定址的字型值，Build 過程不會下載字型，Runtime
+也不猜字型：
 
 ```svml
 <caption-fine:Style id="dialogue" recipe={recipes.caption.dialogue}
   font={caption-fonts}/>
 ```
 
-`fonts:Stack` 产出通用 `FontStackRef`，主字体与 Fallback 都保留自己的真实元数据；
-Caption Recipe 不再重复家族、字重或字形。CJK 与 Emoji 即使由多个 Unicode-range 文件组成，在作者图中仍是一条逻辑边。终端 Text 与 Fine Caption 都拒绝省略字体栈；Visual IR 不接受机器字体兜底。对于同时具有文本与 Emoji 两种呈现的符号，作者应写真实的 Unicode Emoji 序列（例如包含 VS16 的 `☎️`）；任何包都不会为了强制彩色而改写显示稿。
+`fonts:Stack` 產出通用 `FontStackRef`，主字型與 Fallback 都保留自己的真實後設資料；
+Caption Recipe 不再重複家族、字重或字形。CJK 與 Emoji 即使由多個 Unicode-range 檔案組成，在作者圖中仍是一條邏輯邊。終端 Text 與 Fine Caption 都拒絕省略字型棧；Visual IR 不接受機器字型兜底。對於同時具有文字與 Emoji 兩種呈現的符號，作者應寫真實的 Unicode Emoji 序列（例如包含 VS16 的 `☎️`）；任何包都不會為了強制彩色而改寫顯示稿。
 
-品牌字体与自定义字体仍是显式作者资产，不会被塞进共享目录：
+品牌字型與自定義字型仍是顯式作者資產，不會被塞進共享目錄：
 
 ```svml
 <import as="media" from="@hypit/media@1"/>
@@ -332,9 +332,9 @@ Caption Recipe 不再重复家族、字重或字形。CJK 与 Emoji 即使由多
   weight="600" style="normal"/>
 ```
 
-## 综合示例
+## 綜合示例
 
-一个完整的 `recipes.svs` 文件，用于四段式说话人头像项目：
+一個完整的 `recipes.svs` 檔案，用於四段式說話人頭像專案：
 
 ```svs
 <?svml using="@hypit/svs@1"?>
@@ -369,7 +369,7 @@ Caption Recipe 不再重复家族、字重或字形。CJK 与 Emoji 即使由多
 </sheet>
 ```
 
-该文件在 `.svml` 源文件中导入一次，其值在整个文件中被引用：
+該檔案在 `.svml` 原始檔中匯入一次，其值在整個檔案中被引用：
 
 ```svml
 <import as="recipes" source="./recipes.svs"/>

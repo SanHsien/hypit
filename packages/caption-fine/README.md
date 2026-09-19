@@ -87,7 +87,7 @@ and individual Han characters as Display Words; punctuation stays with its displ
 those units for timing and active Paint, while authored Cues remain complete reading phrases.
 Dual Text retains its complete alignment unit even when it displays or speaks several words.
 
-`<组件化|>` authors the same unit as `<组件化|组件化>` without repeating the speech. Fine's `step`
+`<元件化|>` authors the same unit as `<元件化|元件化>` without repeating the speech. Fine's `step`
 karaoke, active underline and active box treat that unit together using its first-to-last speech
 interval. Ordinary Chinese characters around it retain their own activation times. This is an
 explicit authored group, not a renderer-selected segmentation, and does not introduce a new Cue.
@@ -95,7 +95,7 @@ The underlying character anchors remain available to other Timeline consumers. `
 `typewriter` still animate inside the complete unit over its interval when deliberately selected.
 
 `word-gap` sizes the separators authored in `CaptionDisplayWord.separatorBefore`. A numeric or
-writing-system boundary does not create a space: `3D` and `3개월` stay joined, while `是的 就是这样`
+writing-system boundary does not create a space: `3D` and `3개월` stay joined, while `是的 就是這樣`
 keeps its space. Base text, active text, underlines and joined boxes consume the same boundaries.
 For `active-box: trail; active-box-continuity: joined`, Fine measures the complete stationary Cue,
 including the inactive suffix, and joins its painted line rectangles. An over-wide word's internal

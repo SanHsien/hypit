@@ -64,20 +64,20 @@ The three Dual forms serve distinct author choices:
 | --- | --- | --- | --- |
 | `<S\|ess>` | `S` | `ess` | Keep the spelling while specifying the letter's spoken name. |
 | `<New York\|>` | `New York` | `New York` | Keep the same words and internal space in one complete correspondence. |
-| `<\|再见>` | No Caption words | `再见` | Retain speech and its semantic anchors without displaying it. |
+| `<\|再見>` | No Caption words | `再見` | Retain speech and its semantic anchors without displaying it. |
 
 [Pronunciation choices](../creation/script-and-time.md#choose-the-sound-the-spelling-should-carry)
 shows letter names, abbreviations, coined names and homophonic readings. The spoken side is ordinary
 Text supplied to the selected model, not a separate phonetic language interpreted by Script.
 
-When the wording is identical, `<组件化|>` is shorthand for `<组件化|组件化>`. It can group a name,
+When the wording is identical, `<元件化|>` is shorthand for `<元件化|元件化>`. It can group a name,
 compound or phrase for Caption presentation while leaving its spoken Tokens and timing intact:
-`把<动效|><组件化|>。|| 以后就能<直接复用|>。` Choose groups for the intended expression; ordinary
+`把<動效|><元件化|>。|| 以後就能<直接複用|>。` Choose groups for the intended expression; ordinary
 Chinese prose does not require word-by-word markup. The group's Style determines its visual response;
 `||` still controls which reading phrases appear as separate Cues.
 
 With speech omitted, the left side supplies both projections, so semantic markers can be placed
-there and Studio writes back there: `<组@{beat!}件化|>`. Display attributes and markers are annotations,
+there and Studio writes back there: `<組@{beat!}件化|>`. Display attributes and markers are annotations,
 not spoken words. Attributes still apply to the preceding display word rather than the whole group.
 With an explicit spoken side, markers continue to belong on that right-hand side.
 Either form needs a spoken word: `<API|...>` supplies no speech correspondence for its display.
@@ -118,16 +118,16 @@ Turn and padding at the edges of each Dual side are omitted. A Source newline is
 
 | Script body inside a Segment | Display text | What the author chose |
 | --- | --- | --- |
-| `是的 就是这样` | `是的 就是这样` | A real space in Chinese prose. |
-| `是的@{answer}就是这样@{/answer}` | `是的就是这样` | Joined text with a zero-width semantic range. |
-| `是的 @{answer}就是这样@{/answer}` | `是的 就是这样` | The same range after an authored space. |
+| `是的 就是這樣` | `是的 就是這樣` | A real space in Chinese prose. |
+| `是的@{answer}就是這樣@{/answer}` | `是的就是這樣` | Joined text with a zero-width semantic range. |
+| `是的 @{answer}就是這樣@{/answer}` | `是的 就是這樣` | The same range after an authored space. |
 | `Hello @{place}New York.@{/place}` | `Hello New York.` | English spaces and attached punctuation. |
 | `이건 3개월 동안 만든 영상이에요.` | `이건 3개월 동안 만든 영상이에요.` | Korean word spaces; no space inside `3개월`. |
 | `3 개월` | `3 개월` | An explicitly different spelling. |
 | `3D` / `3 D` | `3D` / `3 D` | Numeric/Latin adjacency is also authored. |
 | `<New York\|>` | `New York` | One Alignment Unit with an internal space. |
 | `<API\|A P I>` | `API` | One correspondence to several spoken tokens. |
-| `<\|只说不显示>` | *(no visible words)* | Spoken content and semantic timing remain. |
+| `<\|只說不顯示>` | *(no visible words)* | Spoken content and semantic timing remain. |
 
 Do not insert spaces around markers for parsing, strip Chinese spaces, or infer Korean/English gaps
 from speech tokens. A space is display information, not an extra timed token. Caption consumers use
@@ -181,9 +181,9 @@ wording differ.
 ## Bind meaning to Script identities
 
 Every semantic marker is enclosed in `@{...}`, with `/`, `!` and `~` inside. The marker contributes
-no text or whitespace. `是的@{part}就是这样@{/part}` stays joined; `是的 @{part}就是这样@{/part}`
+no text or whitespace. `是的@{part}就是這樣@{/part}` stays joined; `是的 @{part}就是這樣@{/part}`
 keeps its authored space. Do not add spaces to make a marker parse. Markers cannot split a speech
-Token or its attached punctuation: write `@{beat!}“测试”`, not `“@{beat!}测试”`.
+Token or its attached punctuation: write `@{beat!}“測試”`, not `“@{beat!}測試”`.
 `hel@{beat!}lo` and `안@{beat!}녕` also split tokens. Grouping with Dual Text does not make these
 positions legal. Attributes stay attached to their display word: `word{emphasis}@{beat!}`.
 Write literal `@{part}` as `\@\{part\}`.

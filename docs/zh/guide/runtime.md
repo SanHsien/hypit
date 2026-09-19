@@ -1,43 +1,43 @@
 ---
 title: Runtime
-description: 选择执行服务，独立运行 Build，并保留可持续使用的 Result。
+description: 選擇執行服務，獨立執行 Build，並保留可持續使用的 Result。
 ---
 
-Source 描述作品，Run 选择 Target 与 Candidate，Runtime 使用选定服务执行这些决定，
-项目保留实际得到的 Output。
+Source 描述作品，Run 選擇 Target 與 Candidate，Runtime 使用選定服務執行這些決定，
+專案保留實際得到的 Output。
 
-| 所有者 | 职责 |
+| 所有者 | 職責 |
 | --- | --- |
-| 项目 | Source、素材、组件包与选定的 Runtime Profile |
-| Distribution | 安装的可执行程序、公共 SDK 与执行实现 |
-| Runtime Profile | Provider Endpoint、凭据引用、路由与共享容量 |
-| Build | 使用选定依赖图和配置的一次执行尝试 |
-| Result 仓库 | 已完成的公开 Output、执行结果和保留的运行证据 |
+| 專案 | Source、素材、元件包與選定的 Runtime Profile |
+| Distribution | 安裝的可執行程式、公共 SDK 與執行實現 |
+| Runtime Profile | Provider Endpoint、憑據引用、路由與共享容量 |
+| Build | 使用選定依賴圖和配置的一次執行嘗試 |
+| Result 倉庫 | 已完成的公開 Output、執行結果和保留的執行證據 |
 
-Core 只规划和推进依赖，不需要知道作品是一条视频。新组件或
-[Provider](./providers.md) 通过相同的包接口提供自己的行为。
+Core 只規劃和推進依賴，不需要知道作品是一條影片。新元件或
+[Provider](./providers.md) 透過相同的包介面提供自己的行為。
 
-## 先确定项目，再选择 Profile
+## 先確定專案，再選擇 Profile
 
-从视频项目运行命令，或用 `--workspace` 明确指定项目。否则使用当前目录向上最近的
-`package.json`；没有时，以当前目录为项目。Source 文件名和 Runtime 配置都不决定这个边界。
+從影片專案執行命令，或用 `--workspace` 明確指定專案。否則使用當前目錄向上最近的
+`package.json`；沒有時，以當前目錄為專案。Source 檔名和 Runtime 配置都不決定這個邊界。
 
 ```bash
 hypit paths
 hypit runtime init
 ```
 
-`runtime init` 写入可编辑的起始 `hypit.runtime.json`，通过项目的 `.hypit/runtime`
-文件选择它。已有 Profile 会保留；此操作不安装、不登录、不执行。
-起始配置提供 HypiHub 托管生成和 WhisperX，以及本地媒体处理、渲染。先按作品需要选择服务，
-再准备它们。本地推理、项目 Provider 可以走同一条路径，也可以与 HypiHub 混合使用。
+`runtime init` 寫入可編輯的起始 `hypit.runtime.json`，透過專案的 `.hypit/runtime`
+檔案選擇它。已有 Profile 會保留；此操作不安裝、不登入、不執行。
+起始配置提供 HypiHub 託管生成和 WhisperX，以及本地媒體處理、渲染。先按作品需要選擇服務，
+再準備它們。本地推理、專案 Provider 可以走同一條路徑，也可以與 HypiHub 混合使用。
 
-`hypit runtime use <profile>` 选择已有配置；`--runtime <profile>` 只覆盖当前命令。
-命令只读取当前项目的选择，不继承其他项目的 Runtime。命令行相对路径以当前目录为基准。
+`hypit runtime use <profile>` 選擇已有配置；`--runtime <profile>` 只覆蓋當前命令。
+命令只讀取當前專案的選擇，不繼承其他專案的 Runtime。命令列相對路徑以當前目錄為基準。
 
 ## Runtime Profile
 
-一个只配置本地媒体处理的例子：
+一個只配置本地媒體處理的例子：
 
 ```json
 {
@@ -51,12 +51,12 @@ hypit runtime init
 }
 ```
 
-`dataRoot` 放活跃执行数据和工作文件，与 `.hypit/runtime` 选择文件分开。
-`endpoints` 选择已安装的 Provider 及其配置。凭据通过选定 Store 中的引用获取，
-密钥值不写进 Profile 或 Source。
+`dataRoot` 放活躍執行資料和工作檔案，與 `.hypit/runtime` 選擇檔案分開。
+`endpoints` 選擇已安裝的 Provider 及其配置。憑據透過選定 Store 中的引用獲取，
+金鑰值不寫進 Profile 或 Source。
 
-只有一个兼容 Endpoint 时无需 binding；多个 Endpoint 都能提供同一能力时，用 binding
-表达选择。例如已明确配置本地 WhisperX 后：
+只有一個相容 Endpoint 時無需 binding；多個 Endpoint 都能提供同一能力時，用 binding
+表達選擇。例如已明確配置本地 WhisperX 後：
 
 ```json
 "bindings": {
@@ -64,40 +64,40 @@ hypit runtime init
 }
 ```
 
-安装包使实现可用，选择它才赋予它当前环境中的角色。Model 拥有请求含义，Provider 拥有
-服务支持、接口映射和价格来源。请求失败不会偷偷改用另一个账户。具体配置看所选 Provider 的 README。
+安裝包使實現可用，選擇它才賦予它當前環境中的角色。Model 擁有請求含義，Provider 擁有
+服務支援、介面對映和價格來源。請求失敗不會偷偷改用另一個賬戶。具體配置看所選 Provider 的 README。
 
-## 按当前需要准备服务
+## 按當前需要準備服務
 
-本地媒体处理可以直接准备所选工具并启动 Worker：
+本地媒體處理可以直接準備所選工具並啟動 Worker：
 
 ```bash
 hypit runtime up --endpoint media.local
 hypit runtime status
 ```
 
-只准备资源、暂不启动助手或 Worker 时，使用 `hypit programs prepare --endpoint media.local`。
-通过 `hypit programs status --endpoint media.local` 查看就绪情况；检查配置或排查失败时，
-使用 `hypit doctor --endpoint media.local`。按当前问题选择命令，不必依次执行所有检查。
+只准備資源、暫不啟動助手或 Worker 時，使用 `hypit programs prepare --endpoint media.local`。
+透過 `hypit programs status --endpoint media.local` 檢視就緒情況；檢查配置或排查失敗時，
+使用 `hypit doctor --endpoint media.local`。按當前問題選擇命令，不必依次執行所有檢查。
 
-本地媒体处理没有凭据要求。选中的服务若声明了凭据槽，再单独使用
-`hypit auth status <endpoint>` 检查。例如，选择 HypiHub 后使用
-`hypit auth status hypihub.default`，需要连接账户时执行 `hypit auth login hypihub.default`。
+本地媒體處理沒有憑據要求。選中的服務若宣告瞭憑據槽，再單獨使用
+`hypit auth status <endpoint>` 檢查。例如，選擇 HypiHub 後使用
+`hypit auth status hypihub.default`，需要連線賬戶時執行 `hypit auth login hypihub.default`。
 
-使用 Profile 里的实际 Endpoint 名称，可重复 `--endpoint` 选择多个；省略时覆盖整个 Profile。
-`doctor` 读取配置、运行 Provider 的诊断，不提交生成。除了错误，也要阅读警告：有凭据或能读取
-模型目录，不代表每种请求一定成功。没有选定 Runtime 时，doctor 只检查项目 Result。
+使用 Profile 裡的實際 Endpoint 名稱，可重複 `--endpoint` 選擇多個；省略時覆蓋整個 Profile。
+`doctor` 讀取配置、執行 Provider 的診斷，不提交生成。除了錯誤，也要閱讀警告：有憑據或能讀取
+模型目錄，不代表每種請求一定成功。沒有選定 Runtime 時，doctor 只檢查專案 Result。
 
-`runtime up` 准备所选本地依赖和 Managed Program，再启动 Worker；它不登录或启动托管服务。
-`programs prepare|up|status|down` 单独管理这些本地资源和助手。首次推理环境准备可能涉及大量下载，
-应先比较本地准备成本和托管方式，再选择执行路径。
+`runtime up` 準備所選本地依賴和 Managed Program，再啟動 Worker；它不登入或啟動託管服務。
+`programs prepare|up|status|down` 單獨管理這些本地資源和助手。首次推理環境準備可能涉及大量下載，
+應先比較本地準備成本和託管方式，再選擇執行路徑。
 
-`plan <run>` 检查当前工作需要的能力和轻量就绪状态。发现 Provider 能力需要可加载的包声明；
-没有明确 binding 时，可能需要加载其他已声明 Endpoint。未使用的服务不必启动或登录。
-`build` 不做安装准备：依赖已就绪时，按需启动 Worker 并提交一次 Build。
-[Run 与 Build](../quickstart/run.md) 说明规划、价格、付费授权和显式复用。
+`plan <run>` 檢查當前工作需要的能力和輕量就緒狀態。發現 Provider 能力需要可載入的包宣告；
+沒有明確 binding 時，可能需要載入其他已宣告 Endpoint。未使用的服務不必啟動或登入。
+`build` 不做安裝準備：依賴已就緒時，按需啟動 Worker 並提交一次 Build。
+[Run 與 Build](../quickstart/run.md) 說明規劃、價格、付費授權和顯式複用。
 
-## 执行独立于观察终端
+## 執行獨立於觀察終端
 
 ```bash
 hypit build build.svrun --follow
@@ -105,35 +105,35 @@ hypit status <build-id> --watch
 hypit logs <build-id> --lines 80
 ```
 
-Worker 拥有执行。`--follow` 和 `status --watch` 只是观察；关闭终端或等待超时不会取消 Build。
-停止某一次尝试用 `hypit cancel <build-id>`。远程取消尽力而为，已经完成的 Output 会保留。
+Worker 擁有執行。`--follow` 和 `status --watch` 只是觀察；關閉終端或等待超時不會取消 Build。
+停止某一次嘗試用 `hypit cancel <build-id>`。遠端取消盡力而為，已經完成的 Output 會保留。
 
-失败的尝试保持失败。新 Run 可以选择已有 Output，开启新的 Build。如果执行已经结束，
-只是 Result 保存需要处理，`status` 会指出 `hypit result finish <build-id>`：它只完成待保存工作，
-不会重新生成素材。
+失敗的嘗試保持失敗。新 Run 可以選擇已有 Output，開啟新的 Build。如果執行已經結束，
+只是 Result 儲存需要處理，`status` 會指出 `hypit result finish <build-id>`：它只完成待儲存工作，
+不會重新生成素材。
 
-Build 日志保留 Provider 阶段和诊断。`runtime logs` 查看 Worker 启动和进程错误；
-安装、服务日志属于相应 Managed Program。终端记录丢失不意味着执行证据也丢失。
+Build 日誌保留 Provider 階段和診斷。`runtime logs` 檢視 Worker 啟動和程序錯誤；
+安裝、服務日誌屬於相應 Managed Program。終端記錄丟失不意味著執行證據也丟失。
 
-## 共享容量，独立推进
+## 共享容量，獨立推進
 
-多个 Build 可以同时推进。限制属于实际使用的账户、部署或本地计算资源。
-远程等待不会占住一个整条 Build 的名额、阻止其他 Build 的本地工作。
-Provider 可以分别声明任务容量和 submit、poll、collect 的短调用限制。
-`hypit activity --verbose` 展示活跃工作和共享容量。
+多個 Build 可以同時推進。限制屬於實際使用的賬戶、部署或本地計算資源。
+遠端等待不會佔住一個整條 Build 的名額、阻止其他 Build 的本地工作。
+Provider 可以分別宣告任務容量和 submit、poll、collect 的短呼叫限制。
+`hypit activity --verbose` 展示活躍工作和共享容量。
 
-每个 Build 使用独立加载的项目实现和选定配置。修改项目组件或 Profile 影响下一次 Build，
-已开始的工作保留已加载的实现。Managed Program 有独立生命周期，预热好的 WhisperX 可以服务多个 Build。
+每個 Build 使用獨立載入的專案實現和選定配置。修改專案元件或 Profile 影響下一次 Build，
+已開始的工作保留已載入的實現。Managed Program 有獨立生命週期，預熱好的 WhisperX 可以服務多個 Build。
 
-更新 Distribution 或改变 Worker 继承的 shell 环境，涉及进程生命周期。重启前检查活跃工作：
-`runtime down` 会结束活跃执行上下文，`programs down` 单独停止助手。
-执行器丢失会结束所属尝试，之后通过新 Build 显式复用。这种执行分离不是安全沙箱，
-也不会冻结组件之后才读取的文件。
+更新 Distribution 或改變 Worker 繼承的 shell 環境，涉及程序生命週期。重啟前檢查活躍工作：
+`runtime down` 會結束活躍執行上下文，`programs down` 單獨停止助手。
+執行器丟失會結束所屬嘗試，之後透過新 Build 顯式複用。這種執行分離不是安全沙箱，
+也不會凍結元件之後才讀取的檔案。
 
-## 产物留在项目里
+## 產物留在專案裡
 
-默认 Result 位于 `.hypit/results`。项目通过独立的 `hypit.results.json` 选择位置或仓库，
-不放进 Runtime Profile：
+預設 Result 位於 `.hypit/results`。專案透過獨立的 `hypit.results.json` 選擇位置或倉庫，
+不放進 Runtime Profile：
 
 ```json
 {
@@ -143,15 +143,15 @@ Provider 可以分别声明任务容量和 submit、poll、collect 的短调用�
 }
 ```
 
-S3 适配器可以把 Result 放进桶及项目专属前缀。适配器负责访问和凭据；更换 Result 存储不会
-搬走活跃 Runtime，也不会自动上传外部文件引用。已提交 Build 保留提交时的目标位置，
-修改选择不迁移历史。
+S3 介面卡可以把 Result 放進桶及專案專屬字首。介面卡負責訪問和憑據；更換 Result 儲存不會
+搬走活躍 Runtime，也不會自動上傳外部檔案引用。已提交 Build 保留提交時的目標位置，
+修改選擇不遷移歷史。
 
-Result 在公开 Output 完成时发布它们，最后保留终态。新 Output 可以引用已有文件，复合值内部也一样，
-不意味着多一份素材。显式本地文件引用保持实时性；继续复用时需要保留它们的依赖。
-需要交给人或其他工具的独立文件时，用 `get` 另行导出。
+Result 在公開 Output 完成時釋出它們，最後保留終態。新 Output 可以引用已有檔案，複合值內部也一樣，
+不意味著多一份素材。顯式本地檔案引用保持實時性；繼續複用時需要保留它們的依賴。
+需要交給人或其他工具的獨立檔案時，用 `get` 另行匯出。
 
-`builds`、`history`、`inspect`、`get` 读取项目 Result，不依赖原 Runtime。
-精确存储和执行接口见
-[Result 包](https://github.com/hypit-ai/hypit/blob/main/packages/build-result/README.md) 与
+`builds`、`history`、`inspect`、`get` 讀取專案 Result，不依賴原 Runtime。
+精確儲存和執行介面見
+[Result 包](https://github.com/hypit-ai/hypit/blob/main/packages/build-result/README.md) 與
 [本地 Runtime 包](https://github.com/hypit-ai/hypit/blob/main/packages/runtime-local/README.md)。
