@@ -1,19 +1,19 @@
 # Upstream review report
 
 - Upstream: `https://github.com/hypit-ai/hypit.git` (`main`)
-- Tracking: commit
-- Reviewed through: `a45224c` (v0.2.7)
+- Tracking: release
+- Reviewed through: `168c537` (v0.2.8)
 - Last review date: 2026-09-19
 
 ## Result
 
-No new upstream commits. Nothing to review.
+No upstream release past the reviewed one. Nothing to review.
 
 ## Fork status
 
-- 共同 baseline：`a45224c`（已審視至此）
-- 本 fork `HEAD`：`cfeaa648`，baseline 之後 **ahead 1**
-- upstream tip：`a45224c3`，baseline 之後 **behind 0**
+- 共同 baseline：`168c537`（已審視至此）
+- 本 fork `HEAD`：`4c2138b1`，baseline 之後 **ahead 3**
+- upstream tip：`168c537c`，baseline 之後 **behind 0**
 
 這兩個數字每次 commit 都會變，所以由本檢查當場算出，不寫進文件。
 
