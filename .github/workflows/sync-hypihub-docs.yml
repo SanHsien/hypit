@@ -12,6 +12,8 @@ permissions:
 
 jobs:
   notify:
+    # HypiHub sync needs the upstream-only HYPIHUB_SYNC_TOKEN secret; skip it in forks.
+    if: github.repository == 'hypit-ai/hypit'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source commit
