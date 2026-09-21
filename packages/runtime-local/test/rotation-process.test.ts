@@ -15,7 +15,12 @@ import { statePath } from "../src/config.js";
 
 const distribution = fileURLToPath(new URL("../../../", import.meta.url));
 async function until(predicate: () => boolean | Promise<boolean>, detail: () => string): Promise<void> {
-  const deadline = Date.now()+20_000;
+  // 90s, matching concurrency-process.test.ts: the full suite spawns many real child
+  // processes concurrently, and this test's own real worker subprocess and HTTP polling
+  // loop slow down under that contention (observed ~2.5x under a full `node --test` run
+  // versus standalone). 20s was tight enough to fail intermittently only in the full
+  // suite while always passing alone.
+  const deadline = Date.now()+90_000;
   while (!await predicate()) {
     if (Date.now()>deadline) throw new Error(`Expected rotation progress: ${detail()}`);
     await pause(20);
@@ -23,7 +28,7 @@ async function until(predicate: () => boolean | Promise<boolean>, detail: () => 
 }
 function alive(pid: number): boolean { try { process.kill(pid,0); return true; } catch { return false; } }
 
-test("a draining carrier finishes its existing Build while a new carrier shares resource limits", {timeout:40_000}, async () => {
+test("a draining carrier finishes its existing Build while a new carrier shares resource limits", {timeout:120_000}, async () => {
   const root=await mkdtemp(join(tmpdir(),"hypit-carrier-rotation-"));
   const dataRoot=join(root,"runtime"), profile=join(root,"profile.json");
   const state=new SqliteRuntimeState(statePath(dataRoot));
