@@ -152,3 +152,25 @@
 | not-applicable（5） | #340 #350 #352 #359 #365 | 文件連結、MuAPI Provider 請求（已關閉）、使用問答、訂閱服務、社群群組詢問 |
 
 **水位**：`reviewed_release=v0.2.16`、`reviewed_through=557497b32a6658067c11bf924c7511e61c61df4e`、`reviewed_pr_through=373`、`reviewed_issue_through=374`、`reviewed_date=2026-09-30`。
+
+
+## 2026-09-30: 依賴安全升級（Dependabot）
+
+範圍：前端 `pnpm-lock.yaml` 與 `services/whisperx/uv.lock`。原則同前：只在依賴方要求的主版內升級，`overrides` 一律用 `^` 限主版。
+
+**已升級**
+
+- `hono` 4.12.32 -> 4.13.12：`@hyperframes/*` 把它固定為 4.12.32，修補版是 4.12.34／4.13.5，因此在 `pnpm-workspace.yaml` 以 `overrides` 鎖 `^4.13.5`。
+- `vite`（vitepress 用的那份）5.4.21 -> 6.4.3：vitepress 1.6.4 要求 `vite ^5.4.14`，5.x 沒有修補版，以 `overrides` 的 `vitepress>vite: ^6.4.3` 換到 6.x 的修補版。`pnpm docs:build` 通過。直接依賴的 `vite` 8.2.2 不受影響。
+- `esbuild`：0.21.5（隨 vite 5 移除）與 0.27.7 -> 0.28.2。0.27.7 由 `tsx` 4.21.0（`esbuild ~0.27.0`）帶入，故 `tsx` 升到 4.23.15（同為 4.x，`esbuild ~0.28.0`）；`packages/provider-hyperframes-local` 同步。0.25.12 不在影響範圍。
+- `lightning`／`pytorch-lightning` 2.6.5 -> 2.6.6（`uv lock --upgrade-package`），只動這兩個套件；`pnpm test:whisperx-service` 18 項通過。Dependabot PR #1 同時降級 `onnxruntime` 並新增 `coloredlogs`／`humanfriendly`，未合併，由本次提交取代後關閉。
+
+**延後**
+
+| 套件 | 現在 | 修補版 | 延後原因 | 觸發條件 |
+| --- | --- | --- | --- | --- |
+| `torch` | 2.8.0 | 2.9.1／2.10.0／2.13.0 | `whisperx 3.8.6` 要求 `torch ~=2.8.0`、`torchaudio ~=2.8.0`、`torchvision ~=0.23.0`、`torchcodec <0.8`，任何修補版都會與之衝突 | 上游 `whisperx` 放寬 torch 上限 |
+| `transformers` | 4.57.6 | 5.x（4.x 無修補版） | 5.x 需要 `huggingface-hub >=1.5`，`whisperx 3.8.6` 要求 `huggingface-hub <1.0`，`uv lock` 無解；且是主版升級，需實跑對齊模型才能驗 | 上游 `whisperx` 放寬 `huggingface-hub`，且能在本機實跑對齊 |
+| `nltk` | 3.10.3 | 無修補版（GHSA-8mgp-746c-j5xp） | 無可升版本；警示保持開啟，不 dismiss | 上游釋出修補版 |
+
+`nltk` 可達性：弱點在 `TransitionParser`、`AveragedPerceptron`、`PerceptronTagger.save_to_json`、`save_maxent_params` 的模型讀寫，且僅在啟用 `pathsec` 時才構成沙箱繞過。`whisperx` 只用 `nltk.data.load('tokenizers/punkt_tab/...')` 載入斷句器，本服務只設定 `nltk.data.path`，兩者都不呼叫上述 API。

@@ -4,3 +4,10 @@ packages:
   # Shipped examples are repository fixtures. Real authored projects always live outside this
   # tool checkout and resolve their own project-local packages through the Host's project root.
   - examples/*/packages/*
+
+# Security pins (see docs/fork/DECISIONS.md, 2026-09-30). Each stays inside the dependent's major.
+overrides:
+  # @hyperframes/* pin hono to exactly 4.12.32; fixes are 4.12.34 / 4.13.5.
+  hono: ^4.13.5
+  # vitepress 1.x asks for vite ^5.4.14, which has no patched release; 6.4.3 is the fixed 6.x.
+  vitepress>vite: ^6.4.3
