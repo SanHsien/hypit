@@ -1,4 +1,41 @@
 {
   "_comment": "Reviewed-but-not-now decisions for tools/check_dependency_freshness.py. A deferral is for a floor that would genuinely break something if raised right now, with the reason recorded here; it is not a place to park 'waiting for upstream to move first'. Each entry needs deferredLatest so it expires by itself once the registry moves past the release it was reviewed against; a permanent policy belongs on the declaring line as `# freshness-hold:` instead.",
-  "deferrals": {}
+  "deferrals": {
+    "@puppeteer/browsers": {
+      "deferredLatest": "3.2.3",
+      "reason": "exact pin refreshed together with the lockfile in the dependency maintenance pass; not now"
+    },
+    "@types/node": {
+      "deferredLatest": "26.6.3",
+      "reason": "major above the supported Node 22/24 runtimes; types must match the runtime"
+    },
+    "koffi": {
+      "deferredLatest": "3.3.2",
+      "reason": "exact pin refreshed together with the lockfile in the dependency maintenance pass; not now"
+    },
+    "puppeteer-core": {
+      "deferredLatest": "25.12.0",
+      "reason": "exact pin refreshed together with the lockfile in the dependency maintenance pass; not now"
+    },
+    "rollup": {
+      "deferredLatest": "4.63.5",
+      "reason": "exact pin refreshed together with the lockfile in the dependency maintenance pass; not now"
+    },
+    "rollup-plugin-dts": {
+      "deferredLatest": "6.5.1",
+      "reason": "exact pin refreshed together with the lockfile in the dependency maintenance pass; not now"
+    },
+    "sharp": {
+      "deferredLatest": "0.35.5",
+      "reason": "exact pin refreshed together with the lockfile in the dependency maintenance pass; not now"
+    },
+    "typescript": {
+      "deferredLatest": "7.0.2",
+      "reason": "major upgrade (7.x) needing toolchain migration work; not now"
+    },
+    "vite": {
+      "deferredLatest": "8.3.1",
+      "reason": "exact pin refreshed together with the lockfile in the dependency maintenance pass; not now"
+    }
+  }
 }
