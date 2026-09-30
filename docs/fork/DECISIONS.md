@@ -117,3 +117,38 @@
 共 6 筆 issue，全數 triage 完畢。
 
 - **水位推進**：`tools/upstream_baseline.json` 更新為 `reviewed_through=5a568f4be485ab5e735fe95533cd5f77a85c66ee`（`v0.2.12`）、`reviewed_pr_through=337`、`reviewed_issue_through=333`、`reviewed_date=2026-09-21`。**Git 工作樹本身未合併任何 v0.2.9–v0.2.12 上游程式碼**；下次由主人明確同意後，可依本輪逐筆決策執行實際合併。
+
+
+## 2026-09-30: 上游 v0.2.16 審查（v0.2.13–v0.2.16）
+
+範圍：`5a568f4`（v0.2.12）→ `557497b`（tag `v0.2.16`）共 19 commit；PR `#339`–`#373`（20 筆）；issue `#338`–`#374`（17 筆）。release 軌，不審查 tag 之後的 commit。
+
+**採納方式**：本 fork 是 clean-init 歷史，與上游沒有共同祖先，`git merge` 不可行，一律以 `git cherry-pick -x` 逐筆移植（保留原作者與來源 SHA）。只採納「明確的缺陷修復、有單元測試、可乾淨套用、本機 Windows 閘門全綠」者；其餘記為 adoption pending。Baseline 代表已審查，不代表全部已合併。
+
+### Commit（19 筆）
+
+| 決策 | Commit | 說明 |
+| --- | --- | --- |
+| adopt（4） | `ecf69e4` -> `c19a09a9`（#347）、`7e03b01` -> `164c09de`（#345）、`59d5e29` -> `d29f941a`（#339）、`32baae6` -> `8ead4d76`（#361） | 專輯封面誤判為影片、vocabulary 缺漏內建 package、NTSC 混音時長取整、`packages status` 解析；各自附測試、互不相依 |
+| adoption pending（6） | `465bef7`（#342）、`66a3529`／`78d7436`（#349）、`9ac471d`（#353）、`089c39a`、`c80e513` | `465bef7` 改變輸出色彩空間，需實際 render 驗證；OAuth 兩筆需真實 HypiHub 登入驗證；`9ac471d` 是 Studio 新功能；`089c39a` 為 79 檔效能重構、`c80e513` 是其測試相依（動 `package.json`／lockfile）；併同 v0.2.9–v0.2.12 待決項一次評估 |
+| not-applicable（9） | `238fe97` `2acc41c` `8a3af4f` `557497b`（版號）、`9c9918d` `33fb1a1` `2c32005`（微信群 QR）、`2c7fefd`（README 圖例）、`453be6c`（上游文件站連結） | 版務與上游社群／行銷素材；本 fork 已移除 QR 與第三方推廣區塊 |
+
+### Pull requests（20 筆）
+
+| 決策 | PR | 說明 |
+| --- | --- | --- |
+| adopt（4） | #339 #345 #347 #361 | 見上表 |
+| adoption pending（3） | #342 #349 #353 | 上游已合併；理由見上表 |
+| follow-upstream（8） | #348 #355 #363 #370 #371 #373（open 的修復）、#358 #364（新 Provider） | 上游尚未合併；待其合併或隨 release 帶入。#358／#364 為新功能，非缺陷 |
+| not-applicable（5） | #341（文件連結）、#351（已關閉未合併）、#356（合作夥伴 RevShare）、#357（Manim 範例）、#362（上游 CI pin） | 行銷、範例或上游專屬 CI |
+
+### Issues（17 筆）
+
+| 決策 | Issue | 說明 |
+| --- | --- | --- |
+| resolved by adopted fix（3） | #338 #344 #346 | 分別由 #339、#345、#347 修復 |
+| follow-upstream（7） | #343 #354（無修復／對應 open PR #355）、#366 #367 #368 #369 #374 | `-autorotate` 與 ffmpeg 6.x、Timeline 精確幀預檢；HypiHub 402／目錄不可達屬託管服務行為，對應修復 #370／#371 尚未合併 |
+| monitor（2） | #360 #372 | 回報版本 0.2.15（0.2.13 正常）的 Caption／frame animation 回歸；本 fork 未取 `089c39a`，未受影響，取該重構前須先確認 |
+| not-applicable（5） | #340 #350 #352 #359 #365 | 文件連結、MuAPI Provider 請求（已關閉）、使用問答、訂閱服務、社群群組詢問 |
+
+**水位**：`reviewed_release=v0.2.16`、`reviewed_through=557497b32a6658067c11bf924c7511e61c61df4e`、`reviewed_pr_through=373`、`reviewed_issue_through=374`、`reviewed_date=2026-09-30`。
