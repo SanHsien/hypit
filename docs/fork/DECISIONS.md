@@ -163,6 +163,7 @@
 - `hono` 4.12.32 -> 4.13.12：`@hyperframes/*` 把它固定為 4.12.32，修補版是 4.12.34／4.13.5，因此在 `pnpm-workspace.yaml` 以 `overrides` 鎖 `^4.13.5`。
 - `vite`（vitepress 用的那份）5.4.21 -> 6.4.3：vitepress 1.6.4 要求 `vite ^5.4.14`，5.x 沒有修補版，以 `overrides` 的 `vitepress>vite: ^6.4.3` 換到 6.x 的修補版。`pnpm docs:build` 通過。直接依賴的 `vite` 8.2.2 不受影響。
 - `esbuild`：0.21.5（隨 vite 5 移除）與 0.27.7 -> 0.28.2。0.27.7 由 `tsx` 4.21.0（`esbuild ~0.27.0`）帶入，故 `tsx` 升到 4.23.15（同為 4.x，`esbuild ~0.28.0`）；`packages/provider-hyperframes-local` 同步。0.25.12 不在影響範圍。
+- `urllib3` 2.7.0 -> 2.8.0（`uv lock --upgrade-package`，同主版，只動這一個套件）。
 - `lightning`／`pytorch-lightning` 2.6.5 -> 2.6.6（`uv lock --upgrade-package`），只動這兩個套件；`pnpm test:whisperx-service` 18 項通過。Dependabot PR #1 同時降級 `onnxruntime` 並新增 `coloredlogs`／`humanfriendly`，未合併，由本次提交取代後關閉。
 
 **延後**
