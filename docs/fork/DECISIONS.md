@@ -215,3 +215,14 @@
 | #5 | vite 8.2.2 -> 8.2.4（`packages/studio`） | 本批已包含，合併後即過時 |
 | #6 | certifi -> 2026.10.19（yt-dlp 鎖） | 本批已包含，合併後即過時；#6 把 `uv.lock` 的 `revision` 從 3 改成 5，本批保持 3 |
 | #7 | opentelemetry-api 1.44.0 -> 1.45.1（whisperx 鎖） | 本批已包含，合併後即過時；#7 同時降級 `onnxruntime` 並新增 `coloredlogs`／`humanfriendly`（與先前 PR #1 同型），**不要單獨合併** |
+
+**`package` job（npm-package.yml）：`README Examples section could not be located`**
+
+原因：fork 把 `README.md` 改成繁體中文（2026-09-19，標題變成 `## 示例`、`## 使用 Hypit skill`、`## 只安裝一次`），英文版另存 `README.en.md`；上游的 `scripts/pack-distribution.mjs` 仍以英文標題 `## Examples`、`## Use the Hypit skill`、`## Install once` 當錨點，所以每個 PR 的兩個 `package` job 都失敗（Dependabot PR #3 到 #7 同樣失敗）。與依賴升級無關。
+
+取捨：這支腳本產生的是 npm 套件頁的 README，錨點、插入的 `Install the Hypit CLI (Node.js 22.15 or newer)` 段落與 `Watch the complete video examples on GitHub` 連結全是英文。
+- 讓腳本也認得中文標題：要在三個錨點加中文別名，還要決定插入的是中文還是英文文字，npm 頁會變成中英混雜，之後每次改標題都要同步。
+- 把 `README.md` 的標題改回英文：中文文件配英文標題，等於撤回 2026-09-19 的繁體化，且仍然是兩份 README 靠標題字面值綁在一起。
+- 採用：腳本改讀 `README.en.md`。它的標題與上游相同，npm 頁維持英文，繁中 `README.md` 不受影響，錨點檢查（找不到章節就丟錯）保持原樣、沒有被跳過或放寬。
+
+驗證：本機 `npm run pack:distribution` 成功，產出的 `dist/release/README.md` 有 `Install the Hypit CLI` 段落與 `Watch the complete video examples` 連結。接著的 `npm run check:distribution` 在本機走過安裝、`--version`、`studio --help`、`check`、`runtime up`、`doctor`，最後在清理暫存目錄時遇到 Windows 的 `EPERM`（chrome-headless-shell 仍占用檔案），本機未能看到結尾結果，以 CI 的結果為準。
