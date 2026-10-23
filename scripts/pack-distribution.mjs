@@ -22,7 +22,9 @@ function npm(args, cwd, capture = false) {
 
 npm(["run", "build:public-types"], root);
 const [inventory] = JSON.parse(npm(["pack", "--dry-run", "--ignore-scripts", "--json"], root, true));
-let readme = await readFile(resolve(root, "README.md"), "utf8");
+// The package page is English, and the anchors and inserted text below are English. The fork keeps
+// README.md in Traditional Chinese, so the page is built from the English README instead.
+let readme = await readFile(resolve(root, "README.en.md"), "utf8");
 const examples = readme.indexOf("## Examples\n");
 const next = readme.indexOf("## Use the Hypit skill\n", examples);
 if (examples < 0 || next < 0) throw new Error("README Examples section could not be located.");

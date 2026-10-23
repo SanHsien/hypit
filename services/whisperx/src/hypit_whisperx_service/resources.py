@@ -53,5 +53,7 @@ def assert_sentence_data(root: Path, language: str) -> None:
     try:
         assert_punkt_tab(root)
         load_punkt_params(FileSystemPathPointer(str(root / "tokenizers" / "punkt_tab" / name)))
-    except (OSError, ValueError) as error:
+    # NLTK 3.10.3 raised OSError for a missing Punkt file; 3.10.4 raises LookupError (a subclass of
+    # neither OSError nor ValueError). Both mean the data is not prepared.
+    except (OSError, ValueError, LookupError) as error:
         raise UnpreparedResourceError(f"NLTK sentence data for {language} ({name}) is unavailable; run hypit-whisperx-prepare") from error
