@@ -290,11 +290,11 @@
     "@puppeteer/browsers": "3.2.2",
     "koffi": "3.2.1",
     "puppeteer-core": "25.10.0",
-    "sharp": "0.35.4",
+    "sharp": "0.35.5",
     "cmu-pronouncing-dictionary": "3.0.0",
     "tsx": "4.23.15",
     "typescript": "5.9.3",
-    "vite": "8.2.2",
+    "vite": "8.2.4",
     "cjs-module-lexer": "2.2.1"
   }
 }
