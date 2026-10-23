@@ -172,7 +172,6 @@
 | --- | --- | --- | --- | --- |
 | `torch` | 2.8.0 | 2.9.1／2.10.0／2.13.0 | `whisperx 3.8.6` 要求 `torch ~=2.8.0`、`torchaudio ~=2.8.0`、`torchvision ~=0.23.0`、`torchcodec <0.8`，任何修補版都會與之衝突 | 上游 `whisperx` 放寬 torch 上限 |
 | `transformers` | 4.57.6 | 5.x（4.x 無修補版） | 5.x 需要 `huggingface-hub >=1.5`，`whisperx 3.8.6` 要求 `huggingface-hub <1.0`，`uv lock` 無解；且是主版升級，需實跑對齊模型才能驗 | 上游 `whisperx` 放寬 `huggingface-hub`，且能在本機實跑對齊 |
-| `nltk` | 3.10.3 | 無修補版（GHSA-8mgp-746c-j5xp） | 無可升版本；警示保持開啟，不 dismiss | 上游釋出修補版 |
 
 `nltk` 可達性：弱點在 `TransitionParser`、`AveragedPerceptron`、`PerceptronTagger.save_to_json`、`save_maxent_params` 的模型讀寫，且僅在啟用 `pathsec` 時才構成沙箱繞過。`whisperx` 只用 `nltk.data.load('tokenizers/punkt_tab/...')` 載入斷句器，本服務只設定 `nltk.data.path`，兩者都不呼叫上述 API。
 
@@ -188,6 +187,7 @@
 - `@vue/server-renderer`／`postcss-selector-parser`／`source-map-js`：僅出現在 `pnpm-lock.yaml`（vitepress、`@hyperframes/*` 的間接依賴），以 `pnpm update -r --depth Infinity --lockfile-only vue "@vue/*" postcss-selector-parser source-map-js` 在原範圍內升級。vue 家族一起到 3.5.44（`@vue/server-renderer` 對 `vue` 是精確相依，無法單獨取 3.5.42）、`postcss-selector-parser` 7.1.7、`source-map-js` 1.2.2。
 - whisperx 鎖：`aiohttp` 3.14.4（`yarl` 1.25.1 隨之）、`certifi` 2026.10.19、`mako` 1.4.2、`multidict` 6.9.1、`opentelemetry-api` 1.45.1（整個 OpenTelemetry 家族升到 1.45.1／0.66b1，新增 `opentelemetry-exporter-http-transport`、`opentelemetry-exporter-otlp-common` 兩個同專案套件）、`pillow` 13.0.0。
 - yt-dlp 鎖：`certifi` 2026.10.19。
+- `nltk` 3.10.3 -> 3.10.4（GHSA-8mgp-746c-j5xp，警示範圍 `<= 3.10.3` 但 advisory 沒填 first_patched_version；3.10.4 於 2026-10-21 發行，三個修補 PR #3757／#3759／#3813 皆為其祖先 commit）。3.10.4 對缺少的 Punkt 檔案改丟 `LookupError`（3.10.3 是 `OSError`），`assert_sentence_data` 原本只攔 `(OSError, ValueError)`，缺資料時不會轉成 `UnpreparedResourceError`。已在 `except` 加入 `LookupError`，並新增 `test_a_lookup_error_from_nltk_for_missing_sentence_data_means_unprepared`（還原修正後該測試會失敗）；`pnpm test:whisperx-service` 19 項通過。
 
 **Python 下限提到 3.11（`services/whisperx`）**
 
@@ -201,7 +201,6 @@
 | --- | --- | --- | --- | --- |
 | `torch` | 2.8.0 | 2.9.1／2.10.0／2.13.0 | `uv lock --upgrade-package torch==2.9.1` 回報 `whisperx==3.8.6 depends on torch>=2.8.0,<2.9.dev0`；`whisperx 3.8.7rc1` 仍是 `torch~=2.8.0` | 穩定版 `whisperx` 放寬 torch 上限 |
 | `transformers` | 4.57.6 | 5.10.0 以上（4.x 無修補版；5.10.0 已被 PyPI yanked，實際要取未被 yank 的 5.10 以上版本，目前最新為 5.20.2） | `transformers 5.x` 要求 `huggingface-hub>=1.5`，`whisperx 3.8.6` 要求 `huggingface-hub<1.0`，`uv lock` 無解。`whisperx 3.8.7rc1`（預發行）已放寬為 `huggingface-hub>=0.28.1`，在暫存目錄實測可解出 transformers 5.10.0／huggingface-hub 1.33.0，但那是預發行版、需改 `pyproject.toml` 的釘版，且 4.x -> 5.x 是主版升級，需實跑對齊模型才能驗 | `whisperx` 3.8.7 穩定版釋出，且能在本機實跑對齊 |
-| `nltk` | 3.10.3 | 3.10.4（警示範圍為 `<= 3.10.3`，advisory 沒有填 first_patched_version；3.10.4 於 2026-10-21 發行，三個修補 PR #3757／#3759／#3813 皆為其祖先 commit） | 升到 3.10.4 後 `pnpm test:whisperx-service` 有 1 項失敗：`load_punkt_params` 對缺檔改丟 `LookupError`，而 `services/whisperx/src/hypit_whisperx_service/resources.py` 的 `assert_sentence_data` 只攔 `(OSError, ValueError)`，缺資料時不再轉成 `UnpreparedResourceError`。這是服務程式碼的相容修正，不在依賴升級範圍 | 在 `except` 加入 `LookupError` 並附測試後，再 `uv lock --upgrade-package nltk==3.10.4` |
 
 重新檢查：每次 Dependabot 警示清單變動，或上述任一觸發條件成立時，重跑 `gh api repos/SanHsien/hypit/dependabot/alerts?state=open`。
 

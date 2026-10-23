@@ -10,7 +10,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 from hypit_whisperx_service.config import ServiceConfig
 from hypit_whisperx_service.models import asr_path, use_local_resources_only, alignment_selection
 from hypit_whisperx_service.engine import WhisperXEngine, InferenceInputError
-from hypit_whisperx_service.resources import assert_sentence_data
+from hypit_whisperx_service.resources import UnpreparedResourceError, assert_sentence_data
 
 
 class ResourceBoundaryTests(unittest.TestCase):
@@ -59,6 +59,16 @@ class ResourceBoundaryTests(unittest.TestCase):
             (path / "tokenizers" / "punkt_tab" / "english").mkdir(parents=True)
             with self.assertRaisesRegex(RuntimeError, "sentence data"):
                 assert_sentence_data(path, "en")
+
+    def test_a_lookup_error_from_nltk_for_missing_sentence_data_means_unprepared(self):
+        # NLTK 3.10.4 reports a missing Punkt file as LookupError instead of OSError.
+        with tempfile.TemporaryDirectory() as root:
+            path = Path(root)
+            (path / "tokenizers" / "punkt_tab" / "english").mkdir(parents=True)
+            missing = LookupError("The Punkt model has no 'collocations.tab'")
+            with patch("nltk.tokenize.punkt.load_punkt_params", side_effect=missing):
+                with self.assertRaises(UnpreparedResourceError):
+                    assert_sentence_data(path, "en")
 
     def test_local_asr_directory_requires_tokenizer_before_execution(self):
         with tempfile.TemporaryDirectory() as root:
