@@ -175,3 +175,37 @@
 | `nltk` | 3.10.3 | 無修補版（GHSA-8mgp-746c-j5xp） | 無可升版本；警示保持開啟，不 dismiss | 上游釋出修補版 |
 
 `nltk` 可達性：弱點在 `TransitionParser`、`AveragedPerceptron`、`PerceptronTagger.save_to_json`、`save_maxent_params` 的模型讀寫，且僅在啟用 `pathsec` 時才構成沙箱繞過。`whisperx` 只用 `nltk.data.load('tokenizers/punkt_tab/...')` 載入斷句器，本服務只設定 `nltk.data.path`，兩者都不呼叫上述 API。
+
+
+## 2026-10-24: 依賴安全升級（Dependabot 91 筆開啟警示）
+
+範圍：`package.json`／`packages/*/package.json`／`pnpm-lock.yaml`、`services/whisperx/uv.lock`、`services/yt-dlp/uv.lock`。作法同 2026-09-30：同主版、`overrides` 用 `^`、每個 Python 套件單獨 `uv lock --upgrade-package <pkg>==<最小修補版>`，鎖檔一律由工具重生；`pnpm install --ignore-scripts`。
+
+**已升級**
+
+- `sharp` 0.35.4 -> 0.35.5（`package.json`、`packages/browser-capture`、`packages/video-cli`，三處皆為精確版本）。
+- `vite` 8.2.2 -> 8.2.4（`package.json`、`packages/studio`）。vitepress 用的那份由 `overrides` 的 `vitepress>vite: ^6.4.4` 解析為 6.4.5（6.4.4 是首個修補版，^ 取得範圍內最新）。
+- `@vue/server-renderer`／`postcss-selector-parser`／`source-map-js`：僅出現在 `pnpm-lock.yaml`（vitepress、`@hyperframes/*` 的間接依賴），以 `pnpm update -r --depth Infinity --lockfile-only vue "@vue/*" postcss-selector-parser source-map-js` 在原範圍內升級。vue 家族一起到 3.5.44（`@vue/server-renderer` 對 `vue` 是精確相依，無法單獨取 3.5.42）、`postcss-selector-parser` 7.1.7、`source-map-js` 1.2.2。
+- whisperx 鎖：`aiohttp` 3.14.4（`yarl` 1.25.1 隨之）、`certifi` 2026.10.19、`mako` 1.4.2、`multidict` 6.9.1、`opentelemetry-api` 1.45.1（整個 OpenTelemetry 家族升到 1.45.1／0.66b1，新增 `opentelemetry-exporter-http-transport`、`opentelemetry-exporter-otlp-common` 兩個同專案套件）、`pillow` 13.0.0（僅 Python >=3.11 分支，見下）。
+- yt-dlp 鎖：`certifi` 2026.10.19。
+
+**延後**
+
+| 套件 | 現在 | 修補版 | 延後原因 | 觸發條件 |
+| --- | --- | --- | --- | --- |
+| `torch` | 2.8.0 | 2.9.1／2.10.0／2.13.0 | `uv lock --upgrade-package torch==2.9.1` 回報 `whisperx==3.8.6 depends on torch>=2.8.0,<2.9.dev0`；`whisperx 3.8.7rc1` 仍是 `torch~=2.8.0` | 穩定版 `whisperx` 放寬 torch 上限 |
+| `transformers` | 4.57.6 | 5.10.0 以上（4.x 無修補版；5.10.0 已被 PyPI yanked，實際要取 5.10.1 以上） | `transformers 5.x` 要求 `huggingface-hub>=1.5`，`whisperx 3.8.6` 要求 `huggingface-hub<1.0`，`uv lock` 無解。`whisperx 3.8.7rc1`（預發行）已放寬為 `huggingface-hub>=0.28.1`，在暫存目錄實測可解出 transformers 5.10.0／huggingface-hub 1.33.0，但那是預發行版、需改 `pyproject.toml` 的釘版，且 4.x -> 5.x 是主版升級，需實跑對齊模型才能驗 | `whisperx` 3.8.7 穩定版釋出，且能在本機實跑對齊 |
+| `pillow`（Python 3.10 分支） | 12.3.0 | 13.0.0 | 13.0.0 要求 `Python>=3.11`，而 `services/whisperx/pyproject.toml` 的 `requires-python = ">=3.10,<3.14"`，uv 因此把鎖拆成兩份：>=3.11 用 13.0.0，3.10 留 12.3.0。鎖內仍有 12.3.0，警示會持續開啟 | 決定是否把 `requires-python` 提到 `>=3.11`（README 寫明鎖選 Python 3.13，上游 `whisperx 3.8.6` 仍宣稱支援 3.10）；改後重生鎖即可關閉全部 pillow 警示 |
+| `nltk` | 3.10.3 | 3.10.4（警示範圍為 `<= 3.10.3`，advisory 沒有填 first_patched_version；3.10.4 於 2026-10-21 發行，三個修補 PR #3757／#3759／#3813 皆為其祖先 commit） | 升到 3.10.4 後 `pnpm test:whisperx-service` 有 1 項失敗：`load_punkt_params` 對缺檔改丟 `LookupError`，而 `services/whisperx/src/hypit_whisperx_service/resources.py` 的 `assert_sentence_data` 只攔 `(OSError, ValueError)`，缺資料時不再轉成 `UnpreparedResourceError`。這是服務程式碼的相容修正，不在依賴升級範圍 | 在 `except` 加入 `LookupError` 並附測試後，再 `uv lock --upgrade-package nltk==3.10.4` |
+
+重新檢查：每次 Dependabot 警示清單變動，或上述任一觸發條件成立時，重跑 `gh api repos/SanHsien/hypit/dependabot/alerts?state=open`。
+
+**Dependabot PR 的處置**
+
+| PR | 內容 | 與本批的關係 |
+| --- | --- | --- |
+| #3 | aiohttp 3.14.3 -> 3.14.4（whisperx 鎖） | 本批已包含，合併後即過時 |
+| #4 | vite 8.2.2 -> 8.2.4（根） | 本批已包含，合併後即過時；#4 另外帶入 rolldown／postcss 等間接依賴更新，本批只取修補所需 |
+| #5 | vite 8.2.2 -> 8.2.4（`packages/studio`） | 本批已包含，合併後即過時 |
+| #6 | certifi -> 2026.10.19（yt-dlp 鎖） | 本批已包含，合併後即過時；#6 把 `uv.lock` 的 `revision` 從 3 改成 5，本批保持 3 |
+| #7 | opentelemetry-api 1.44.0 -> 1.45.1（whisperx 鎖） | 本批已包含，合併後即過時；#7 同時降級 `onnxruntime` 並新增 `coloredlogs`／`humanfriendly`（與先前 PR #1 同型），**不要單獨合併** |
