@@ -187,6 +187,7 @@
 - `@vue/server-renderer`／`postcss-selector-parser`／`source-map-js`：僅出現在 `pnpm-lock.yaml`（vitepress、`@hyperframes/*` 的間接依賴），以 `pnpm update -r --depth Infinity --lockfile-only vue "@vue/*" postcss-selector-parser source-map-js` 在原範圍內升級。vue 家族一起到 3.5.44（`@vue/server-renderer` 對 `vue` 是精確相依，無法單獨取 3.5.42）、`postcss-selector-parser` 7.1.7、`source-map-js` 1.2.2。
 - whisperx 鎖：`aiohttp` 3.14.4（`yarl` 1.25.1 隨之）、`certifi` 2026.10.19、`mako` 1.4.2、`multidict` 6.9.1、`opentelemetry-api` 1.45.1（整個 OpenTelemetry 家族升到 1.45.1／0.66b1，新增 `opentelemetry-exporter-http-transport`、`opentelemetry-exporter-otlp-common` 兩個同專案套件）、`pillow` 13.0.0。
 - yt-dlp 鎖：`certifi` 2026.10.19。
+- `nanoid` 3.3.16 -> 3.3.20（`pnpm audit` 的 high，GHSA-2v37-7h3g-55p8，範圍 `<3.3.18`；當時沒有對應的 Dependabot 警示）：`@hyperframes/core` 的 `postcss` 8.5.25 帶入，以 `overrides` 的 `nanoid: ^3.3.18` 限在 3.x。
 - `nltk` 3.10.3 -> 3.10.4（GHSA-8mgp-746c-j5xp，警示範圍 `<= 3.10.3` 但 advisory 沒填 first_patched_version；3.10.4 於 2026-10-21 發行，三個修補 PR #3757／#3759／#3813 皆為其祖先 commit）。3.10.4 對缺少的 Punkt 檔案改丟 `LookupError`（3.10.3 是 `OSError`），`assert_sentence_data` 原本只攔 `(OSError, ValueError)`，缺資料時不會轉成 `UnpreparedResourceError`。已在 `except` 加入 `LookupError`，並新增 `test_a_lookup_error_from_nltk_for_missing_sentence_data_means_unprepared`（還原修正後該測試會失敗）；`pnpm test:whisperx-service` 19 項通過。
 
 **Python 下限提到 3.11（`services/whisperx`）**
@@ -201,6 +202,7 @@
 | --- | --- | --- | --- | --- |
 | `torch` | 2.8.0 | 2.9.1／2.10.0／2.13.0 | `uv lock --upgrade-package torch==2.9.1` 回報 `whisperx==3.8.6 depends on torch>=2.8.0,<2.9.dev0`；`whisperx 3.8.7rc1` 仍是 `torch~=2.8.0` | 穩定版 `whisperx` 放寬 torch 上限 |
 | `transformers` | 4.57.6 | 5.10.0 以上（4.x 無修補版；5.10.0 已被 PyPI yanked，實際要取未被 yank 的 5.10 以上版本，目前最新為 5.20.2） | `transformers 5.x` 要求 `huggingface-hub>=1.5`，`whisperx 3.8.6` 要求 `huggingface-hub<1.0`，`uv lock` 無解。`whisperx 3.8.7rc1`（預發行）已放寬為 `huggingface-hub>=0.28.1`，在暫存目錄實測可解出 transformers 5.10.0／huggingface-hub 1.33.0，但那是預發行版、需改 `pyproject.toml` 的釘版，且 4.x -> 5.x 是主版升級，需實跑對齊模型才能驗 | `whisperx` 3.8.7 穩定版釋出，且能在本機實跑對齊 |
+| `zod`（`pnpm audit` 的 high，GHSA-mrhx-c7xc-m3w5，範圍 `<4.6.6`；沒有對應的 Dependabot 警示） | 3.25.76 | 4.6.6 | 唯一修補版是 4.x，而 `chromium-bidi 17.0.2` 要求 `zod ^3.24.1`，它由 `puppeteer 25.5.0`（`@hyperframes/engine` 精確釘住）與 `puppeteer-core 25.10.0` 精確釘住。實測用 `chromium-bidi>zod: ^4.6.6` 覆寫後，`parseObject` 的錯誤分支用了 zod 3 才有的 `error.errors`，輸入不合法時丟 `TypeError: Cannot read properties of undefined (reading 'map')`，而不是 `InvalidArgumentException`（合法輸入仍正常）。本 repo 的 `browser-capture` 與 hyperframes 走預設 CDP，沒有啟用 WebDriver BiDi，但覆寫會留下潛在的相容問題，故不採用。`chromium-bidi` 最新版（158.0.8120-0）已改用 `zod ^4.6.5`，不過 `puppeteer-core` 25.10.0 與 `puppeteer` 25.5.0 都精確釘住 17.0.2 | `@hyperframes/*` 更新 `puppeteer`，且 `puppeteer-core` 升到引用 zod 4 版 `chromium-bidi` 的版本（25.16.0 引用 `chromium-bidi 157.0.8090-0`），並以實跑驗證 `browser-capture` |
 
 重新檢查：每次 Dependabot 警示清單變動，或上述任一觸發條件成立時，重跑 `gh api repos/SanHsien/hypit/dependabot/alerts?state=open`。
 
