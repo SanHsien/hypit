@@ -186,8 +186,14 @@
 - `sharp` 0.35.4 -> 0.35.5（`package.json`、`packages/browser-capture`、`packages/video-cli`，三處皆為精確版本）。
 - `vite` 8.2.2 -> 8.2.4（`package.json`、`packages/studio`）。vitepress 用的那份由 `overrides` 的 `vitepress>vite: ^6.4.4` 解析為 6.4.5（6.4.4 是首個修補版，^ 取得範圍內最新）。
 - `@vue/server-renderer`／`postcss-selector-parser`／`source-map-js`：僅出現在 `pnpm-lock.yaml`（vitepress、`@hyperframes/*` 的間接依賴），以 `pnpm update -r --depth Infinity --lockfile-only vue "@vue/*" postcss-selector-parser source-map-js` 在原範圍內升級。vue 家族一起到 3.5.44（`@vue/server-renderer` 對 `vue` 是精確相依，無法單獨取 3.5.42）、`postcss-selector-parser` 7.1.7、`source-map-js` 1.2.2。
-- whisperx 鎖：`aiohttp` 3.14.4（`yarl` 1.25.1 隨之）、`certifi` 2026.10.19、`mako` 1.4.2、`multidict` 6.9.1、`opentelemetry-api` 1.45.1（整個 OpenTelemetry 家族升到 1.45.1／0.66b1，新增 `opentelemetry-exporter-http-transport`、`opentelemetry-exporter-otlp-common` 兩個同專案套件）、`pillow` 13.0.0（僅 Python >=3.11 分支，見下）。
+- whisperx 鎖：`aiohttp` 3.14.4（`yarl` 1.25.1 隨之）、`certifi` 2026.10.19、`mako` 1.4.2、`multidict` 6.9.1、`opentelemetry-api` 1.45.1（整個 OpenTelemetry 家族升到 1.45.1／0.66b1，新增 `opentelemetry-exporter-http-transport`、`opentelemetry-exporter-otlp-common` 兩個同專案套件）、`pillow` 13.0.0。
 - yt-dlp 鎖：`certifi` 2026.10.19。
+
+**Python 下限提到 3.11（`services/whisperx`）**
+
+`pillow` 的 39 筆警示（4 critical、23 high、12 medium）唯一的修補版是 13.0.0，而它要求 `Python>=3.11`；`requires-python = ">=3.10,<3.14"` 讓 uv 為 3.10 分支留下 12.3.0，警示因此關不掉。有修補版的 high／critical 不能延後，所以把 `services/whisperx/pyproject.toml` 提到 `>=3.11,<3.14`。理由：`.github/workflows` 沒有任何一處測 Python 3.10（只有 3.12），checked-in 鎖選的是 3.13，等於降低的支援範圍從未被驗證過。重生後鎖內沒有 pillow 12.x，另外移除只給 3.10 分支用的 `async-timeout`、`tomli`、`numpy` 2.2.6、`pandas` 2.3.3、`scipy` 1.15.3、`scikit-learn` 1.7.2 等；沒有任何套件被升級或新增。同步改為一致：`services/whisperx/README.md`、`check.py` 的執行期檢查、`CONTRIBUTING*.md`、`docs/guide/develop.md`、`docs/zh/guide/develop.md`（Python 3.11–3.13）。`services/yt-dlp` 不用 pillow，維持 `>=3.10`。
+
+觸發條件：若日後要恢復支援 Python 3.10，必須等 Pillow 釋出給 3.10 使用的修補版（13.x 以後的 3.10 相容發行或 12.x 的回補）。
 
 **延後**
 
@@ -195,7 +201,6 @@
 | --- | --- | --- | --- | --- |
 | `torch` | 2.8.0 | 2.9.1／2.10.0／2.13.0 | `uv lock --upgrade-package torch==2.9.1` 回報 `whisperx==3.8.6 depends on torch>=2.8.0,<2.9.dev0`；`whisperx 3.8.7rc1` 仍是 `torch~=2.8.0` | 穩定版 `whisperx` 放寬 torch 上限 |
 | `transformers` | 4.57.6 | 5.10.0 以上（4.x 無修補版；5.10.0 已被 PyPI yanked，實際要取未被 yank 的 5.10 以上版本，目前最新為 5.20.2） | `transformers 5.x` 要求 `huggingface-hub>=1.5`，`whisperx 3.8.6` 要求 `huggingface-hub<1.0`，`uv lock` 無解。`whisperx 3.8.7rc1`（預發行）已放寬為 `huggingface-hub>=0.28.1`，在暫存目錄實測可解出 transformers 5.10.0／huggingface-hub 1.33.0，但那是預發行版、需改 `pyproject.toml` 的釘版，且 4.x -> 5.x 是主版升級，需實跑對齊模型才能驗 | `whisperx` 3.8.7 穩定版釋出，且能在本機實跑對齊 |
-| `pillow`（Python 3.10 分支） | 12.3.0 | 13.0.0 | 13.0.0 要求 `Python>=3.11`，而 `services/whisperx/pyproject.toml` 的 `requires-python = ">=3.10,<3.14"`，uv 因此把鎖拆成兩份：>=3.11 用 13.0.0，3.10 留 12.3.0。鎖內仍有 12.3.0，警示會持續開啟 | 決定是否把 `requires-python` 提到 `>=3.11`（README 寫明鎖選 Python 3.13，上游 `whisperx 3.8.6` 仍宣稱支援 3.10）；改後重生鎖即可關閉全部 pillow 警示 |
 | `nltk` | 3.10.3 | 3.10.4（警示範圍為 `<= 3.10.3`，advisory 沒有填 first_patched_version；3.10.4 於 2026-10-21 發行，三個修補 PR #3757／#3759／#3813 皆為其祖先 commit） | 升到 3.10.4 後 `pnpm test:whisperx-service` 有 1 項失敗：`load_punkt_params` 對缺檔改丟 `LookupError`，而 `services/whisperx/src/hypit_whisperx_service/resources.py` 的 `assert_sentence_data` 只攔 `(OSError, ValueError)`，缺資料時不再轉成 `UnpreparedResourceError`。這是服務程式碼的相容修正，不在依賴升級範圍 | 在 `except` 加入 `LookupError` 並附測試後，再 `uv lock --upgrade-package nltk==3.10.4` |
 
 重新檢查：每次 Dependabot 警示清單變動，或上述任一觸發條件成立時，重跑 `gh api repos/SanHsien/hypit/dependabot/alerts?state=open`。

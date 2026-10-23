@@ -9,7 +9,7 @@ description: 開始 Hypit 開發工作。
 |---|---|---|
 | Node.js | 22.15+ | 所有工作 |
 | pnpm | 10.33.x | workspace 管理；由根目錄 `packageManager` 欄位選擇 |
-| Python | 3.10–3.13 | 本地 WhisperX 與 OpenCV Managed Program |
+| Python | 3.11–3.13 | 本地 WhisperX 與 OpenCV Managed Program |
 | uv | latest | Python 環境管理 |
 | ffmpeg / ffprobe | 較新的穩定版 | 媒體處理 |
 | Chrome / Chromium | 由 `hypit runtime up` 下載 | 本地 HyperFrames 渲染 |
