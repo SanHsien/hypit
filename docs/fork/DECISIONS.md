@@ -266,3 +266,13 @@ Alert 編號的來源：雲端工作環境查詢時回 `403 Resource not accessi
 - **測試**：`packages/provider-hyperframes-local/test/sampling.test.ts`，`&amp;lt;` 得 `&lt;`、`&amp;amp;` 得 `&amp;`，一般實體照常還原。
 
 驗證：兩項修正各自還原後，對應測試都會失敗；`pnpm check`、`pnpm test` 前後比對沒有新增失敗。
+
+
+## 2026-10-25: 依賴下限刷新、zod 警示 #109 關閉、程式碼掃描分流
+
+- **依賴下限**：`@puppeteer/browsers` 3.2.6、`puppeteer-core` 25.16.0、`koffi` 3.3.4、`cjs-module-lexer` 2.3.0、`rollup` 4.65.0、`vite` 8.3.5（根與各套件同步）；Actions 依 SHA 重新釘選（download-artifact v8.0.2、setup-node／setup-python v7.1.0、upload-artifact v7.0.2、codeql-action v4.39.1）。已到最新的 deferral 條目移除，`@types/node` 刷到 26.6.5，`rollup-plugin-dts` 改寫真實延後原因。
+- **zod #109 關閉**：先前「zod 延後」的出口條件（puppeteer-core 升到 25.16.0）已成立。`@hyperframes/engine` 實際要求的是 `puppeteer ^25.2.1`（舊鎖檔只是解析成 25.5.0，並非精確釘住），新增 `overrides` 的 `puppeteer@<25.16.0: ^25.16.0` 後，`chromium-bidi` 157 帶入 `zod` 4.6.7，鎖檔不再含 zod 3。這取代上面 2026-10-24 表格中 `zod` 一列的延後。
+- **Dependabot #111／#112（brotli／brotlicffi）**：`services/yt-dlp/uv.lock` 在 main 已是 1.2.1／1.2.1.0，Dependabot 未重掃，以 inaccurate 駁回。
+- **程式碼掃描 24 筆**：逐筆讀碼與實測後全數駁回，無需改碼。10 筆為測試或獨立 mkdtemp 目錄、`.github/automation` 受 `github.repository == 'hypit-ai/hypit'` 限制不在 fork 執行、其餘為本機 CLI 對自己文件／設定的多項式回溯或同使用者 stat 後讀取（需 10^4 以上病態字元才有可測延遲，無安全後果）。
+- **刻意延後**：torch 3、transformers 5 仍等穩定版 `whisperx` 3.8.7（PyPI 目前只有 3.8.7rc1）。
+

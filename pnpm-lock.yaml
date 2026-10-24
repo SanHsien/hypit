@@ -8,7 +8,7 @@ overrides:
   hono: ^4.13.5
   vitepress>vite: ^6.4.4
   nanoid: ^3.3.18
-  puppeteer: 25.16.0
+  puppeteer@<25.16.0: ^25.16.0
 
 importers:
 
