@@ -11,7 +11,7 @@ import type {
 
 const NAME = /^[A-Za-z_][A-Za-z0-9_.:-]*/u;
 const ALIAS = /^[a-z][a-z0-9_-]{0,63}$/u;
-const REFERENCE = /^[A-Za-z_][A-Za-z0-9_.:-]*(?:\.[A-Za-z_][A-Za-z0-9_.:-]*)*$/u;
+const REFERENCE = /^[A-Za-z_][A-Za-z0-9_.:-]*$/u;
 
 type OpeningTag = {
   readonly name: string;

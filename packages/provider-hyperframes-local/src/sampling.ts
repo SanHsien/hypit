@@ -22,7 +22,7 @@ export function videoSlots(html: string): VideoSlot[] {
     const attribute = (name: string): string => {
       const value = new RegExp(`(?:\\s)${name}="([^"]*)"`, "u").exec(tag)?.[1];
       assert(value !== undefined, `HyperFrames video lacks ${name}; compile its frame sampling before rendering`);
-      return value.replaceAll("&amp;", "&").replaceAll("&quot;", '"').replaceAll("&lt;", "<").replaceAll("&gt;", ">");
+      return value.replaceAll("&quot;", '"').replaceAll("&lt;", "<").replaceAll("&gt;", ">").replaceAll("&amp;", "&");
     };
     const sourceFps = rational(attribute("data-hypit-source-fps"), "source frame rate");
     const slot = {
