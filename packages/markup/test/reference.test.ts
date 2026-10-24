@@ -4,8 +4,15 @@ import test from "node:test";
 import { MarkupFrontendError } from "../src/error.js";
 import { parseOpeningTag } from "../src/syntax.js";
 
-/** The reference grammar before the CodeQL js/redos fix, kept as the behavioral oracle. */
-const ORIGINAL_REFERENCE = /^[A-Za-z_][A-Za-z0-9_.:-]*(?:\.[A-Za-z_][A-Za-z0-9_.:-]*)*$/u;
+/**
+ * The language of the reference grammar before the CodeQL js/redos fix, written without a regular
+ * expression: its dotted segments only repeat characters the leading segment already allows.
+ */
+function originalAccepts(path: string): boolean {
+  const head = /[A-Za-z_]/u;
+  const tail = /[A-Za-z0-9_.:-]/u;
+  return path.length > 0 && head.test(path[0]!) && [...path.slice(1)].every((char) => tail.test(char));
+}
 
 function acceptsReference(path: string): boolean {
   try {
@@ -27,7 +34,7 @@ test("reference attributes accept the same paths as the original grammar", () =>
   }
   const alphabet = ["A", "z", "_", "0", ".", ":", "-", "!"];
   const visit = (path: string): void => {
-    assert.equal(acceptsReference(path), ORIGINAL_REFERENCE.test(path), JSON.stringify(path));
+    assert.equal(acceptsReference(path), originalAccepts(path), JSON.stringify(path));
     if (path.length < 4) for (const char of alphabet) visit(path + char);
   };
   visit("");
