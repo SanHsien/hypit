@@ -240,3 +240,29 @@
 驗證：`pnpm test:whisperx-service` 19 個測試全過。yt-dlp 服務沒有測試腳本，只以 `uv run --project services/yt-dlp --frozen` 確認環境可安裝並能匯入 `brotli` 與 `yt_dlp`。
 
 刻意不處理：#109（zod high）。chromium-bidi 17.0.2 要求 `zod ^3`，升到修補版會破壞相依，維持既有延後決定。
+
+## 2026-10-24：修正兩個 CodeQL 判定為真的問題（js/redos、js/double-escaping）
+
+背景：同日對 open 的 CodeQL alert 做唯讀判讀，兩個確認為真且修法明確，本次只修這兩個；其餘多為測試碼或誤報，維持不處理。兩者都是上游程式碼的缺陷，依 FORK.md 回貢判準屬於可送回上游的修正，回貢與否待維護者另行決定。
+
+| CodeQL 規則 | 位置 | Alert 編號 |
+| --- | --- | --- |
+| `js/redos`（指數級回溯） | `packages/markup/src/syntax.ts:14`（`REFERENCE`） | #12 |
+| `js/double-escaping` | `packages/provider-hyperframes-local/src/sampling.ts:25`（`videoSlots` 的屬性解碼） | #14 |
+
+Alert 編號的來源：雲端工作環境查詢時回 `403 Resource not accessible by integration`，表中編號於合併前由本機維護帳號以 `gh api repos/SanHsien/hypit/code-scanning/alerts?state=open` 查得補上。
+
+### 1. `REFERENCE` 正則的 ReDoS
+
+- **問題**：原式 `/^[A-Za-z_][A-Za-z0-9_.:-]*(?:\.[A-Za-z_][A-Za-z0-9_.:-]*)*$/u` 的字元類 `[A-Za-z0-9_.:-]` 已含 `.`，`X*(\.X*)*` 對同一段字串有指數多種切法。輸入 `"A.".repeat(30) + "!"`（61 字元）在本次測試環境要約 13 秒才判定不合法。
+- **修正**：改為 `/^[A-Za-z_][A-Za-z0-9_.:-]*$/u`。
+- **等價性**：後面的群組每個字元都落在前段字元類內，所以原式能接受的字串新式都接受；新式就是原式群組重複 0 次的情形，所以反過來也成立。另以字母表 `A z _ 0 9 . : - !` 窮舉所有長度 ≤6 的字串（597,871 個）比對新舊兩式，結果 0 筆不一致。
+- **測試**：`packages/markup/test/reference.test.ts`，以原式所接受的語言（不用正則的逐字元判斷）為對照，經 `parseOpeningTag` 檢查合法／不合法參考的結果不變（含長度 ≤4 的窮舉），並要求病態輸入在 50ms 內被拒絕。
+
+### 2. HTML 實體重複還原
+
+- **問題**：`&amp;` 先於 `&quot;`、`&lt;`、`&gt;` 還原，`&amp;lt;` 會先變成 `&lt;` 再變成 `<`，被解碼兩次。
+- **修正**：`&amp;` 改為最後還原，每個實體只解碼一次。
+- **測試**：`packages/provider-hyperframes-local/test/sampling.test.ts`，`&amp;lt;` 得 `&lt;`、`&amp;amp;` 得 `&amp;`，一般實體照常還原。
+
+驗證：兩項修正各自還原後，對應測試都會失敗；`pnpm check`、`pnpm test` 前後比對沒有新增失敗。
