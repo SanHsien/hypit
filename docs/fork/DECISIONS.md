@@ -250,7 +250,7 @@
 | `js/redos`（指數級回溯） | `packages/markup/src/syntax.ts:14`（`REFERENCE`） | 未查得，見下方說明 |
 | `js/double-escaping` | `packages/provider-hyperframes-local/src/sampling.ts:25`（`videoSlots` 的屬性解碼） | 未查得，見下方說明 |
 
-Alert 編號：本次工作環境呼叫 `gh api repos/SanHsien/hypit/code-scanning/alerts?state=open` 回 `403 Resource not accessible by integration`，無法取得編號；合併前請以有權限的帳號查詢後補上，或以 PR 上 CodeQL 標示為已修正的 alert 為準。
+Alert 編號：`js/redos`（`packages/markup/src/syntax.ts:14`）為 #12，`js/double-escaping`（`packages/provider-hyperframes-local/src/sampling.ts:25`）為 #14。雲端工作環境查詢時回 `403 Resource not accessible by integration`，編號於合併前由本機維護帳號以 `gh api repos/SanHsien/hypit/code-scanning/alerts?state=open` 查得補上。
 
 ### 1. `REFERENCE` 正則的 ReDoS
 
