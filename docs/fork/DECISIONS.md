@@ -226,3 +226,17 @@
 - 採用：腳本改讀 `README.en.md`。它的標題與上游相同，npm 頁維持英文，繁中 `README.md` 不受影響，錨點檢查（找不到章節就丟錯）保持原樣、沒有被跳過或放寬。
 
 驗證：本機 `npm run pack:distribution` 成功，產出的 `dist/release/README.md` 有 `Install the Hypit CLI` 段落與 `Watch the complete video examples` 連結。接著的 `npm run check:distribution` 在本機走過安裝、`--version`、`studio --help`、`check`、`runtime up`、`doctor`，最後在清理暫存目錄時遇到 Windows 的 `EPERM`（chrome-headless-shell 仍占用檔案），本機未能看到結尾結果，以 CI 的結果為準。
+
+## 2026-10-24：brotli／brotlicffi／setuptools 安全修補（Dependabot #110、#111、#112）
+
+| 警示 | 套件 | 鎖檔 | 版本 |
+| --- | --- | --- | --- |
+| #111（critical） | brotli | `services/yt-dlp/uv.lock` | 1.2.0 -> 1.2.1 |
+| #112（critical） | brotlicffi | `services/yt-dlp/uv.lock` | 1.2.0.2 -> 1.2.1.0 |
+| #110（low） | setuptools | `services/whisperx/uv.lock` | 83.0.0 -> 84.1.0 |
+
+做法：每個套件各跑一次 `uv lock --upgrade-package <套件>==<修補版>`，取最小修補版；只動鎖檔，`pyproject.toml` 的下限不需調整。鎖檔差異只含這三個套件的版本與 `files.pythonhosted.org` 的檔案網址／雜湊，沒有新增套件。
+
+驗證：`pnpm test:whisperx-service` 19 個測試全過。yt-dlp 服務沒有測試腳本，只以 `uv run --project services/yt-dlp --frozen` 確認環境可安裝並能匯入 `brotli` 與 `yt_dlp`。
+
+刻意不處理：#109（zod high）。chromium-bidi 17.0.2 要求 `zod ^3`，升到修補版會破壞相依，維持既有延後決定。
