@@ -282,19 +282,19 @@
     "@hypit/wan": "workspace:*",
     "@hypit/whisperx": "workspace:*",
     "@types/node": "24.10.1",
-    "rollup": "4.62.4",
+    "rollup": "4.65.0",
     "rollup-plugin-dts": "6.2.3",
     "vitepress": "^1.6.4"
   },
   "dependencies": {
-    "@puppeteer/browsers": "3.2.2",
-    "koffi": "3.2.1",
-    "puppeteer-core": "25.10.0",
+    "@puppeteer/browsers": "3.2.6",
+    "koffi": "3.3.4",
+    "puppeteer-core": "25.16.0",
     "sharp": "0.35.5",
     "cmu-pronouncing-dictionary": "3.0.0",
     "tsx": "4.23.15",
     "typescript": "5.9.3",
-    "vite": "8.2.4",
-    "cjs-module-lexer": "2.2.1"
+    "vite": "8.3.5",
+    "cjs-module-lexer": "2.3.0"
   }
 }

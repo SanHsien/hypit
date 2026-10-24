@@ -33,7 +33,7 @@
     "@hypit/runtime": "workspace:*",
     "@hypit/runtime-host-node": "workspace:*",
     "@hypit/runtime-kit": "workspace:*",
-    "@puppeteer/browsers": "3.2.2",
+    "@puppeteer/browsers": "3.2.6",
     "tsx": "4.23.15"
   },
   "devDependencies": {

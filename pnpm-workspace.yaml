@@ -13,3 +13,6 @@ overrides:
   vitepress>vite: ^6.4.4
   # postcss 8.5.25 (via @hyperframes/core) resolves nanoid 3.3.16; 3.3.18 is the fixed 3.x.
   nanoid: ^3.3.18
+  # @hyperframes/engine pins puppeteer 25.5.0, which drags chromium-bidi 17 and zod 3 (alert #109,
+  # fixed only in zod >= 4.6.6). puppeteer 25.16.0 is the same major and resolves chromium-bidi 157 with zod 4.6.7.
+  puppeteer: 25.16.0

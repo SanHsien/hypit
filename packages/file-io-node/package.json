@@ -8,6 +8,6 @@
     ".": "./src/index.ts"
   },
   "dependencies": {
-    "koffi": "3.2.1"
+    "koffi": "3.3.4"
   }
 }

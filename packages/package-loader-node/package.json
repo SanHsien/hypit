@@ -12,7 +12,7 @@
     "@hypit/component-kit": "workspace:*",
     "@hypit/host": "workspace:*",
     "@hypit/protocol": "workspace:*",
-    "cjs-module-lexer": "2.2.1",
+    "cjs-module-lexer": "2.3.0",
     "typescript": "5.9.3"
   }
 }
