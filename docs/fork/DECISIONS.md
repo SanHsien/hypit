@@ -247,10 +247,10 @@
 
 | CodeQL 規則 | 位置 | Alert 編號 |
 | --- | --- | --- |
-| `js/redos`（指數級回溯） | `packages/markup/src/syntax.ts:14`（`REFERENCE`） | 未查得，見下方說明 |
-| `js/double-escaping` | `packages/provider-hyperframes-local/src/sampling.ts:25`（`videoSlots` 的屬性解碼） | 未查得，見下方說明 |
+| `js/redos`（指數級回溯） | `packages/markup/src/syntax.ts:14`（`REFERENCE`） | #12 |
+| `js/double-escaping` | `packages/provider-hyperframes-local/src/sampling.ts:25`（`videoSlots` 的屬性解碼） | #14 |
 
-Alert 編號：`js/redos`（`packages/markup/src/syntax.ts:14`）為 #12，`js/double-escaping`（`packages/provider-hyperframes-local/src/sampling.ts:25`）為 #14。雲端工作環境查詢時回 `403 Resource not accessible by integration`，編號於合併前由本機維護帳號以 `gh api repos/SanHsien/hypit/code-scanning/alerts?state=open` 查得補上。
+Alert 編號的來源：雲端工作環境查詢時回 `403 Resource not accessible by integration`，表中編號於合併前由本機維護帳號以 `gh api repos/SanHsien/hypit/code-scanning/alerts?state=open` 查得補上。
 
 ### 1. `REFERENCE` 正則的 ReDoS
 
