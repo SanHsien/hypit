@@ -77,9 +77,9 @@
 | `56057fd` | fix(pixverse): render at 540p or 720p | 暫不採用，待維護者決定。PixVerse Provider 輸出解析度修正，需維護者評估是否引入。 |
 | `d24583e` | docs: arrange Trendshift badges and add TypeScript weekly badge | 不適用。上游 README 徽章排版，本 fork 已移除 Trendshift 等第三方徽章。 |
 | `802ecb4` | docs: point the BeatAPI launch-partner links to the referral sign-up URL | 不適用。上游合作夥伴推廣連結，同 `1af179d`。 |
-| `636270f` | fix(providers): keep async jobs pending when a progress poll hits a transport error (#336) | 暫不採用，待維護者決定。跨多個 Provider 的輪詢錯誤處理修正，具通用可靠性價值，待授權後評估合併。 |
+| `636270f` | fix(providers): keep async jobs pending when a progress poll hits a transport error (#336) | 已移植（`4eeb814f`，2026-10-25）。跨多個 Provider 的輪詢錯誤處理修正，具通用可靠性價值，待授權後評估合併。 |
 | `5d257c5` | chore(release): prepare @hypit/hypit 0.2.11 | 不適用。上游 release 版務 commit。 |
-| `ec6f208` | fix(endpoint-kit): share the poll error decision across asynchronous Providers (#337) | 暫不採用，待維護者決定。`636270f` 的後續一般化重構，同一輪詢錯誤處理修正系列。 |
+| `ec6f208` | fix(endpoint-kit): share the poll error decision across asynchronous Providers (#337) | 已移植（`134d4a97`，2026-10-25）。`636270f` 的後續一般化重構，同一輪詢錯誤處理修正系列。 |
 | `5a568f4` | chore(release): prepare @hypit/hypit 0.2.12 | 不適用。上游 release 版務 commit。 |
 
 共 19 筆 commit，全數 triage 完畢；本次不執行 `git merge`。
@@ -98,8 +98,8 @@
 | [#331](https://github.com/hypit-ai/hypit/pull/331) | 暫不採用，待維護者決定 | 對應 commit `a2d13d5`，新 Provider 功能擴充，見上表。 |
 | [#334](https://github.com/hypit-ai/hypit/pull/334) | 暫不採用，待維護者決定 | 對應 issue #333，新增 Higgsfield Provider（Seedance 2.0/2.5），新功能提案，需維護者評估是否引入。 |
 | [#335](https://github.com/hypit-ai/hypit/pull/335) | 不適用 | 僅新增「reproducible renderer bug reporting」文件指引，不影響程式碼行為。 |
-| [#336](https://github.com/hypit-ai/hypit/pull/336) | 暫不採用，待維護者決定 | 對應 commit `636270f`，見上表。 |
-| [#337](https://github.com/hypit-ai/hypit/pull/337) | 暫不採用，待維護者決定 | 對應 commit `ec6f208`，見上表。 |
+| [#336](https://github.com/hypit-ai/hypit/pull/336) | 已移植（2026-10-25） | 對應 commit `636270f`，見上表。 |
+| [#337](https://github.com/hypit-ai/hypit/pull/337) | 已移植（2026-10-25） | 對應 commit `ec6f208`，見上表。 |
 
 共 12 筆 PR，全數 triage 完畢。
 
