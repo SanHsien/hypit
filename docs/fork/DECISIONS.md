@@ -284,6 +284,6 @@ Alert 編號的來源：雲端工作環境查詢時回 `403 Resource not accessi
 - **決策：現在不升 0.3。** 等 0.3.2 以上穩定；上游 issue #388（內建範例重放失敗，Windows）與 #433（caption 相鄰 Cue 回歸）仍 open，另有約 40 個修復 PR 未合併。升級前須先有完整的 render 實測。fork 的 markup 正則 ReDoS 修復在 0.3.1 仍需保留（同一個正則），HTML 實體重複還原的修復在 0.3 已不適用。
 - **已移植（`git cherry-pick -x`，各自獨立 commit）**：#383 alpha Normalize 加速、#384 yt-dlp 加 curl_cffi（`uv lock --check` 通過）、#363 still-video 的 BT.709、#348 plan 回報無請求的 Producer 失敗、#355 Timeline 精確幀預檢、#377 SVS 允許 sheet 結尾文字、#336→#337→#376 poll／transport 錯誤鏈（`provider-beatapi` 在 fork 已不存在，衝突以刪除解決）。
 - **略過**：#373（修的是 fork 沒取的 `089c39a` 回歸）、`5885c00`（0.3 基底）、#378 與所有微信 QR／合作夥伴行銷 commit、版號 commit、簡中文件與遷移指南、新功能 #387／#389／#390。
-- **待上游合併後移植**：#394+#399（text replace 字面化，issue #393）、#395（script 逗號數字，issue #391）、#416（Runtime Profile 解析錯誤訊息）；手工評估：#426（issue #425）、#406（簽名 URL 不入錯誤訊息）、issue #392（svs 引號值還原，疑似同源未驗證）。其餘 PR 目標套件只在 0.3 存在，隨 0.3 處理。
+- **待上游合併後移植**：#394+#399（text replace 字面化，issue #393）、#395 或其後繼 #438（script 逗號數字，issue #391；10-25 複查 #438 diff 乾淨，無隱藏內容，兩者仍 open 未合併，fork 的 `lexical.ts` 有同一缺陷）、#416（Runtime Profile 解析錯誤訊息）；手工評估：#426（issue #425）、#406（簽名 URL 不入錯誤訊息）、issue #392（svs 引號值還原，疑似同源未驗證）。其餘 PR 目標套件只在 0.3 存在，隨 0.3 處理。
 - **#437**（html-local GPU 影片匯出，上游標 DO NOT MERGE 的 0.3 新功能）：略過。
 - **issue**：#381、#382 由上述移植解決；#380、#386、#432、#435 與 fork 無關；#388、#433 僅升 0.3 才相關。
