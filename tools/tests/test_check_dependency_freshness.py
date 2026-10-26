@@ -54,6 +54,20 @@ class WorkflowActionFloorTests(unittest.TestCase):
                 self.assertEqual(package["minimum"], "7.0.1" if "7.0.1" in line else "6")
 
 
+class RepositoryWorkflowTests(unittest.TestCase):
+    def test_every_action_pinned_in_this_repository_has_a_floor_the_check_can_compare(self) -> None:
+        # A pin the check reads as "NO FLOOR" is invisible to the monthly freshness report: it can
+        # fall any number of majors behind and the report stays green. Every `uses:` in
+        # .github/workflows must say which release it is (`@SHA # vX.Y.Z`) or carry an explicit
+        # `# freshness-hold:` reason.
+        blind = [
+            f"{row['name']} ({row['source']}): {row['requirement']}"
+            for row in freshness.load_workflow_actions(freshness.REPO_ROOT)
+            if not row["minimum"] and not row["hold"]
+        ]
+        self.assertEqual(blind, [], "Action pins the freshness check cannot compare")
+
+
 class RegistryResponseTests(unittest.TestCase):
     def test_a_response_cut_off_mid_body_reads_as_unavailable_not_as_a_crash(self) -> None:
         # `response.read()` raises IncompleteRead, an HTTPException that is not an OSError. The
