@@ -5,7 +5,9 @@ No test here touches the network: registry and GitHub calls are replaced.
 
 from __future__ import annotations
 
+import http.client
 import unittest
+from unittest import mock
 
 import _paths  # noqa: F401  (puts tools/ on sys.path)
 import check_dependency_freshness as freshness
@@ -37,6 +39,24 @@ class WorkflowActionFloorTests(unittest.TestCase):
 
     def test_a_branch_ref_has_no_floor(self) -> None:
         self.assertEqual(self.action("      - uses: owner/repo@main")["minimum"], "")
+
+
+class RegistryResponseTests(unittest.TestCase):
+    def test_a_response_cut_off_mid_body_reads_as_unavailable_not_as_a_crash(self) -> None:
+        # `response.read()` raises IncompleteRead, an HTTPException that is not an OSError. The
+        # lookup must come back as None ("CHECK FAILED" in the report) like every other
+        # transport failure, so the report is still written.
+        response = mock.MagicMock()
+        response.__enter__.return_value = response
+        response.read.side_effect = http.client.IncompleteRead(b"{", 100)
+        with mock.patch.object(freshness.urllib.request, "urlopen", return_value=response):
+            self.assertIsNone(freshness._get_json("https://registry.example.invalid/pkg"))
+
+    def test_a_connection_error_reads_as_unavailable(self) -> None:
+        with mock.patch.object(
+            freshness.urllib.request, "urlopen", side_effect=ConnectionResetError()
+        ):
+            self.assertIsNone(freshness._get_json("https://registry.example.invalid/pkg"))
 
 
 if __name__ == "__main__":
