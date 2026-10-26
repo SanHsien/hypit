@@ -8,7 +8,9 @@ from __future__ import annotations
 
 import json
 import subprocess
+import tempfile
 import unittest
+from pathlib import Path
 from unittest import mock
 
 import _paths  # noqa: F401  (puts tools/ on sys.path)
@@ -82,6 +84,75 @@ class CommitCollectionTests(unittest.TestCase):
         )
         self.assertEqual([commit["subject"] for commit in commits], ["first", "second"])
         self.assertEqual([commit["short"] for commit in commits], ["aaaaaaa", "bbbbbbb"])
+
+
+class ForkStatusTests(unittest.TestCase):
+    """`ahead`/`behind` against a real (local, throwaway) git history."""
+
+    REF = "refs/upstream-check/main"
+
+    def setUp(self) -> None:
+        self.scratch = tempfile.TemporaryDirectory(ignore_cleanup_errors=True)
+        self.addCleanup(self.scratch.cleanup)
+        self.root = Path(self.scratch.name)
+
+    def git(self, repo: Path, *args: str) -> str:
+        result = subprocess.run(
+            ["git", "-c", "user.name=t", "-c", "user.email=t@example.invalid",
+             "-c", "commit.gpgsign=false", "-c", "core.autocrlf=false", *args],
+            cwd=repo, capture_output=True, text=True, encoding="utf-8", check=False,
+        )
+        self.assertEqual(result.returncode, 0, f"git {args}: {result.stderr}")
+        return result.stdout.strip()
+
+    def commit(self, repo: Path, name: str) -> str:
+        (repo / name).write_text(name, encoding="utf-8")
+        self.git(repo, "add", name)
+        self.git(repo, "commit", "-q", "-m", name)
+        return self.git(repo, "rev-parse", "HEAD")
+
+    def init(self, name: str) -> Path:
+        repo = self.root / name
+        repo.mkdir()
+        self.git(repo, "init", "-q", "-b", "main")
+        return repo
+
+    def fetch_upstream(self, fork: Path, upstream_repo: Path) -> None:
+        self.git(fork, "fetch", "-q", str(upstream_repo), f"+refs/heads/main:{self.REF}")
+
+    def test_a_fork_with_its_own_history_has_no_ahead_count(self) -> None:
+        # This fork was created with a clean-init history that shares no commit with upstream, so
+        # `reviewed..HEAD` is the fork's entire history. Reporting that as "ahead N since the
+        # baseline" states something false (and it grows with every fork commit).
+        upstream_repo = self.init("upstream")
+        baseline_sha = self.commit(upstream_repo, "u1")
+        self.commit(upstream_repo, "u2")
+        fork = self.init("fork")
+        for name in ("f1", "f2", "f3"):
+            self.commit(fork, name)
+        self.fetch_upstream(fork, upstream_repo)
+
+        status = upstream.fork_status({"reviewed_through": baseline_sha}, fork, self.REF)
+
+        self.assertIsNone(status["ahead"])
+        self.assertEqual(status["behind"], 1)
+        text = " ".join(upstream.render_fork_status(status))
+        self.assertNotIn("ahead", text)
+
+    def test_a_fork_branched_from_upstream_counts_its_own_commits_as_ahead(self) -> None:
+        upstream_repo = self.init("upstream")
+        baseline_sha = self.commit(upstream_repo, "u1")
+        fork = self.root / "fork"
+        self.git(self.root, "clone", "-q", str(upstream_repo), str(fork))
+        self.commit(fork, "f1")
+        self.commit(fork, "f2")
+        self.commit(upstream_repo, "u2")
+        self.fetch_upstream(fork, upstream_repo)
+
+        status = upstream.fork_status({"reviewed_through": baseline_sha}, fork, self.REF)
+
+        self.assertEqual((status["ahead"], status["behind"]), (2, 1))
+        self.assertIn("ahead 2", " ".join(upstream.render_fork_status(status)))
 
 
 if __name__ == "__main__":

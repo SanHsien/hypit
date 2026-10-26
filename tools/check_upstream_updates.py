@@ -150,19 +150,48 @@ def fork_status(baseline: dict, repo_dir: Path, upstream_ref: str) -> dict:
         "baseline": reviewed[:7],
         "fork_head": run_git(["rev-parse", "--short", "HEAD"], repo_dir).strip(),
         "upstream_tip": run_git(["rev-parse", "--short", upstream_ref], repo_dir).strip(),
-        "ahead": count(f"{reviewed}..HEAD"),
+        # A fork created with a clean-init history shares no commit with upstream, so
+        # `reviewed..HEAD` is the fork's whole history, not "what was added after the baseline".
+        # With no common ancestor "ahead" has no meaning; None says so instead of a number.
+        "ahead": count(f"{reviewed}..HEAD") if shares_history(reviewed, repo_dir) else None,
         "behind": count(f"{reviewed}..{upstream_ref}"),
     }
+
+
+def shares_history(reviewed: str, repo_dir: Path) -> bool:
+    """Does HEAD have any commit in common with the reviewed upstream commit?"""
+    result = subprocess.run(
+        ["git", "merge-base", "HEAD", reviewed],
+        cwd=repo_dir,
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+    )
+    if result.returncode == 0:
+        return True
+    if result.returncode == 1:  # git merge-base: exit 1 means "no common ancestor"
+        return False
+    raise UpstreamCheckError(f"git merge-base HEAD {reviewed} failed: {result.stderr.strip()}")
 
 
 def render_fork_status(status: dict | None, error: str | None = None) -> list[str]:
     if status is None:
         return ["## Fork status", "", f"無法計算：{error or 'unknown'}", ""]
+    if status["ahead"] is None:
+        fork_line = (
+            f"- 本 fork `HEAD`：`{status['fork_head']}`，與 upstream 沒有共同祖先（clean-init 歷史），"
+            "不計領先數"
+        )
+    else:
+        fork_line = (
+            f"- 本 fork `HEAD`：`{status['fork_head']}`，baseline 之後 **ahead {status['ahead']}**"
+        )
     return [
         "## Fork status",
         "",
-        f"- 共同 baseline：`{status['baseline']}`（已審視至此）",
-        f"- 本 fork `HEAD`：`{status['fork_head']}`，baseline 之後 **ahead {status['ahead']}**",
+        f"- 已審視的 upstream baseline：`{status['baseline']}`",
+        fork_line,
         f"- upstream tip：`{status['upstream_tip']}`，baseline 之後 **behind {status['behind']}**",
         "",
         "這兩個數字每次 commit 都會變，所以由本檢查當場算出，不寫進文件。",
