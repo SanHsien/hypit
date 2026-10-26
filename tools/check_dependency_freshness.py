@@ -64,7 +64,7 @@ _RANGE_RE = re.compile(r"^(\^|~|>=|>|=)?\s*v?([0-9]+(?:\.[0-9]+)*)")
 # `owner/repo`, optionally followed by a sub-path: `github/codeql-action/init` is one
 # action published from a directory of `github/codeql-action`.
 _USES_RE = re.compile(
-    r"^\s*(?:-\s*)?uses:\s*([\w.\-]+/[\w.\-]+(?:/[\w.\-]+)*)@([0-9a-fA-F]{40}|\S+)"
+    r"^\s*(?:-\s*)?uses:\s*[\"']?([\w.\-]+/[\w.\-]+(?:/[\w.\-]+)*)@([0-9a-fA-F]{40}|[^\s\"']+)[\"']?"
     r"(?:[ \t]*#[ \t]*(.*))?[ \t]*$",
     re.MULTILINE,
 )

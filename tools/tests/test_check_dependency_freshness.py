@@ -40,6 +40,19 @@ class WorkflowActionFloorTests(unittest.TestCase):
     def test_a_branch_ref_has_no_floor(self) -> None:
         self.assertEqual(self.action("      - uses: owner/repo@main")["minimum"], "")
 
+    def test_a_quoted_uses_value_is_read_like_an_unquoted_one(self) -> None:
+        # YAML allows `uses: "owner/repo@v6"`. A pattern that only knows the bare form drops the
+        # line without a trace, so that Action never appears in the report at all.
+        for line in (
+            '      - uses: "actions/checkout@v6"',
+            "      - uses: 'actions/checkout@v6'",
+            f'      - uses: "actions/checkout@{SHA_STARTING_WITH_DIGIT}" # v7.0.1',
+        ):
+            with self.subTest(line=line):
+                package = self.action(line)
+                self.assertEqual(package["name"], "actions/checkout")
+                self.assertEqual(package["minimum"], "7.0.1" if "7.0.1" in line else "6")
+
 
 class RegistryResponseTests(unittest.TestCase):
     def test_a_response_cut_off_mid_body_reads_as_unavailable_not_as_a_crash(self) -> None:
