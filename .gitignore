@@ -72,3 +72,5 @@ examples/**/.svml/
 # Reverse-engineering scratch projects live outside the repository too
 /projects/*
 
+# Fork maintenance tools (tools/*.py) and their tests
+tools/**/__pycache__/
