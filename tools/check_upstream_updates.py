@@ -31,6 +31,9 @@ UPSTREAM_REF_PREFIX = "refs/upstream-check"
 DEFAULT_DECISION_LOG = "docs/fork/DECISIONS.md"
 DEFAULT_DECISION_LOG = "docs/fork/DECISIONS.md"
 TRACK_MODES = ("release", "commit")
+# `gh pr|issue list` returns only the newest N items. Large enough that a release's worth of
+# tickets fits; still bounded, so hitting it is detected (see collect_new_tickets).
+TICKET_LIST_LIMIT = 1000
 _SEMVER_TAG_RE = re.compile(r"^v?(\d+)\.(\d+)\.(\d+)$")
 
 
@@ -228,7 +231,7 @@ def collect_new_tickets(baseline: dict, kind: str) -> list[dict] | None:
         result = subprocess.run(
             [
                 "gh", kind, "list", "--repo", slug, "--state", "all",
-                "--limit", "50", "--json", "number,title",
+                "--limit", str(TICKET_LIST_LIMIT), "--json", "number,title",
             ],
             capture_output=True,
             text=True,
@@ -246,6 +249,11 @@ def collect_new_tickets(baseline: dict, kind: str) -> list[dict] | None:
     try:
         items = json.loads(result.stdout)
     except ValueError:
+        return None
+    if len(items) >= TICKET_LIST_LIMIT and all(item["number"] > watermark for item in items):
+        # The listing was cut off while still above the watermark: older unreviewed items were
+        # dropped without a trace. Say "not checked" rather than hand back a partial list that
+        # reads as the whole set.
         return None
     return sorted(
         (item for item in items if item["number"] > watermark),
