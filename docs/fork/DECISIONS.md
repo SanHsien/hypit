@@ -287,3 +287,30 @@ Alert 編號的來源：雲端工作環境查詢時回 `403 Resource not accessi
 - **待上游合併後移植**：#394+#399（text replace 字面化，issue #393）、#395 或其後繼 #438（script 逗號數字，issue #391；10-25 複查 #438 diff 乾淨，無隱藏內容，兩者仍 open 未合併，fork 的 `lexical.ts` 有同一缺陷）、#416（Runtime Profile 解析錯誤訊息）；手工評估：#426（issue #425）、#406（簽名 URL 不入錯誤訊息）、issue #392（svs 引號值還原，疑似同源未驗證）。其餘 PR 目標套件只在 0.3 存在，隨 0.3 處理。
 - **#437**（html-local GPU 影片匯出，上游標 DO NOT MERGE 的 0.3 新功能）：略過。
 - **issue**：#381、#382 由上述移植解決；#380、#386、#432、#435 與 fork 無關；#388、#433 僅升 0.3 才相關。
+
+
+## 2026-10-26：WhisperX 釘版警示複查（Dependabot #14–#20、#26）——無可相容修補，維持延後
+
+沒有改任何依賴。對照 2026-10-24／10-25 的延後表，逐筆複查結果：
+
+| 警示 | 套件／嚴重度 | 修補版 | 對應延後列 |
+| --- | --- | --- | --- |
+| #15、#16、#19 | `torch` medium／low／low | 2.9.1、2.10.0、2.13.0（#19 的 2.13.0 一次涵蓋三筆） | `torch` |
+| #14、#17、#18、#20 | `transformers` medium／high／high／high | 5.0.0rc3、5.3.0、5.5.0、5.10.0 | `transformers` |
+| #26 | `transformers` high（GHSA-x9r9-c232-4q39，範圍 `>= 4.49.0, <= 5.8.1`） | 無 `first_patched_version` | `transformers`，見下 |
+
+**#26 之前沒有被明寫**：這筆沒有修補版，4.x 內無解（鎖檔 4.57.6 在範圍內，PyPI 上 4.57.x 最新就是 4.57.6）。
+只有離開 5.8.1 以下（5.9 以上，取未被 yank 的版本）才脫離範圍，所以出口條件與 #14／#17／#18／#20 相同，
+不另設一條，也不能靠版本號以外的方式宣稱已修。
+
+**2026-10-26 複查事實**（PyPI JSON 實查）：
+- `whisperx` 最新穩定版仍是 3.8.6（`torch~=2.8.0`、`huggingface-hub<1.0.0`）；預發行 3.8.7rc1 放寬了 `huggingface-hub>=0.28.1`，但仍是 `torch~=2.8.0`。
+- `torch` 沒有 2.8.x 的修補發行（2.8.0 之後的穩定版是 2.9 以上）；`transformers` 4.x 沒有修補發行，最新穩定 5.20.x。
+- 因此沒有任何與 `whisperx 3.8.6` 相容的修補版；不強制升級、不 override、不 dismiss、不移除 WhisperX 對齊功能。
+
+**觸發條件（比 10-25 的「等 3.8.7」更精確）**：10-25 寫「等穩定版 `whisperx` 3.8.7」，但對 `torch` 而言 3.8.7rc1 仍卡在 2.8。
+重新檢查要同時成立：(1) 穩定版 `whisperx` 的相依圖允許實際修補版的 `torch`（至少 2.13.0）與 `transformers`（5.10 以上、未被 yank）及其要求的 `huggingface-hub>=1.5`，`uv lock` 可解；
+(2) `pnpm test:whisperx-service` 與本機實跑對齊模型通過。只是版本號變成 3.8.7，或只有預發行，都不算成立。
+重跑：`gh api repos/SanHsien/hypit/dependabot/alerts?state=open`，並對 `https://pypi.org/pypi/whisperx/json` 查最新穩定版的 `requires_dist`。
+
+這些警示的程式碼可達性沒有逐筆驗證，因此不主張「不受影響」，只主張「沒有相容修補可套」。
