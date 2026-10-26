@@ -19,3 +19,12 @@ python tools/check_upstream_updates.py
 - 逐筆審閱後，在 `docs/fork/DECISIONS.md` 記錄採納／略過決策。
 - 推進 `tools/upstream_baseline.json` 的水位線，並執行 `tools/dev_check.ps1` 驗證。
 
+## 修改檢查腳本時
+
+`tools/check_upstream_updates.py` 與 `tools/check_dependency_freshness.py` 的測試在 `tools/tests/`，不連網：
+
+```powershell
+python -I -m unittest discover -s tools/tests -t tools/tests
+```
+
+`pnpm test` 也會跑它（`test/fork-tools.test.ts`）。

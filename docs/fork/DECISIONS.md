@@ -314,3 +314,41 @@ Alert 編號的來源：雲端工作環境查詢時回 `403 Resource not accessi
 重跑：`gh api repos/SanHsien/hypit/dependabot/alerts?state=open`，並對 `https://pypi.org/pypi/whisperx/json` 查最新穩定版的 `requires_dist`。
 
 這些警示的程式碼可達性沒有逐筆驗證，因此不主張「不受影響」，只主張「沒有相容修補可套」。
+
+## 2026-10-27：深度掃描——fork 自有程式的缺陷修正（8 個 commit）
+
+範圍：只看 fork 自己加的程式——`tools/`（兩支 Python 檢查腳本）、`hypit.cmd`、`.github/workflows/` 中 fork 加的與被 fork 改過的、`scripts/pack-distribution.mjs`、`services/whisperx` 的 NLTK 修補，以及 cherry-pick 的整合點（#336／#337／#376 輪詢錯誤鏈、#361 `packages status`、#345 vocabulary、#339 mux、#347 media probe）。上游原有程式不改。依賴不動：WhisperX 釘版造成的 torch／transformers 延後維持原決定，沒有升級、override 或 dismiss。
+
+`tools/` 以前完全沒有測試。新增 `tools/tests/`（stdlib `unittest`，不連網：`gh`、registry 都以替身取代，git 只在暫存的本機 repo 跑），並由 `test/fork-tools.test.ts` 掛進 `pnpm test`，CI 的 Windows job 因此會跑。
+
+| # | commit | 位置 | 什麼輸入出錯、錯成什麼 | 重現測試（修前失敗） |
+| --- | --- | --- | --- | --- |
+| 1 | `62c6f925` | `tools/check_dependency_freshness.py` `parse_workflow_actions` | `uses: owner/repo@<40 位 SHA>` 沒有版本註解時，SHA 開頭的十進位數字被當成版本（`3d3c42e…` → 下限 `3`），對任何較新 major 報 REVIEW UPDATE；字母開頭的 SHA 卻是 NO FLOOR，行為不一致 | `test_check_dependency_freshness.py::test_a_pinned_sha_without_a_version_comment_has_no_floor`（`'3' != ''`） |
+| 2 | `78021b10` | 同檔 `_get_json` | 回應中途被切斷，`response.read()` 丟 `http.client.IncompleteRead`（`HTTPException`，不是 `OSError`），整支腳本帶 traceback 結束、不產報告；其他連線失敗都會變成 CHECK FAILED 並照常寫報告與 workflow output | `test_a_response_cut_off_mid_body_reads_as_unavailable_not_as_a_crash`（`IncompleteRead`） |
+| 3 | `9b7a9efd` | `tools/check_upstream_updates.py` `collect_new_tickets` | `gh … list --limit 50` 只回最新 50 筆。兩次審查之間超過 50 筆新 PR／issue 時，較舊的未審項目被靜默丟掉，報告寫「N 筆」而 N 偏小，之後推進水位更把它們標成已 triage。上一輪（v0.2.16→v0.3.1）就是 63 個 commit、#375–#437 | `test_a_listing_cut_off_above_the_watermark_is_reported_as_not_checked`（4900 筆新項目只回 50 筆且當成全部）。現在上限 1000，填滿且全部仍高於水位就回 `None`（未檢查、exit 2） |
+| 4 | `0c186058` | 同檔 `collect_new_commits` | `str.splitlines()` 也會在 U+2028／U+2029／U+0085／換頁／垂直定位處斷行；commit 標題含其一，一筆紀錄被切兩段，`line.split("\x1f", 2)` 丟 `ValueError`（不是 `UpstreamCheckError`），每週檢查帶 traceback 結束 | `test_a_subject_with_a_unicode_line_separator_is_one_commit`（五種分隔字元皆 `ValueError`） |
+| 5 | `fd58ac7e` | 同檔 `fork_status` | 本 fork 是 clean-init 歷史，與 upstream 沒有共同祖先，`reviewed..HEAD` 就是整個 fork 歷史：報告寫「共同 baseline … baseline 之後 ahead 30」，數字隨每個 fork commit 增加，說的是假事實。現在先 `git merge-base HEAD <reviewed>`，沒有共同祖先時 `ahead` 為 `None`、報告明說；從 upstream 分出的 fork 行為不變 | `test_a_fork_with_its_own_history_has_no_ahead_count`（`3 is not None`），其兄弟測試釘住分支型 fork 的舊行為 |
+| 6 | `7c70e8bc` | `tools/check_dependency_freshness.py` `_USES_RE` | YAML 允許 `uses: "owner/repo@v6"`、`uses: 'owner/repo@<sha>' # v7.0.1`；只認裸值的樣式整行不匹配，那個 Action 連 NO FLOOR 都不會出現，報告裡沒有任何一列 | `test_a_quoted_uses_value_is_read_like_an_unquoted_one`（三種寫法皆 `0 != 1`） |
+| 7 | `8954e41b` | `.github/workflows/automation-check.yml`、`repository-analysis.yml` | 兩處 `actions/checkout` 釘在 `d23441a`（v6.1.0）且沒有版本註解，所以被讀成 NO FLOOR，比其他七個 workflow（v7.0.1）落後一個 major，月報從未顯示；10-25 的重新釘選也因此漏掉。改釘 `3d3c42e…`（v7.0.1，與其餘一致） | `test_every_action_pinned_in_this_repository_has_a_floor_the_check_can_compare`（修前列出 `actions/checkout@d23441a48e51`）。這兩個 workflow 無法在本機執行，推送後以 `Check repository analysis` 的 CI 結果為準 |
+| 8 | `1f8331e4` | `hypit.cmd` | 「依賴未安裝」訊息在 `if not exist (...)` 區塊內、未加引號地印 `%LAUNCHER_DIR%`。cmd 在解析區塊時就展開變數（不管條件真假），安裝目錄如 `C:\Program Files (x86)\hypit\` 的 `)` 提早結束區塊：`\hypit\ was unexpected at this time`，exit 255，依賴全裝好也到不了 `node`；路徑含 `&` 時（`Tom & Jerry`）缺依賴的訊息同樣壞掉。現在路徑加引號 | `test/hypit-cmd.test.ts`（隱藏的 console 子行程，替身 `bin/hypit.mjs`；`plain`、`Program Files (x86)`、`Tom & Jerry` 三個目錄。修前 `(x86)` 兩項與 `&` 缺依賴一項失敗） |
+
+### 刻意不修
+
+- **`upstream-review-report.md` 被追蹤進 git**：`check_upstream_updates.py` 預設把報告寫到 repo 根目錄，每次 `dev_check.ps1` 都會改動這個被追蹤的檔，內容（HEAD、數字）永遠過期，也讓「保持乾淨工作目錄」做不到。正解是 `git rm --cached` 並加進 `.gitignore`，但那是從 repo 移除檔案，需要維護者決定；沒有動它。
+- **`check_dependency_freshness.py` 只讀根目錄 `package.json`**：`packages/*/package.json` 的 registry 相依（`@hyperframes/engine`、`@hyperframes/producer`、`@aws-sdk/*`、約 100 個 `@fontsource*`）完全不在月報裡。補上會一次出現大量新紅燈，其中字型套件是刻意精確釘版，需要先決定哪些要 hold／deferral，不是機械修正；留給維護者。
+- **`publish-npm.yml` 未限定在上游 repo**：fork 若發 release 會嘗試走 npm trusted publishing；該信任綁在 `hypit-ai/hypit`，在 fork 只會失敗而不會發出去。要不要像 `sync-hypihub-docs.yml` 一樣加 `if: github.repository == 'hypit-ai/hypit'` 取決於 fork 是否可能自行發佈，未改。
+- **`packages/markup/test/reference.test.ts` 的 50ms 牆鐘上限**：病態輸入修前要約 13 秒，50ms 在極重負載下理論上會誤報，但這次整套測試並行跑時穩定通過，沒有可重現的失敗，不動。
+- **整套測試中兩個偶發失敗**（`credential-store-os/test/windows.test.ts`、`runtime-local/test/programs.test.ts`）：整套並行時一次逾時、一次 `EBUSY` 清理暫存目錄；單獨重跑都通過，判定為負載造成，與本批無關。
+
+### 上游程式觀察清單（不改，記錄）
+
+- `packages/package-loader-node/src/location.ts` 的 `distributionPackageDeclaring`（#361）對每個 `packages/*/package.json` 與 `services/*/package.json` 直接 `JSON.parse`、沒有 try/catch：任何一個 manifest 格式錯誤，`hypit packages status` 會以原始 `SyntaxError` 結束，而不是報告是哪個檔案。
+- `services/whisperx/src/hypit_whisperx_service/resources.py` 的 `prepare_punkt_tab` 只檢查 `tokenizers/punkt_tab` 目錄存在就視為已完成，不檢查各語言檔；目錄在、語言檔缺時 `prepare` 直接返回，`assert_sentence_data` 之後才失敗。`assert_punkt_tab` 還會改寫全域 `nltk.data.path`。
+- `packages/provider-hyperframes-local/src/sampling.ts` 的 `videoSlots` 只還原 `&quot; &lt; &gt; &amp;`，不認 `&#39;`／`&apos;`／數字實體；目前編譯器不會輸出這些，編譯器若改變轉義方式需同步。
+
+### 驗證
+
+- `tools/tests`：14 個測試通過（`python -I -m unittest discover -s tools/tests -t tools/tests`），並經 `test/fork-tools.test.ts` 由 Node 執行；每個重現測試都在修前先確認失敗。
+- `test/hypit-cmd.test.ts`：6 個測試通過。
+- `pnpm check` exit 0；單元測試 202 個檔案（排除 3 個會啟動 headless Chrome 的檔案）：第二次完整執行 1065 項，通過 1042、略過 23、失敗 0；第一次完整執行有上述 2 個偶發失敗，單獨重跑皆通過。
+- 未執行：WhisperX 服務測試（需安裝 torch 等重型相依）、啟動瀏覽器的 3 個測試、需要 GPU 或真實模型的測試。

@@ -22,6 +22,9 @@
 | `tools/dev_check.ps1` | Windows 本機一鍵 gate（TypeCheck + Tests + UpstreamCheck） |
 | `tools/check_upstream_updates.py` | 上游 commit / PR / Issue 增量檢查 |
 | `tools/upstream_baseline.json` | 上游已審核水位紀錄 |
+| `tools/check_dependency_freshness.py` | 每月依賴下限與 Actions 釘選新鮮度檢查 |
+| `tools/tests/` | 上述兩支 Python 檢查腳本的 `unittest`；由 `test/fork-tools.test.ts` 掛進 `pnpm test` |
+| `hypit.cmd` | Windows 啟動器（取代上游的 POSIX `hypit` 腳本）；`test/hypit-cmd.test.ts` 驗證含 `(`、`)`、`&` 的安裝路徑 |
 | `.github/workflows/upstream-check.yml` | 每週對 `upstream/main` 檢查新 commit 與 ticket |
 | `docs/fork/DECISIONS.md`、`docs/fork/UPSTREAM.md` | fork 維護決策與同步指引 |
 | `.cursor/rules/no-upstream-pr.mdc` | 防呆規則：禁止誤對上游開 PR 或推送 |
