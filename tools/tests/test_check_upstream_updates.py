@@ -55,5 +55,34 @@ class TicketCollectionTests(unittest.TestCase):
         )
 
 
+class CommitCollectionTests(unittest.TestCase):
+    SHA = "a" * 40
+
+    def collect(self, log_output: str) -> list[dict]:
+        def run_git(args: list[str], repo_dir: object) -> str:
+            return log_output if args[0] == "log" else "docs/readme.md\n"
+
+        with mock.patch.object(upstream, "run_git", side_effect=run_git):
+            return upstream.collect_new_commits({"reviewed_through": "0" * 40}, None, "ref")
+
+    def test_a_subject_with_a_unicode_line_separator_is_one_commit(self) -> None:
+        # str.splitlines() breaks on U+2028, U+0085 and form feed as well as newline. A subject
+        # containing one (pasted from a document, say) turned one `git log` record into two
+        # fragments and the unpack of the second raised ValueError, ending the whole check.
+        for separator in (" ", " ", "\x85", "\x0c", "\x0b"):
+            with self.subTest(separator=repr(separator)):
+                subject = f"fix: first{separator}second"
+                commits = self.collect(f"{self.SHA}\x1f2026-10-26\x1f{subject}\n")
+                self.assertEqual([commit["subject"] for commit in commits], [subject])
+
+    def test_each_log_line_is_its_own_commit(self) -> None:
+        other = "b" * 40
+        commits = self.collect(
+            f"{self.SHA}\x1f2026-10-25\x1ffirst\n{other}\x1f2026-10-26\x1fsecond\n"
+        )
+        self.assertEqual([commit["subject"] for commit in commits], ["first", "second"])
+        self.assertEqual([commit["short"] for commit in commits], ["aaaaaaa", "bbbbbbb"])
+
+
 if __name__ == "__main__":
     unittest.main()

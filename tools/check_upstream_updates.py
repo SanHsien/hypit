@@ -183,7 +183,9 @@ def collect_new_commits(baseline: dict, repo_dir: Path, ref: str) -> list[dict]:
         repo_dir,
     )
     commits = []
-    for line in raw.splitlines():
+    # Split on newline only: str.splitlines() also breaks on U+2028, U+0085 and form feed, which
+    # a commit subject can contain, and that would cut one record in two.
+    for line in raw.split("\n"):
         if not line.strip():
             continue
         sha, date, subject = line.split("\x1f", 2)
@@ -191,7 +193,7 @@ def collect_new_commits(baseline: dict, repo_dir: Path, ref: str) -> list[dict]:
             item
             for item in run_git(
                 ["show", "--name-only", "--format=", sha], repo_dir
-            ).splitlines()
+            ).split("\n")
             if item.strip()
         ]
         commits.append(
