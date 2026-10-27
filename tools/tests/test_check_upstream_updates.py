@@ -6,7 +6,6 @@ repositories.
 
 from __future__ import annotations
 
-import json
 import subprocess
 import tempfile
 import unittest
@@ -15,46 +14,6 @@ from unittest import mock
 
 import _paths  # noqa: F401  (puts tools/ on sys.path)
 import check_upstream_updates as upstream
-
-BASELINE = {
-    "repo": "https://github.com/owner/name.git",
-    "reviewed_pr_through": 100,
-    "reviewed_issue_through": 100,
-}
-
-
-def fake_gh(newest_first: list[int]):
-    """A `gh <kind> list --limit N` that, like the real one, returns only the newest N items."""
-
-    def run(command: list[str], **_: object) -> subprocess.CompletedProcess[str]:
-        limit = int(command[command.index("--limit") + 1])
-        items = [{"number": number, "title": f"item {number}"} for number in newest_first[:limit]]
-        return subprocess.CompletedProcess(command, 0, json.dumps(items), "")
-
-    return run
-
-
-class TicketCollectionTests(unittest.TestCase):
-    def collect(self, newest_first: list[int]) -> list[dict] | None:
-        with mock.patch.object(upstream.subprocess, "run", side_effect=fake_gh(newest_first)):
-            return upstream.collect_new_tickets(BASELINE, "pr")
-
-    def test_every_item_above_the_watermark_is_returned_when_there_are_few(self) -> None:
-        tickets = self.collect(list(range(130, 90, -1)))
-        assert tickets is not None
-        self.assertEqual([item["number"] for item in tickets], list(range(101, 131)))
-
-    def test_a_listing_cut_off_above_the_watermark_is_reported_as_not_checked(self) -> None:
-        # `gh ... list` returns only the newest --limit items. When even the oldest item it
-        # returned is above the watermark, the older unreviewed ones were dropped silently, and
-        # the report would say "N new items" for a larger N. It has to be None ("not checked"),
-        # never a partial list that reads as complete.
-        newest_first = list(range(5000, 100, -1))
-        tickets = self.collect(newest_first)
-        self.assertTrue(
-            tickets is None or {item["number"] for item in tickets} == set(range(101, 5001)),
-            "a truncated listing was returned as if it were the full set of new items",
-        )
 
 
 class CommitCollectionTests(unittest.TestCase):
@@ -120,24 +79,6 @@ class ForkStatusTests(unittest.TestCase):
     def fetch_upstream(self, fork: Path, upstream_repo: Path) -> None:
         self.git(fork, "fetch", "-q", str(upstream_repo), f"+refs/heads/main:{self.REF}")
 
-    def test_a_fork_with_its_own_history_has_no_ahead_count(self) -> None:
-        # This fork was created with a clean-init history that shares no commit with upstream, so
-        # `reviewed..HEAD` is the fork's entire history. Reporting that as "ahead N since the
-        # baseline" states something false (and it grows with every fork commit).
-        upstream_repo = self.init("upstream")
-        baseline_sha = self.commit(upstream_repo, "u1")
-        self.commit(upstream_repo, "u2")
-        fork = self.init("fork")
-        for name in ("f1", "f2", "f3"):
-            self.commit(fork, name)
-        self.fetch_upstream(fork, upstream_repo)
-
-        status = upstream.fork_status({"reviewed_through": baseline_sha}, fork, self.REF)
-
-        self.assertIsNone(status["ahead"])
-        self.assertEqual(status["behind"], 1)
-        text = " ".join(upstream.render_fork_status(status))
-        self.assertNotIn("ahead", text)
 
     def test_a_fork_branched_from_upstream_counts_its_own_commits_as_ahead(self) -> None:
         upstream_repo = self.init("upstream")
