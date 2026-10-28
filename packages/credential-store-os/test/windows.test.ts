@@ -4,6 +4,7 @@ import type { ChildProcess, ExecFileOptionsWithStringEncoding } from "node:child
 import { once } from "node:events";
 import { syncBuiltinESMExports } from "node:module";
 import { randomUUID } from "node:crypto";
+import { join } from "node:path";
 import test from "node:test";
 import { credentialRef } from "@hypit/runtime";
 import { OsCredentialStore } from "../src/store.js";
@@ -31,6 +32,22 @@ test("an oversized bridge response terminates the child and keeps secret output 
     await closed;
     assert.equal(child?.killed, true);
   } finally { launch.mock.restore(); syncBuiltinESMExports(); child?.kill(); }
+});
+
+// Ported from upstream PR #443 (issue #451): a bare name lets CreateProcess search the current
+// directory first, where a planted powershell.exe would run. The mock throws, so nothing starts.
+test("Windows PowerShell is resolved under SystemRoot, never by bare name", {
+  skip: process.env.SystemRoot === undefined,
+}, async t => {
+  const commands: string[] = [];
+  t.mock.method(childProcess, "execFile", (command: string) => {
+    commands.push(command);
+    throw new Error("execFile intercepted by test");
+  });
+  syncBuiltinESMExports();
+  t.after(() => { t.mock.restoreAll(); syncBuiltinESMExports(); });
+  await assert.rejects(windowsCredential("read", "test", "test"), /intercepted/u);
+  assert.deepEqual(commands, [join(process.env.SystemRoot!, "System32", "WindowsPowerShell", "v1.0", "powershell.exe")]);
 });
 
 test("Windows locker replaces credentials and retains the previous value if replacement fails", {
