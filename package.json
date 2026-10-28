@@ -282,7 +282,7 @@
     "@hypit/wan": "workspace:*",
     "@hypit/whisperx": "workspace:*",
     "@types/node": "24.10.1",
-    "rollup": "4.65.0",
+    "rollup": "4.65.1",
     "rollup-plugin-dts": "6.2.3",
     "vitepress": "^1.6.4"
   },
