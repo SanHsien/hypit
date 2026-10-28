@@ -352,3 +352,33 @@ Alert 編號的來源：雲端工作環境查詢時回 `403 Resource not accessi
 - `test/hypit-cmd.test.ts`：6 個測試通過。
 - `pnpm check` exit 0；單元測試 202 個檔案（排除 3 個會啟動 headless Chrome 的檔案）：第二次完整執行 1065 項，通過 1042、略過 23、失敗 0；第一次完整執行有上述 2 個偶發失敗，單獨重跑皆通過。
 - 未執行：WhisperX 服務測試（需安裝 torch 等重型相依）、啟動瀏覽器的 3 個測試、需要 GPU 或真實模型的測試。
+
+## 2026-10-28：依賴新鮮度（rollup）與上游 PR #439–#455、issue #447–#456 分流
+
+**新鮮度**：月檢查只有 `rollup` 4.65.0 → 4.65.1（修補版，10-26 發佈）不是 OK 或已延後。直接升級（`266615ca`），鎖檔只動 rollup 與 26 個平台套件的雜湊，用指定的 pnpm 10.33.0 重產。`@types/node`、`rollup-plugin-dts`、`typescript` 的既有延後維持不變。上次紅燈另一個來源是當時開著的 Dependabot PR，現在 open PR 為 0。
+
+**上游**：release 軌沒有新版（仍 `v0.3.1`）。PR #439–#446 是同一位作者（Wenjix）的安全強化，各對應 issue #447–#454。fork 基底是 v0.2.8 加移植，**8 筆 diff 都套不上**，所以照判準四移植做法，並先實查缺陷在 fork 是否存在。隱藏內容掃描（空白夾內容、超長行、`eval`／`new Function(`／`globalThis`／長 base64）8 筆皆無命中。
+
+**提前移植**（fork 現在就有、且可由外部輸入觸發）：
+
+| PR | head | fork 實況 | commit |
+|---|---|---|---|
+| #444（issue #452） | `d137a532af` | `packages/yt-dlp/src/download.ts` 把連結直接放在最後一個參數、沒有 `--`；`--plugin-dirs=<dir>` 形式的「連結」會被當選項，可從指定目錄執行 Python。新測試修前 2 筆失敗（選項形式的連結一路走到環境檢查） | `5dc763c0` |
+| #443（issue #451） | `926502ed1a` | `packages/runtime-local/src/programs.ts:187` 只跳脫 ASCII 引號（U+2018–U+201B 也會結束字面值）、`$env:` 名稱未驗證、`:258` 與 `packages/credential-store-os/src/windows.ts:34` 以裸名稱 `powershell.exe` 啟動（會先找工作目錄）。測試 mock 掉 spawn／execFile，不會啟動 PowerShell；修前 4 筆失敗 | `541ab592` |
+| #442（issue #450） | `3e2399d1a3` | 跨磁碟機或 UNC 目標讓 `relative()` 回絕對路徑，`build-result/src/store.ts`（兩處）、`cli/src/result-export.ts:38`、`runtime-local/src/config.ts:994` 的包含檢查都放行；build id `d:build` 是磁碟機相對路徑。build id 測試修前失敗；產生的 build id 格式 `bld_<數字>T<數字>Z_<nonce>` 不含冒號 | `d5afdfeb` |
+
+**不提前移植（附證據與重看條件）**
+
+| 項目 | fork 實況 | 重看條件 |
+|---|---|---|
+| PR #439（issue #447）markup 參照名稱 ReDoS | 已不存在：fork 的 `packages/markup/src/syntax.ts:14` 是線性的 `/^[A-Za-z_][A-Za-z0-9_.:-]*$/u`（2026-10-24 已修） | 無 |
+| PR #440（issue #448）style 值跳脫 | 目標檔 `packages/composition/src/visual.ts` 只在 0.3 存在 | 升 0.3 時 |
+| PR #441（issue #449）保留 `data-hypit-*` 屬性 | 缺陷存在：`packages/composition/src/track.ts:565` 允許所有 `data-*`。需要作者在自己的專案裡寫入該屬性才觸發，不是外部輸入 | 上游合併，或 fork 開始載入他人提供的專案 |
+| PR #445（issue #453）三個二次方正則 | `recipe`、`text-fine` 套件 fork 沒有；`studio/src/parameters.ts` 沒有同一個正則 | 升 0.3 時 |
+| PR #446（issue #454）樣板菱形展開 | 缺陷存在：`packages/text/src/program.ts:291` 同樣遞迴展開；只在作者寫出菱形呼叫圖時變慢，對自己的輸入 | 上游合併，或實際遇到 render 卡住 |
+| PR #455 產品導覽錄影範例（+2102） | 0.3 新功能與範例 | 升 0.3 時 |
+| issue #456 HypiHub provider 下載網址未限制 | 缺陷可能存在：fork 有 `packages/provider-hypihub`；要能影響已設定服務的回應才觸發；上游尚無 PR | 上游出修正 PR |
+
+**順帶發現（未修，另報）**：`packages/credential-store-os/test/windows.test.ts` 的「Windows locker replaces credentials…」在 win32 會真的啟動 PowerShell 並寫入維護者的 Windows 認證管理員（測試名用隨機 service、結束時刪除）。本輪本機驗證一律以 `--test-skip-pattern`／`--test-name-pattern` 避開它。
+
+**水位**：release `v0.3.1`（不變）、PR #455、issue #456、日期 2026-10-28。

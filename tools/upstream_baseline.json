@@ -3,9 +3,9 @@
   "branch": "main",
   "reviewed_through": "8efbac03ed10929b0f4a3c79fe2b3f77b6479daf",
   "reviewed_release": "v0.3.1",
-  "reviewed_date": "2026-10-25",
-  "reviewed_pr_through": 438,
-  "reviewed_issue_through": 435,
+  "reviewed_date": "2026-10-28",
+  "reviewed_pr_through": 455,
+  "reviewed_issue_through": 456,
   "track": "release",
   "decision_log": "docs/fork/DECISIONS.md"
 }
