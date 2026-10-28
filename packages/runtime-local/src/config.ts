@@ -1,6 +1,6 @@
 import { fileExecutionLogs } from "./log.js";
 import { readFile, rm, stat } from "node:fs/promises";
-import { dirname, relative, resolve, sep } from "node:path";
+import { dirname, isAbsolute, relative, resolve, sep } from "node:path";
 
 import {
   collectLoadedNodePackageComponents,
@@ -991,7 +991,7 @@ function buildWorkPath(root: string, build: string): string {
   const work = resolve(root, "work");
   const target = resolve(work, build);
   const relation = relative(work, target);
-  if (relation.length === 0 || relation === ".." || relation.startsWith(`..${sep}`)) {
+  if (relation.length === 0 || relation === ".." || relation.startsWith(`..${sep}`) || isAbsolute(relation)) {
     throw new Error(`Build ${build} leaves Runtime work root ${work}`);
   }
   return target;

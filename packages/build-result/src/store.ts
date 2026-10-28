@@ -171,7 +171,9 @@ export function buildResultDirectory(root: string, build: string): string {
   const bucket = buildResultDateBucket(build)!;
   const target = resolve(directory, bucket, build);
   const relation = relative(directory, target);
-  assert(relation.length > 0 && relation !== ".." && !relation.startsWith(`..${sep}`),
+  // Cross-drive and UNC targets make relative() return an absolute path on Windows, which cannot
+  // start with ".." -- reject it the same way as an escaping one (upstream PR #442).
+  assert(relation.length > 0 && relation !== ".." && !relation.startsWith(`..${sep}`) && !isAbsolute(relation),
     `Build ${build} leaves Build Result root ${directory}`);
   return target;
 }
@@ -192,7 +194,7 @@ function containedResultPath(directory: string, path: string): string {
   const root = resolve(directory);
   const absolute = resolve(root, path);
   const relation = relative(root, absolute);
-  assert(relation !== ".." && !relation.startsWith(`..${sep}`),
+  assert(relation !== ".." && !relation.startsWith(`..${sep}`) && !isAbsolute(relation),
     `Build Result path ${path} leaves ${root}`);
   return absolute;
 }

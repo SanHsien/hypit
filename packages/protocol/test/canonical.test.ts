@@ -35,7 +35,8 @@ test("Resource ids retain their narrow execution-reference syntax", () => {
 
 test("Build ids cannot address a parent or nested path", () => {
   assert.doesNotThrow(() => assertBuildId("build-19"));
-  for (const value of ["..", ".", "episode/19", "episode\\19", " padded "]) {
+  // "c:" and "d:build" are drive-relative on Windows (upstream PR #442, issue #450).
+  for (const value of ["..", ".", "episode/19", "episode\\19", " padded ", "c:", "d:build"]) {
     assert.throws(() => assertBuildId(value), /Build id/u);
   }
 });

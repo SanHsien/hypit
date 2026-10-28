@@ -47,6 +47,8 @@ export function assertOrderedBuildId(value: string): void {
 export function assertBuildId(value: string): void {
   assert(value.length > 0 && value === value.trim(), "Build id must be a non-empty unpadded name");
   assert(value !== "." && value !== "..", "Build id must not be a dot directory");
-  assert(!value.includes("/") && !value.includes("\\") && !value.includes("\0"),
+  // ":" makes a drive-relative path on Windows ("d:build"), which resolve() takes off the root
+  // (upstream PR #442, issue #450).
+  assert(!value.includes("/") && !value.includes("\\") && !value.includes("\0") && !value.includes(":"),
     "Build id must be one path-free name");
 }
