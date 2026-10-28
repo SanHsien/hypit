@@ -255,6 +255,24 @@ test("filesystem repository streams one normalized byte range", async () => {
   }
 });
 
+// Ported from upstream PR #442 (issue #450): on Windows "Z:foo" is drive-relative, resolves off
+// the Build Result root, and relative() returns an absolute path that never starts with "..".
+test("a Build file on another drive cannot leave the Build Result directory", {
+  skip: process.platform !== "win32",
+}, async () => {
+  const root = await mkdtemp(join(tmpdir(), "hypit-result-drive-"));
+  const build = "bld_20260902T100000009Z_0000000001";
+  try {
+    const repository = new FileBuildResultRepository(root);
+    await assert.rejects(
+      repository.openFile(build, { kind: "build-file", path: "Z:foo", size: 1, mediaType: "video/mp4" }),
+      /leaves/u,
+    );
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
+});
+
 test("filesystem decodes Result and writer data before exposing it", async () => {
   const root = await mkdtemp(join(tmpdir(), "hypit-result-decode-"));
   const malformed = "bld_20260902T100000010Z_0000000001";

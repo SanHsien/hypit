@@ -365,7 +365,7 @@ Alert 編號的來源：雲端工作環境查詢時回 `403 Resource not accessi
 |---|---|---|---|
 | #444（issue #452） | `d137a532af` | `packages/yt-dlp/src/download.ts` 把連結直接放在最後一個參數、沒有 `--`；`--plugin-dirs=<dir>` 形式的「連結」會被當選項，可從指定目錄執行 Python。新測試修前 2 筆失敗（選項形式的連結一路走到環境檢查） | `5dc763c0` |
 | #443（issue #451） | `926502ed1a` | `packages/runtime-local/src/programs.ts:187` 只跳脫 ASCII 引號（U+2018–U+201B 也會結束字面值）、`$env:` 名稱未驗證、`:258` 與 `packages/credential-store-os/src/windows.ts:34` 以裸名稱 `powershell.exe` 啟動（會先找工作目錄）。測試 mock 掉 spawn／execFile，不會啟動 PowerShell；修前 4 筆失敗 | `541ab592` |
-| #442（issue #450） | `3e2399d1a3` | 跨磁碟機或 UNC 目標讓 `relative()` 回絕對路徑，`build-result/src/store.ts`（兩處）、`cli/src/result-export.ts:38`、`runtime-local/src/config.ts:994` 的包含檢查都放行；build id `d:build` 是磁碟機相對路徑。build id 測試修前失敗；產生的 build id 格式 `bld_<數字>T<數字>Z_<nonce>` 不含冒號 | `d5afdfeb` |
+| #442（issue #450） | `3e2399d1a3` | 跨磁碟機或 UNC 目標讓 `relative()` 回絕對路徑，`build-result/src/store.ts`（兩處）、`cli/src/result-export.ts:38`、`runtime-local/src/config.ts:994` 的包含檢查都放行；build id `d:build` 是磁碟機相對路徑。build id 測試與兩個 Windows 專用的包含測試（`FileBuildResultRepository.openFile`、`exportBuildResultOutput`，路徑 `Z:foo`）修前都失敗（前者直接讀到根目錄外、回傳 `undefined`）；產生的 build id 格式 `bld_<數字>T<數字>Z_<nonce>` 不含冒號 | `d5afdfeb` |
 
 **不提前移植（附證據與重看條件）**
 
