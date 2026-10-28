@@ -21,3 +21,6 @@
   `pwsh -NoProfile -File tools/dev_check.ps1 -Quick`（或完整無參數版本）。
 - 保持乾淨工作目錄，不隨意刪除上游核心套件或依賴。
 
+## 路線圖
+
+- `ROADMAP.md` 是本 repo 後續工作的單一真相源。完成或新增工作時，在同一個 commit 更新它：做完的列刪掉、新工作加進去。不要在其他文件另列待辦。
