@@ -379,6 +379,6 @@ Alert 編號的來源：雲端工作環境查詢時回 `403 Resource not accessi
 | PR #455 產品導覽錄影範例（+2102） | 0.3 新功能與範例 | 升 0.3 時 |
 | issue #456 HypiHub provider 下載網址未限制 | 缺陷可能存在：fork 有 `packages/provider-hypihub`；要能影響已設定服務的回應才觸發；上游尚無 PR | 上游出修正 PR |
 
-**順帶發現（未修，另報）**：`packages/credential-store-os/test/windows.test.ts` 的「Windows locker replaces credentials…」在 win32 會真的啟動 PowerShell 並寫入維護者的 Windows 認證管理員（測試名用隨機 service、結束時刪除）。本輪本機驗證一律以 `--test-skip-pattern`／`--test-name-pattern` 避開它。
+**順帶發現（2026-10-30 已修）**：`packages/credential-store-os/test/windows.test.ts` 的「Windows locker replaces credentials…」會真的啟動 PowerShell 並寫入 Windows 認證管理員，現在預設 skip，只有設 `HYPIT_LIVE_WINDOWS_CREDENTIALS=1` 才跑。CI 刻意不設這個變數：認證管理員在 hosted runner 上的行為不在本 fork 的支援範圍，同檔另外兩條 mock 測試已涵蓋命令組裝。手動驗證：在可丟棄的 Windows 帳號設 `HYPIT_LIVE_WINDOWS_CREDENTIALS=1` 後跑該測試檔。
 
 **水位**：release `v0.3.1`（不變）、PR #455、issue #456、日期 2026-10-28。

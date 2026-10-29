@@ -50,8 +50,15 @@ test("Windows PowerShell is resolved under SystemRoot, never by bare name", {
   assert.deepEqual(commands, [join(process.env.SystemRoot!, "System32", "WindowsPowerShell", "v1.0", "powershell.exe")]);
 });
 
+const liveCredentials = process.env.HYPIT_LIVE_WINDOWS_CREDENTIALS === "1";
+
+// Live writes to Windows PasswordVault are gated behind HYPIT_LIVE_WINDOWS_CREDENTIALS=1 so standard
+// test runs do not pollute the maintainer's Windows Credential Manager.
 test("Windows locker replaces credentials and retains the previous value if replacement fails", {
-  skip: process.platform !== "win32", timeout: 60_000,
+  skip: process.platform !== "win32"
+    ? "Windows only"
+    : (!liveCredentials && "live Windows credential write skipped by default; set HYPIT_LIVE_WINDOWS_CREDENTIALS=1 to run"),
+  timeout: 60_000,
 }, async () => {
   const store = new OsCredentialStore({ service: `hypit-test-${randomUUID()}` });
   const ref = credentialRef("os", "replacement");
