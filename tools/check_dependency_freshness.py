@@ -261,9 +261,79 @@ def fetch_pypi_version(package_name: str, timeout: float = 10.0) -> str | None:
 # ------------------------------------------------------------------------------- npm
 
 
+def _clean_pattern(raw: str) -> str:
+    return raw.strip().strip("'\"").rstrip("/\\")
+
+
+def parse_pnpm_workspace_packages(text: str) -> list[str]:
+    """Extract package glob patterns under `packages:` in a pnpm-workspace.yaml.
+
+    Handles the block list (`- pattern`), the flow list (`packages: [a, b]`) and a trailing
+    `# comment` after `packages:`. Patterns starting with `!` are returned as written.
+    """
+    patterns: list[str] = []
+    in_packages = False
+    for raw_line in text.splitlines():
+        line = raw_line.split("#", 1)[0].strip()
+        if not line:
+            continue
+        if not in_packages:
+            if line == "packages:":
+                in_packages = True
+            elif line.startswith("packages:") and line[len("packages:") :].strip().startswith("["):
+                flow = line[len("packages:") :].strip()
+                if "]" not in flow:
+                    return []  # a flow list spanning lines: refuse it rather than read a part of it
+                inner = flow[1 : flow.index("]")]
+                patterns.extend(p for p in (_clean_pattern(x) for x in inner.split(",")) if p)
+                break
+            continue
+        if line.startswith("- "):
+            pattern = _clean_pattern(line[2:])
+            if pattern:
+                patterns.append(pattern)
+        elif not line.startswith("-") and ":" in line:
+            break
+    return patterns
+
+
+def find_npm_manifests(root: Path = REPO_ROOT) -> list[Path]:
+    """All npm package.json manifests this repository owns: root plus workspace packages."""
+    manifests: list[Path] = []
+    root_manifest = root / "package.json"
+    if root_manifest.is_file():
+        manifests.append(root_manifest)
+
+    workspace_file = root / "pnpm-workspace.yaml"
+    if workspace_file.is_file():
+        patterns = parse_pnpm_workspace_packages(workspace_file.read_text(encoding="utf-8"))
+        include = [p for p in patterns if not p.startswith("!")]
+        exclude = [p[1:].strip().rstrip("/\\") for p in patterns if p.startswith("!")]
+        if not include:
+            # An unreadable `packages:` block must not quietly shrink the scan to the root.
+            raise DependencyCheckError(
+                "pnpm-workspace.yaml exists but no `packages:` patterns could be read from it"
+            )
+        excluded: set[Path] = set()
+        for pattern in exclude:
+            excluded.update(root.glob(f"{pattern}/package.json"))
+        for pattern in include:
+            for candidate in sorted(root.glob(f"{pattern}/package.json")):
+                if candidate.is_file() and candidate not in excluded and candidate not in manifests:
+                    manifests.append(candidate)
+    else:
+        for candidate in sorted(root.glob("packages/*/package.json")):
+            if candidate.is_file() and candidate not in manifests:
+                manifests.append(candidate)
+
+    if not manifests:
+        raise DependencyCheckError("missing npm manifest: package.json")
+    return manifests
+
+
 def load_npm(root: Path = REPO_ROOT) -> list[dict[str, str]]:
     packages: list[dict[str, str]] = []
-    for path in _existing(root, NPM_MANIFESTS, "npm"):
+    for path in find_npm_manifests(root):
         rel = path.relative_to(root).as_posix()
         try:
             data = json.loads(path.read_text(encoding="utf-8"))

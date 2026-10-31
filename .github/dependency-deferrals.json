@@ -1,17 +1,21 @@
 {
-  "_comment": "Reviewed-but-not-now decisions for tools/check_dependency_freshness.py. A deferral is for a floor that would genuinely break something if raised right now, with the reason recorded here; it is not a place to park 'waiting for upstream to move first'. Each entry needs deferredLatest so it expires by itself once the registry moves past the release it was reviewed against; a permanent policy belongs on the declaring line as `# freshness-hold:` instead.",
+  "_comment": "Reviewed-but-not-now decisions for tools/check_dependency_freshness.py. A deferral is for a floor that would genuinely break something if raised right now, with the reason recorded here; it is not a place to park 'waiting for upstream to move first'. Each entry needs deferredLatest so it expires by itself once the registry moves past the release it was reviewed against; a permanent policy belongs on the declaring line as `# freshness-hold:` instead. A not-yet-verified major or dependency change may also be parked here, but the reason must name the verification that is missing.",
   "deferrals": {
-    "@types/node": {
-      "deferredLatest": "26.6.5",
-      "reason": "major above the supported Node 22/24 runtimes; types must match the runtime"
+    "@hyperframes/engine": {
+      "deferredLatest": "0.8.223",
+      "reason": "0.8.0 itself looks like a renumbering: it was published 2026-08-18T00:09Z, about 2.5 hours after 0.7.111, with the same dependency list apart from the @hyperframes/* version ranges and nearly the same size (1852267 vs 1852261 bytes unpacked). What does change by 0.8.221: engine requires puppeteer ~25.11.0 (was ^25.2.1) and adds undici 7.25.0; producer drops wawoff2 and the @fontsource/* dependencies (unpacked 78.3 MB -> 3.0 MB) and pins @hyperframes/* exactly. Trial on 2026-10-30 with engine and producer both at 0.8.221: pnpm check exit 0 and packages/provider-hyperframes-local tests 0 failed (34 passed, 13 skipped); the pnpm override puppeteer@<25.16.0 -> ^25.16.0 still resolved puppeteer 25.16.0 and zod 4.6.7. Missing before it can be raised: a real render with Chromium (the 13 skipped provider tests and a full render through provider-hyperframes-local) against 0.8.221, since the dependencies changed (puppeteer ~25.11.0, undici 7.25.0, wawoff2 and bundled @fontsource dropped) and no frame has been rendered with them. Not moved to 0.7.111: the check compares 0.x on major.minor, so any 0.7.x stays red against 0.8.x. The trial stayed at 0.8.221; deferredLatest is 0.8.223, the registry latest on 2026-10-31, and 0.8.222 and 0.8.223 were not tried. It moves almost daily; once the registry passes it the entry expires on its own and the check goes red, which is the cue to re-review."
     },
-    "rollup-plugin-dts": {
-      "deferredLatest": "6.5.1",
-      "reason": "only used to emit the public type bundle (scripts/build-public-type-entry.mjs); 6.2 -> 6.5 is not verified against the distribution build yet"
+    "@hyperframes/producer": {
+      "deferredLatest": "0.8.223",
+      "reason": "0.8.0 itself looks like a renumbering: it was published 2026-08-18T00:09Z, about 2.5 hours after 0.7.111, with the same dependency list apart from the @hyperframes/* version ranges and nearly the same size (1852267 vs 1852261 bytes unpacked). What does change by 0.8.221: engine requires puppeteer ~25.11.0 (was ^25.2.1) and adds undici 7.25.0; producer drops wawoff2 and the @fontsource/* dependencies (unpacked 78.3 MB -> 3.0 MB) and pins @hyperframes/* exactly. Trial on 2026-10-30 with engine and producer both at 0.8.221: pnpm check exit 0 and packages/provider-hyperframes-local tests 0 failed (34 passed, 13 skipped); the pnpm override puppeteer@<25.16.0 -> ^25.16.0 still resolved puppeteer 25.16.0 and zod 4.6.7. Missing before it can be raised: a real render with Chromium (the 13 skipped provider tests and a full render through provider-hyperframes-local) against 0.8.221, since the dependencies changed (puppeteer ~25.11.0, undici 7.25.0, wawoff2 and bundled @fontsource dropped) and no frame has been rendered with them. Not moved to 0.7.111: the check compares 0.x on major.minor, so any 0.7.x stays red against 0.8.x. The trial stayed at 0.8.221; deferredLatest is 0.8.223, the registry latest on 2026-10-31, and 0.8.222 and 0.8.223 were not tried. It moves almost daily; once the registry passes it the entry expires on its own and the check goes red, which is the cue to re-review."
+    },
+    "@types/node": {
+      "deferredLatest": "26.6.6",
+      "reason": "major above the supported Node 22/24 runtimes (declared 24.10.1); types must match the runtime, so raising to 26.x would type APIs the runtime does not have. Cannot be raised until the supported runtime moves to Node 26."
     },
     "typescript": {
       "deferredLatest": "7.0.2",
-      "reason": "major upgrade (7.x) needing toolchain migration work; not now"
+      "reason": "Trial on 2026-10-31 with the root typescript at 7.0.2: pnpm check fails with TS2882 in packages/studio/src/ui/main.ts(19,8) (side-effect import of '../style.css' has no type declarations). Missing before it can be raised: an ambient declaration for CSS side-effect imports, then a clean pnpm check and test run with 7.x, and the same for the typescript pins in packages/cli, packages/package-loader-node and the examples/*/packages/* manifests (not tried)."
     }
   }
 }

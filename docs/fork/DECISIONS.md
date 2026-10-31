@@ -335,7 +335,7 @@ Alert 編號的來源：雲端工作環境查詢時回 `403 Resource not accessi
 ### 刻意不修
 
 - **`upstream-review-report.md` 被追蹤進 git**：`check_upstream_updates.py` 預設把報告寫到 repo 根目錄，每次 `dev_check.ps1` 都會改動這個被追蹤的檔，內容（HEAD、數字）永遠過期，也讓「保持乾淨工作目錄」做不到。正解是 `git rm --cached` 並加進 `.gitignore`，但那是從 repo 移除檔案，需要維護者決定；沒有動它。
-- **`check_dependency_freshness.py` 只讀根目錄 `package.json`**：`packages/*/package.json` 的 registry 相依（`@hyperframes/engine`、`@hyperframes/producer`、`@aws-sdk/*`、約 100 個 `@fontsource*`）完全不在月報裡。補上會一次出現大量新紅燈，其中字型套件是刻意精確釘版，需要先決定哪些要 hold／deferral，不是機械修正；留給維護者。
+- **`check_dependency_freshness.py` 只讀根目錄 `package.json`**：`packages/*/package.json` 的 registry 相依（`@hyperframes/engine`、`@hyperframes/producer`、`@aws-sdk/*`、約 100 個 `@fontsource*`）完全不在月報裡。補上會一次出現大量新紅燈，其中字型套件是刻意精確釘版，需要先決定哪些要 hold／deferral，不是機械修正；留給維護者。（**已由 2026-10-30 的改動補上**：檢查器現在讀所有 workspace manifest，見文末「2026-10-30」一節。）
 - **`publish-npm.yml` 未限定在上游 repo**：fork 若發 release 會嘗試走 npm trusted publishing；該信任綁在 `hypit-ai/hypit`，在 fork 只會失敗而不會發出去。要不要像 `sync-hypihub-docs.yml` 一樣加 `if: github.repository == 'hypit-ai/hypit'` 取決於 fork 是否可能自行發佈，未改。
 - **`packages/markup/test/reference.test.ts` 的 50ms 牆鐘上限**：病態輸入修前要約 13 秒，50ms 在極重負載下理論上會誤報，但這次整套測試並行跑時穩定通過，沒有可重現的失敗，不動。
 - **整套測試中兩個偶發失敗**（`credential-store-os/test/windows.test.ts`、`runtime-local/test/programs.test.ts`）：整套並行時一次逾時、一次 `EBUSY` 清理暫存目錄；單獨重跑都通過，判定為負載造成，與本批無關。
@@ -382,3 +382,37 @@ Alert 編號的來源：雲端工作環境查詢時回 `403 Resource not accessi
 **順帶發現（2026-10-30 已修）**：`packages/credential-store-os/test/windows.test.ts` 的「Windows locker replaces credentials…」會真的啟動 PowerShell 並寫入 Windows 認證管理員，現在預設 skip，只有設 `HYPIT_LIVE_WINDOWS_CREDENTIALS=1` 才跑。CI 刻意不設這個變數：認證管理員在 hosted runner 上的行為不在本 fork 的支援範圍，同檔另外兩條 mock 測試已涵蓋命令組裝。手動驗證：在可丟棄的 Windows 帳號設 `HYPIT_LIVE_WINDOWS_CREDENTIALS=1` 後跑該測試檔。
 
 **水位**：release `v0.3.1`（不變）、PR #455、issue #456、日期 2026-10-28。
+
+## 2026-10-30：依賴新鮮度涵蓋 `packages/*`、`examples/*/packages/*`
+
+**補上**：`tools/check_dependency_freshness.py` 的 `find_npm_manifests` 依 `pnpm-workspace.yaml` 的 `packages:` 讀所有 workspace manifest（沒有該檔時退回 `packages/*`）。`!` 開頭的 pattern 從結果扣除；`packages:` 存在但讀不到任何納入的 pattern（空區塊、只有註解、`{}`、只有排除）時丟 `DependencyCheckError`，不再靜默退回只掃根目錄。`packages:  # 註解` 與 `packages: [a, b]` 都能解析。`dependency-freshness.yml` 的 push `paths` 加上 `pnpm-workspace.yaml` 與 `packages/*/package.json`。這取代上面 2026-10-27「刻意不修」的第二條。
+
+**第一次跑出的紅燈**：
+- `koffi` 3.3.4 → 3.3.5、`rollup` 4.65.1 → 4.66.0：修補／次要版，直接升級（沿用 rollup 4.65.1 的前例 `266615ca`），`pnpm install` 後 `file-io-node`、`runtime-local` 相關測試與 `build:public-types` 通過，不 defer。
+- 其餘寫進 `.github/dependency-deferrals.json`，**名單待維護者核可**（ROADMAP 對應列保留到核可）：`@aws-sdk/*`、13 個 `@fontsource*`、`@hyperframes/engine`／`producer`。三組都做了試升並還原：測試沒有失敗，保留 deferral 的理由分別是沒有連真實 AWS 的驗證、字型資料本身改變且未做渲染比對、未跑真實渲染。`@hyperframes/*` 的 0.8.0 看來只是重新編號（發佈於 0.7.111 約 2.5 小時後，相依清單與大小幾乎相同），實際差異寫在該筆 deferral；`deferredLatest: 0.8.221` 每天可能變動，registry 超過後該筆自動失效，月報轉紅即重審。
+- `typescript`、`rollup-plugin-dts` 的 deferral 本次未動；`@types/node` 只把 `deferredLatest` 從 26.6.5 推到 26.6.6（同一 major，理由不變）。
+
+## 2026-10-30：上游 PR #457 分流
+
+**裁決：略過，不移植，沒有本線對應缺陷，ROADMAP 不留列。** #457（rponeawa，「resolve 0.4 media and rendering audit findings」，40 個檔、+873／-614）已合併，但合併目標是上游的審查分支 `codex/0.4-review`，不是上游 `main`；fork 基底是 v0.2.8 加移植，release 軌仍停在 `v0.3.1`，所以它不在 fork 的來源範圍內。
+
+證據（對照 `gh pr diff 457 --repo hypit-ai/hypit` 與本 fork 的 `packages/`）：
+
+| #457 動到的位置 | fork 實況 |
+|---|---|
+| `html-document`、`html-playback`、`html-program`、`media-local`、`media-operations`、`provider-html-local`（約 30 個檔，含 Electron 生命週期、行程樹清理、GPU 擷取、Mediabunny 內建 bundle） | 這六個套件在 fork 都不存在（0.3 重寫後才有；fork 用 `provider-hyperframes-local`），沒有對應程式可修 |
+| `packages/media/src/prepared.ts`（`preparedVisualExtent`、`frameIndex`）、`packages/temporal/src/map.ts`（逆向取樣邊界方向） | fork 的 `packages/media/src` 沒有 `prepared.ts`，`packages/temporal/src` 沒有 `map.ts`，這些函式不存在，缺陷不在本線；`frameIndex` 是新功能不是修復 |
+| `test/run.mjs` 用 `path.sep` 選環境測試 | fork 的 `test/run.mjs` 沒有 `/test/environment/` 篩選，同一缺陷不存在 |
+| `packages/cli/test/composition/build-programs.test.ts` | 只改該測試的固定資料，與 fork 的 CLI 行為無關 |
+
+PR 內容裡沒有本線也存在的安全或資料遺失問題，所以不另開 ROADMAP 列。重看條件：升 0.3／0.4 線時，這批 audit 修復要整批連同 0.4 重寫一起評估。`reviewed_pr_through` 推到 457。
+
+## 2026-10-31：依賴 deferral 的決定（維護者授權派工方判斷）
+
+維護者授權派工方決定 2026-10-30 那批 deferral 的去留，決定如下，取代 2026-10-30 一節「名單待維護者核可」的說法。
+
+- **直接升級**：`@aws-sdk/client-lambda`、`@aws-sdk/client-s3`（3.1103.0 → 3.1161.0）、13 個 `@fontsource*`（`noto-emoji` 5.3.2，其餘 5.3.1）、`rollup-plugin-dts`（6.2.3 → 6.5.1）。升級後 `fonts-open`、三個 S3／Lambda 套件的測試（26 項）、`pnpm build:public-types`、`pnpm check` 都通過，對應 deferral 已移除。**已知限度**：字型升級帶來新的字型資料，可能改變渲染出的字形，且沒有做算圖比對；S3／Lambda 沒有連真實 AWS 測過（Lambda 的測試不經本機 HTTP 端點）。
+- **留著**：`@hyperframes/engine`／`producer`（0.7.101 → 0.8.221，相依有變、未實際算圖）、`typescript`（5.9.3 → 7.0.2，試升在 `packages/studio/src/ui/main.ts` 出現 TS2882，要補 CSS side-effect import 的型別宣告）。兩組是待辦的升級驗證，不是待核可名單，理由與缺少的驗證寫在 deferral 內，ROADMAP 對應列已改寫。`_comment` 補上「尚未驗證的大版本也可暫列，須寫明缺的驗證」。
+- **`@types/node`**：不能升。專案支援 Node 22/24 runtime，26.x 型別會描述 runtime 沒有的 API，維持 deferral（理由不變）。
+- `dependency-freshness.yml` 的 push `paths` 再加 `services/*/package.json`、`examples/*/packages/*/package.json`（審查建議），與 `pnpm-workspace.yaml` 的納入範圍一致。
+- **2026-10-31 當天 registry 又前進**：`koffi` 3.3.5 → 3.3.6、`rollup` 4.66.0 → 4.67.2 同樣直接升級（`file-io-node`／`runtime-local` 測試 22 項、`build:public-types`、`pnpm check` 通過）；`@hyperframes/*` 的 `deferredLatest` 推到 0.8.223（試升仍是 0.8.221 的結果，理由不變）。

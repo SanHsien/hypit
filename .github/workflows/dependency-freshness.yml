@@ -5,6 +5,10 @@ on:
     branches: [main]
     paths:
       - package.json
+      - pnpm-workspace.yaml
+      - packages/*/package.json
+      - services/*/package.json
+      - examples/*/packages/*/package.json
       - tools/check_dependency_freshness.py
       - .github/dependabot.yml
       - .github/dependency-deferrals.json

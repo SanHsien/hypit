@@ -6,7 +6,10 @@ No test here touches the network: registry and GitHub calls are replaced.
 from __future__ import annotations
 
 import http.client
+import json
+import tempfile
 import unittest
+from pathlib import Path
 from unittest import mock
 
 import _paths  # noqa: F401  (puts tools/ on sys.path)
@@ -66,6 +69,129 @@ class RepositoryWorkflowTests(unittest.TestCase):
             if not row["minimum"] and not row["hold"]
         ]
         self.assertEqual(blind, [], "Action pins the freshness check cannot compare")
+
+
+class NpmWorkspaceManifestTests(unittest.TestCase):
+    def test_parse_pnpm_workspace_packages(self) -> None:
+        yaml_content = (
+            "# Workspace configuration\n"
+            "packages:\n"
+            "  - 'packages/*'\n"
+            '  - "services/*"\n'
+            "  - examples/*/packages/* # inline comment\n"
+            "\n"
+            "overrides:\n"
+            "  - ignored/*\n"
+        )
+        patterns = freshness.parse_pnpm_workspace_packages(yaml_content)
+        self.assertEqual(patterns, ["packages/*", "services/*", "examples/*/packages/*"])
+
+    def test_find_npm_manifests_with_workspace_file(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = Path(tmp_dir)
+            (root / "pnpm-workspace.yaml").write_text("packages:\n  - packages/*\n", encoding="utf-8")
+            (root / "package.json").write_text("{}", encoding="utf-8")
+            pkg_a = root / "packages" / "pkg-a"
+            pkg_a.mkdir(parents=True)
+            (pkg_a / "package.json").write_text("{}", encoding="utf-8")
+
+            manifests = freshness.find_npm_manifests(root)
+            self.assertEqual(manifests, [root / "package.json", pkg_a / "package.json"])
+
+    def test_find_npm_manifests_without_workspace_file_falls_back_to_packages(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = Path(tmp_dir)
+            (root / "package.json").write_text("{}", encoding="utf-8")
+            pkg_a = root / "packages" / "pkg-a"
+            pkg_a.mkdir(parents=True)
+            (pkg_a / "package.json").write_text("{}", encoding="utf-8")
+
+            manifests = freshness.find_npm_manifests(root)
+            self.assertEqual(manifests, [root / "package.json", pkg_a / "package.json"])
+
+    def test_a_negated_pattern_excludes_its_manifests_instead_of_being_read_as_a_literal_glob(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = Path(tmp_dir)
+            (root / "pnpm-workspace.yaml").write_text(
+                "packages:\n  - packages/*\n  - '!packages/skipped'\n", encoding="utf-8"
+            )
+            (root / "package.json").write_text("{}", encoding="utf-8")
+            for name in ("kept", "skipped"):
+                (root / "packages" / name).mkdir(parents=True)
+                (root / "packages" / name / "package.json").write_text("{}", encoding="utf-8")
+
+            manifests = freshness.find_npm_manifests(root)
+            self.assertEqual(manifests, [root / "package.json", root / "packages" / "kept" / "package.json"])
+
+    def test_a_workspace_file_with_no_readable_patterns_raises_instead_of_scanning_only_the_root(self) -> None:
+        unreadable = (
+            "packages:\n",  # empty block
+            "packages:\n  # only a comment\n",
+            "packages: {}\n",  # not a list
+            "overrides:\n  foo: 1\n",  # no packages key at all
+            "packages:\n  - '!packages/skipped'\n",  # only exclusions: nothing is included
+            "packages: [packages/*,\n  services/*]\n",  # flow list across lines
+        )
+        for text in unreadable:
+            with self.subTest(text=text), tempfile.TemporaryDirectory() as tmp_dir:
+                root = Path(tmp_dir)
+                (root / "pnpm-workspace.yaml").write_text(text, encoding="utf-8")
+                (root / "package.json").write_text("{}", encoding="utf-8")
+                with self.assertRaises(freshness.DependencyCheckError):
+                    freshness.find_npm_manifests(root)
+
+    def test_packages_key_with_a_trailing_comment_or_a_flow_list_is_still_read(self) -> None:
+        self.assertEqual(
+            freshness.parse_pnpm_workspace_packages("packages:  # the workspace\n  - packages/*\n"),
+            ["packages/*"],
+        )
+        self.assertEqual(
+            freshness.parse_pnpm_workspace_packages("packages: [packages/*, 'services/*']\n"),
+            ["packages/*", "services/*"],
+        )
+
+    def test_find_npm_manifests_missing_manifest_raises_error(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = Path(tmp_dir)
+            with self.assertRaises(freshness.DependencyCheckError):
+                freshness.find_npm_manifests(root)
+
+    def test_load_npm_collects_declarations_across_workspaces(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = Path(tmp_dir)
+            (root / "pnpm-workspace.yaml").write_text("packages:\n  - packages/*\n", encoding="utf-8")
+            (root / "package.json").write_text(
+                json.dumps({"devDependencies": {"typescript": "^5.9.0"}}),
+                encoding="utf-8",
+            )
+            pkg_a = root / "packages" / "pkg-a"
+            pkg_a.mkdir(parents=True)
+            (pkg_a / "package.json").write_text(
+                json.dumps({
+                    "dependencies": {
+                        "lodash": "4.17.21",
+                        "internal-pkg": "workspace:*",
+                        "local-file": "file:../sibling",
+                    }
+                }),
+                encoding="utf-8",
+            )
+
+            packages = freshness.load_npm(root)
+            names = {p["name"]: p for p in packages}
+            self.assertIn("typescript", names)
+            self.assertIn("lodash", names)
+            self.assertNotIn("internal-pkg", names)
+            self.assertNotIn("local-file", names)
+            self.assertEqual(names["lodash"]["source"], "packages/pkg-a/package.json")
+
+    def test_repository_load_npm_covers_packages_directory(self) -> None:
+        packages = freshness.load_npm(freshness.REPO_ROOT)
+        names = {p["name"] for p in packages}
+        self.assertIn("@hyperframes/engine", names)
+        self.assertIn("@aws-sdk/client-s3", names)
+        self.assertIn("typescript", names)
+        self.assertGreater(len(packages), 100)
 
 
 class RegistryResponseTests(unittest.TestCase):

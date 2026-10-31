@@ -282,13 +282,13 @@
     "@hypit/wan": "workspace:*",
     "@hypit/whisperx": "workspace:*",
     "@types/node": "24.10.1",
-    "rollup": "4.65.1",
-    "rollup-plugin-dts": "6.2.3",
+    "rollup": "4.67.2",
+    "rollup-plugin-dts": "6.5.1",
     "vitepress": "^1.6.4"
   },
   "dependencies": {
     "@puppeteer/browsers": "3.2.6",
-    "koffi": "3.3.4",
+    "koffi": "3.3.6",
     "puppeteer-core": "25.16.0",
     "sharp": "0.35.5",
     "cmu-pronouncing-dictionary": "3.0.0",
