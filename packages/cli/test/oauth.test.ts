@@ -140,6 +140,20 @@ test("OAuth token exchange uses the Endpoint-declared request timeout", async ()
   );
 });
 
+function environmentWithOverrides(
+  base: NodeJS.ProcessEnv,
+  overrides: Readonly<Record<string, string>>,
+): NodeJS.ProcessEnv {
+  const env: NodeJS.ProcessEnv = { ...base };
+  const keysToRemove = new Set(Object.keys(overrides).map((key) => key.toLowerCase()));
+  for (const key of Object.keys(env)) {
+    if (keysToRemove.has(key.toLowerCase())) {
+      delete env[key];
+    }
+  }
+  return Object.assign(env, overrides);
+}
+
 test("a missing browser opener leaves the printed authorization URL usable", async () => {
   const directory = await mkdtemp(join(tmpdir(), "hypit-oauth-no-opener-"));
   try {
@@ -161,7 +175,10 @@ process.stdout.write(value);
 `);
     const child = spawnSync(process.execPath, ["--import", import.meta.resolve("tsx"), entry], {
       encoding: "utf8", windowsHide: true, timeout: 15_000,
-      env: { ...process.env, PATH: "", ComSpec: join(directory, "missing-cmd.exe") },
+      env: environmentWithOverrides(process.env, {
+        PATH: "",
+        ComSpec: join(directory, "missing-cmd.exe"),
+      }),
     });
     assert.equal(child.status, 0, child.error?.message ?? child.stderr);
     assert.equal(decodeOAuth2Credential(child.stdout)?.accessToken, "manual-access");
