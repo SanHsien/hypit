@@ -416,3 +416,20 @@ PR 內容裡沒有本線也存在的安全或資料遺失問題，所以不另�
 - **`@types/node`**：不能升。專案支援 Node 22/24 runtime，26.x 型別會描述 runtime 沒有的 API，維持 deferral（理由不變）。
 - `dependency-freshness.yml` 的 push `paths` 再加 `services/*/package.json`、`examples/*/packages/*/package.json`（審查建議），與 `pnpm-workspace.yaml` 的納入範圍一致。
 - **2026-10-31 當天 registry 又前進**：`koffi` 3.3.5 → 3.3.6、`rollup` 4.66.0 → 4.67.2 同樣直接升級（`file-io-node`／`runtime-local` 測試 22 項、`build:public-types`、`pnpm check` 通過）；`@hyperframes/*` 的 `deferredLatest` 推到 0.8.223（試升仍是 0.8.221 的結果，理由不變）。
+
+## 2026-11-02：上游 PR #458／#459 分流
+
+兩筆都是 OPEN。已取 PR 現行 head 全 diff 掃描隱藏內容（判準八：行內長空白、`eval(`、`new Function(`、`globalThis`、200 字元以上 base64、120 字元以上 hex、超過 600 字元單行），
+命中只有 `typeof globalThis.fetch` 型別引用與 #459 一行中文文件長行，無隱藏內容。
+
+**#458（head `dbabd8c3fe7d30d44461830ace9fe8627ff3d4ae`，4 個檔 +248／-6）：條件式，釘到 monitored，ROADMAP 中期表已列。** 缺陷在本 fork 存在：
+`packages/provider-hypihub/src/provider.ts:174-186` 的 `download(url)` 對服務回傳的資產 URL 直接 `this.fetcher(url, { signal })`，沒有主機檢查、沒有 `redirect: "manual"`，
+第 417 行對 `asset.url` 逐筆呼叫（請求不帶 bearer token，所以只有 SSRF／導向風險，沒有 token 外洩）。但上游修法預設只信任服務 origin 與 `*.amazonaws.com`，並新增 `assetHosts` 設定；
+這會改變下載主流程（走其他 CDN 的部署會直接被拒），且 PR 未合併、內容可能再改。不在此輪移植；觸發條件：上游合併 #458，或本 fork 開始連接非自管的 HypiHub 服務。
+移植時依判準四：fork 的 `download` 是單行風格且帶重試，要在每次重試與每個 redirect 都驗證，不能照抄 diff。
+
+**#459（head `ea83a97d3cb60d84146bda7d1f5e9f22e9d64ce9`，5 個檔 +68／-22）：不採用。** 內容是說明 `20260914` 封存檔無法被 0.3 Result schema 開啟，並把範例改指向釘住 0.2.18 的 checkout。
+本 fork 的實際基底是 v0.2.8（`package.json` version），沒有 0.3 的 `source.id`／`frameDomain`，該不相容不發生；`examples/complex-explainer` 存在但屬 0.2 線。
+重看條件：升到上游 0.3（ROADMAP 中期表「升到上游 0.3」，其觸發條件已含 issue #388）時一併評估。
+
+`reviewed_pr_through` 推到 459；commit／release 水位不動（無新 release）。
