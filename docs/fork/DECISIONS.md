@@ -440,3 +440,6 @@ PR 內容裡沒有本線也存在的安全或資料遺失問題，所以不另�
 `pnpm-workspace.yaml` 的 `overrides` 新增 `"@hono/node-server": ^2.1.3`，鎖檔解析到 2.1.6，仍在 2.x 內，peer `hono ^4.13.5` 由 4.13.12 滿足。
 
 維持延後不動：torch 3、transformers 5（whisperx 3.8.6 綁 `torch<2.9`、`huggingface-hub<1.0`）；PyPI 上 whisperx 仍只有預發行 `3.8.7rc1`，重看條件照上方 2026-10-26 節的觸發條件。
+
+**2026-11-04 補記**：新增 #117（`torch` high，範圍 `< 2.10.0`，修補版 2.10.0，11-04 建立）。出口條件與 #15、#16、#19 相同（whisperx 允許 `torch>=2.13`），併入 `torch` 延後列，不另設條件。
+`Dependency freshness` 的 `Mark maintenance as required` 與兩個 `Dependabot Updates`（uv `No solution found`，whisperx 綁 `torch~=2.8.0`）失敗，都來自這批既有延後，與 `@hono/node-server` override 無關；延後解除前會持續紅燈。
