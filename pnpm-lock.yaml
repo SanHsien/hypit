@@ -9,6 +9,7 @@ overrides:
   vitepress>vite: ^6.4.4
   nanoid: ^3.3.18
   puppeteer@<25.16.0: ^25.16.0
+  '@hono/node-server': ^2.1.3
 
 importers:
 
@@ -4660,8 +4661,8 @@ packages:
   '@fontsource/zcool-xiaowei@5.3.0':
     resolution: {integrity: sha512-iRuUPl9ONFbYzi6JcEshpE4VedINyzQ4hv0Z5XEt0cB0pMPiQeqc2Qvv1NwJCNzkPwG02VCdcO+cF2K8ylYn2A==}
 
-  '@hono/node-server@2.0.12':
-    resolution: {integrity: sha512-eWpQYr67tqJLeaSUl0Q+TquuYfUdTibpOJlUMV2FfUP7+KqCC5TufnwnlXL6mobZBJbGAYRd7ZvEBDCbLInjhg==}
+  '@hono/node-server@2.1.6':
+    resolution: {integrity: sha512-p/KH9MnfNcsm3sR6x4lNgm5j+QN4Et8srKredl9DZfXiyZ1UQ3aQ2YVpFLbqktYN5JI+DB+VZFKM2PqE5hLKjQ==}
     engines: {node: '>=20'}
     peerDependencies:
       hono: ^4.13.5
@@ -6954,7 +6955,7 @@ snapshots:
   '@fontsource/zcool-xiaowei@5.3.0':
     optional: true
 
-  '@hono/node-server@2.0.12(hono@4.13.12)':
+  '@hono/node-server@2.1.6(hono@4.13.12)':
     dependencies:
       hono: 4.13.12
 
@@ -6974,7 +6975,7 @@ snapshots:
 
   '@hyperframes/engine@0.7.101':
     dependencies:
-      '@hono/node-server': 2.0.12(hono@4.13.12)
+      '@hono/node-server': 2.1.6(hono@4.13.12)
       '@hyperframes/core': 0.7.101
       '@hyperframes/parsers': 0.7.101
       hono: 4.13.12
@@ -7022,7 +7023,7 @@ snapshots:
       '@fontsource/oswald': 5.3.0
       '@fontsource/outfit': 5.3.0
       '@fontsource/space-mono': 5.3.0
-      '@hono/node-server': 2.0.12(hono@4.13.12)
+      '@hono/node-server': 2.1.6(hono@4.13.12)
       '@hyperframes/core': 0.7.101
       '@hyperframes/engine': 0.7.101
       '@hyperframes/lint': 0.7.101

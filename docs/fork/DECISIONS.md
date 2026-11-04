@@ -433,3 +433,10 @@ PR 內容裡沒有本線也存在的安全或資料遺失問題，所以不另�
 重看條件：升到上游 0.3（ROADMAP 中期表「升到上游 0.3」，其觸發條件已含 issue #388）時一併評估。
 
 `reviewed_pr_through` 推到 459；commit／release 水位不動（無新 release）。
+
+## 2026-11-04：Dependabot #116 `@hono/node-server`
+
+間接依賴（`@hyperframes/engine`、`@hyperframes/producer` 宣告 `^2.0.5`，舊鎖檔解析成 2.0.12），受影響範圍 `>= 1.19.10, < 2.1.3`，修補版 2.1.3。
+`pnpm-workspace.yaml` 的 `overrides` 新增 `"@hono/node-server": ^2.1.3`，鎖檔解析到 2.1.6，仍在 2.x 內，peer `hono ^4.13.5` 由 4.13.12 滿足。
+
+維持延後不動：torch 3、transformers 5（whisperx 3.8.6 綁 `torch<2.9`、`huggingface-hub<1.0`）；PyPI 上 whisperx 仍只有預發行 `3.8.7rc1`，重看條件照上方 2026-10-26 節的觸發條件。

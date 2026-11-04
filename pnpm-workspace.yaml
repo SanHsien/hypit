@@ -17,3 +17,6 @@ overrides:
   # chromium-bidi 17 / zod 3 (GHSA-mrhx-c7xc-m3w5, fixed only in zod >= 4.6.6; alert #109).
   # Floor-style: anything older than 25.16.0 is lifted to the same major; newer majors are left alone.
   "puppeteer@<25.16.0": ^25.16.0
+  # @hyperframes/engine and producer ask for ^2.0.5, which the old lockfile resolved to 2.0.12
+  # (alert #116); 2.1.3 is the fixed 2.x.
+  "@hono/node-server": ^2.1.3
