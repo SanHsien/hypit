@@ -443,3 +443,13 @@ PR 內容裡沒有本線也存在的安全或資料遺失問題，所以不另�
 
 **2026-11-04 補記**：新增 #117（`torch` high，範圍 `< 2.10.0`，修補版 2.10.0，11-04 建立）。出口條件與 #15、#16、#19 相同（whisperx 允許 `torch>=2.13`），併入 `torch` 延後列，不另設條件。
 `Dependency freshness` 的 `Mark maintenance as required` 與兩個 `Dependabot Updates`（uv `No solution found`，whisperx 綁 `torch~=2.8.0`）失敗，都來自這批既有延後，與 `@hono/node-server` override 無關；延後解除前會持續紅燈。
+
+## 2026-11-05：Hyperframes 限版延後
+
+- `@hyperframes/engine`／`producer` 保留 0.7.101，`deferredLatest` 為 0.9.16。新版需要 Node >=22、puppeteer ~25.11.0，producer 精確釘住同版內部套件；與 0.9.15 相比，engines 與外部依賴不變，只有內部版本前進。
+- 解除條件仍為 ROADMAP 既有驗收：Chromium 完整算圖（含先前略過的 13 項測試）及完整 Windows 閘門通過。0.8.221 的舊試升不能證明 0.9.16 相容；registry 前進時重新審查。
+
+## 2026-11-06：一般依賴精確釘版升級
+
+- AWS Lambda／S3 3.1161.0 → 3.1162.0、koffi 3.3.6 → 3.3.7、rollup 4.67.2 → 4.67.5、vite 8.3.5 → 8.3.6；同步所有直接宣告與 pnpm lockfile。
+- 移除上述五個套件及已更新的 CodeQL init／analyze 4.39.3、pnpm/action-setup 6.1.1 的 deferral；保留 Hyperframes、Node 型別與 TypeScript 的既有技術理由。
