@@ -12,7 +12,7 @@ No upstream release past the reviewed one. Nothing to review.
 ## Fork status
 
 - 共同 baseline：`8efbac0`（已審視至此）
-- 本 fork `HEAD`：`d0b6f1fb`，與 upstream 無共同祖先（歷史已壓縮），不計 ahead
+- 本 fork `HEAD`：`c5a91104`，與 upstream 無共同祖先（歷史已壓縮），不計 ahead
 - upstream tip：`2d31e887`，baseline 之後 **behind 21**
 
 這兩個數字每次 commit 都會變，所以由本檢查當場算出，不寫進文件。
