@@ -551,3 +551,11 @@ packages/studio/src/ui/main.ts(19,8): error TS2882: Cannot find module or type d
 - **上游**：PR #469，head `907758ce8742b5e2864eb9fc0b5dedf7bc42102f`，OPEN。11 個告警中 fork 有的只有兩處，其餘不適用的理由見上方同日分流表；這次只移植這兩處（程式小、行為等價、有測試）。上游同 PR 的測試清理（`ranking.test.ts` 的恆等 replace、`upload.test.ts` 的 S3 路由尾端斜線）是上游測試檔自己的整理，fork 不引入。
 - **移植**：`packages/comment-sticker/src/surface.ts` 的 `dedent` 把 `/\n\s*$/u` 改成由尾端往前掃的 `trimTrailingBlankLines`（結果與原正則相同：從尾端空白串中第一個換行處切掉）；`packages/provider-hypihub/src/upload.ts` 新增並匯出 `trimTrailingSlashes`，`upload.ts` 與 `provider.ts` 兩個 `apiBaseUrl` 都改用它取代 `/\/+$/u`。
 - **測試**：`packages/comment-sticker/test/comment-sticker.test.ts` 新增兩段縮排案例與 200000 個換行後接字元的線性時間案例（門檻 1 秒，原版 21.8 秒、斷言失敗；移植後 0.6 秒內整個檔案跑完）；上游把換行數放 50000，在這台機器舊版約 1 秒仍低於其 2 秒門檻，所以加大。`packages/provider-hypihub/test/upload.test.ts` 新增 `trimTrailingSlashes` 與帶尾端斜線 base URL 的請求網址案例。`packages/comment-sticker` 與 `packages/provider-hypihub` 全部 71 筆通過，`pnpm check` exit 0。
+
+## 2026-11-07：`undici` Dependabot 告警（alert #118–#146，29 筆）
+
+**來源**：`@hyperframes/engine@0.9.20` 以**精確版本** `undici: 7.25.0` 宣告相依（producer 與 `provider-hyperframes-local` 經它引入，`pnpm why undici` 只有這一條路徑），所以宣告範圍到不了 7.28.0 以後的修補版，`pnpm update` 解不開；這是準則允許用 override 的情形（範圍不可達）。未修補版本範圍中最高的修補版是 7.30.1（14 筆 medium、10 筆 high、5 筆 low）。
+
+**處理**：`pnpm-workspace.yaml` 的 `overrides` 加 `undici: ^7.30.1`（留在 7.x 主版內，與 `hono`、`@hono/node-server` 的前例一致），鎖檔以 pnpm 10.33.0 重產，解到 `undici@7.30.2`，鎖檔只動這一個套件三行；`pnpm install --frozen-lockfile` 通過。
+
+**驗證**：`HYPIT_BROWSER_TESTS=1`、`--test-concurrency=1` 跑 `packages/provider-hyperframes-local/test/*.test.ts`（真實受管 Chrome）：53 項、通過 49、失敗 0、略過 4，與 2026-11-07 Hyperframes 升級時的基線相同。**限度**：告警要推送後 GitHub 重掃才會轉 fixed，本機只能確認鎖檔解到 7.30.2（高於所有告警列的修補版 7.28.0／7.29.0／7.29.1／7.30.1）；`@hyperframes/engine` 自己用 undici 的路徑（下載、HTTP 請求）沒有專屬測試，只靠上述算圖測試涵蓋。**重看條件**：`@hyperframes/engine` 改成範圍宣告或不再相依 undici 時移除此 override。

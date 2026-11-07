@@ -1,11 +1,11 @@
 # 路線圖
 
 > 本 repo 後續工作的單一真相源。做完一項，就在同一個 commit 刪掉那一列；新工作只加在這裡。
-> 現況段的數字是 2026-10-29 依 `main` `07dded3c2b1e` 查的快照，開工前先重查 GitHub。
+> 現況段的數字是 2026-11-07 依 `main` `d0b6f1fb66dc` 查的快照，開工前先重查 GitHub。
 
 ## 現況
-`hypit-ai/hypit` 的 Windows 專屬維護 fork（AI 代理操控的程式化剪輯與短影音模板）。實際程式基底是 v0.2.8 加逐筆移植，上游 release 軌審到 `v0.3.1`、PR #455、issue #456，但刻意還沒升 0.3（`tools/upstream_baseline.json`、[`docs/fork/DECISIONS.md`](docs/fork/DECISIONS.md) 2026-10-25）。
-2026-10-29 查：open PR 0、Dependabot open alert 8 筆（high 4、medium 2、low 2，全是 WhisperX 釘版連帶的 `torch`／`transformers`）、code scanning 0；CI／CodeQL／Dependency freshness／Upstream check 最近一次 success；issues 已停用，open issue 數「未查到」（查法：`gh api repos/SanHsien/hypit/dependabot/alerts?state=open`、`gh run list -R SanHsien/hypit -b main`）。
+`hypit-ai/hypit` 的 Windows 專屬維護 fork（AI 代理操控的程式化剪輯與短影音模板）。實際程式基底是 v0.2.8 加逐筆移植，上游 release 軌審到 `v0.3.1`、PR #475、issue #474，但刻意還沒升 0.3（`tools/upstream_baseline.json`、[`docs/fork/DECISIONS.md`](docs/fork/DECISIONS.md) 2026-10-25）。
+2026-11-07 查：open PR 0、code scanning 0；Dependabot open alert 38 筆：`undici` 29 筆（high 10、medium 14、low 5，`@hyperframes/engine` 精確釘 7.25.0 造成，已用 `pnpm-workspace.yaml` 的 `undici: ^7.30.1` override 解到 7.30.2，推送後才會轉 fixed）加 WhisperX 釘版連帶的 `torch` 4 筆、`transformers` 5 筆；`main` 最近一次 CI／CodeQL／Dependency freshness success，`Dependabot Updates` failure（uv 解不出 `torch~=2.8.0`，與上述 WhisperX 延後同源）；issues 已停用，open issue 數「未查到」（查法：`gh api repos/SanHsien/hypit/dependabot/alerts?state=open`、`gh run list -R SanHsien/hypit -b main`）。
 
 ## 近期：可以直接動手
 | 項目 | 為什麼 | 驗收方式 | 建議執行者 | 證據 |
@@ -17,8 +17,8 @@
 ## 中期：等條件成立再做
 | 項目 | 觸發條件 | 驗收方式 | 建議執行者 | 證據 |
 | --- | --- | --- | --- | --- |
-| 解除 `torch`／`transformers` 告警 | 穩定版 `whisperx` 的相依圖允許 `torch` ≥ 2.13.0 與 `transformers` ≥ 5.10（未被 yank）及其要求的 `huggingface-hub`，且 `uv lock` 可解；只有預發行或只是版號變成 3.8.7 都不算 | `services/whisperx` 鎖檔更新；`pnpm test:whisperx-service` 與本機對齊模型實跑通過；Dependabot 這 8 筆 state=fixed | Claude Sonnet | [`docs/fork/DECISIONS.md`](docs/fork/DECISIONS.md) 2026-10-26 WhisperX 釘版警示複查；查法 `https://pypi.org/pypi/whisperx/json` 的 `requires_dist` |
-| 移植等上游合併的修正：#394＋#399（text replace）、#395 或 #438（script 逗號數字）、#416（Runtime Profile 錯誤訊息）、#441（保留 `data-hypit-*`）、#446（樣板菱形展開）；手工評估 #426、#406、issue #392；issue #456＋PR #458（HypiHub 結果資產下載的主機白名單，2026-11-02 審：head `dbabd8c3`，仍 OPEN，缺陷在 fork 存在、見 DECISIONS 同日條目）、PR #464（只取 `persist-credentials: false` 兩處，`ci.yml`、`sync-hypihub-docs.yml`；npm 釘版不適用）、#466（Pollo 轉址帶 API key）、#467（Result symlink 讀取，fork 檔案是 `packages/build-result/src/store.ts`）、#469（只取 `comment-sticker` `dedent` 與 `provider-hypihub` 的 `apiBaseUrl` 兩處）、#471（Studio 素材與 Result 以沙箱文件提供）；issue #473（Studio projection unresolved，fork 未重現），2026-11-07 審：#464／#466／#467／#469／#471 皆 OPEN、已釘 `monitored`，見 DECISIONS 同日條目 | 上游合併對應 PR（`Upstream check` 失敗會提示），或 #441 的 fork 開始載入他人提供的專案、#446 實際遇到 render 卡住 | 每筆 `git cherry-pick -x` 或依判準四移植做法，附修前失敗的測試；`pwsh -NoProfile -File tools/dev_check.ps1` 綠；`docs/fork/DECISIONS.md` 記結論並推進水位 | Claude Sonnet | [`docs/fork/DECISIONS.md`](docs/fork/DECISIONS.md) 2026-10-25、2026-10-28 上游分流表；`tools/upstream_baseline.json` |
+| 解除 `torch`／`transformers` 告警 | 穩定版 `whisperx` 的相依圖允許 `torch` ≥ 2.13.0 與 `transformers` ≥ 5.10（未被 yank）及其要求的 `huggingface-hub`，且 `uv lock` 可解；只有預發行或只是版號變成 3.8.7 都不算 | `services/whisperx` 鎖檔更新；`pnpm test:whisperx-service` 與本機對齊模型實跑通過；Dependabot 這 9 筆（torch 4、transformers 5）state=fixed | Claude Sonnet | [`docs/fork/DECISIONS.md`](docs/fork/DECISIONS.md) 2026-10-26 WhisperX 釘版警示複查；查法 `https://pypi.org/pypi/whisperx/json` 的 `requires_dist` |
+| 移植等上游合併的修正：#394＋#399（text replace）、#395 或 #438（script 逗號數字）、#416（Runtime Profile 錯誤訊息）、#441（保留 `data-hypit-*`）、#446（樣板菱形展開）；手工評估 #426、#406、issue #392；issue #456＋PR #458（HypiHub 結果資產下載的主機白名單，2026-11-02 審：head `dbabd8c3`，仍 OPEN，缺陷在 fork 存在、見 DECISIONS 同日條目）、PR #464（只取 `persist-credentials: false` 兩處，`ci.yml`、`sync-hypihub-docs.yml`；npm 釘版不適用）；issue #473（Studio projection unresolved，fork 未重現）；2026-11-07 已先行移植 #466、#467、#469（兩處）、#471，上游合併後改用上游版本取代（五筆皆 OPEN、已釘 `monitored`，見 DECISIONS 同日條目） | 上游合併對應 PR（`Upstream check` 失敗會提示），或 #441 的 fork 開始載入他人提供的專案、#446 實際遇到 render 卡住 | 每筆 `git cherry-pick -x` 或依判準四移植做法，附修前失敗的測試；`pwsh -NoProfile -File tools/dev_check.ps1` 綠；`docs/fork/DECISIONS.md` 記結論並推進水位 | Claude Sonnet | [`docs/fork/DECISIONS.md`](docs/fork/DECISIONS.md) 2026-10-25、2026-10-28 上游分流表；`tools/upstream_baseline.json` |
 | 升到上游 0.3 | 上游出 0.3.2 以上，且 issue #388（Windows 範例重放失敗）與 #433（caption 相鄰 Cue 回歸）已修 | 模擬合併的衝突檔逐一處理並保留 fork 的 markup ReDoS 修正與 Windows 啟動器；完整 render 實測（含內建範例重放）通過；同時處理只在 0.3 存在的 #440、#445、#455；CI 綠 | Claude Opus | [`docs/fork/DECISIONS.md`](docs/fork/DECISIONS.md) 2026-10-25（v0.3.1 模擬合併 50 個衝突檔） |
 
 ## 刻意不做
