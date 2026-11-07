@@ -336,7 +336,7 @@ Alert 編號的來源：雲端工作環境查詢時回 `403 Resource not accessi
 
 - **`upstream-review-report.md` 被追蹤進 git**：`check_upstream_updates.py` 預設把報告寫到 repo 根目錄，每次 `dev_check.ps1` 都會改動這個被追蹤的檔，內容（HEAD、數字）永遠過期，也讓「保持乾淨工作目錄」做不到。正解是 `git rm --cached` 並加進 `.gitignore`，但那是從 repo 移除檔案，需要維護者決定；沒有動它。
 - **`check_dependency_freshness.py` 只讀根目錄 `package.json`**：`packages/*/package.json` 的 registry 相依（`@hyperframes/engine`、`@hyperframes/producer`、`@aws-sdk/*`、約 100 個 `@fontsource*`）完全不在月報裡。補上會一次出現大量新紅燈，其中字型套件是刻意精確釘版，需要先決定哪些要 hold／deferral，不是機械修正；留給維護者。（**已由 2026-10-30 的改動補上**：檢查器現在讀所有 workspace manifest，見文末「2026-10-30」一節。）
-- **`publish-npm.yml` 未限定在上游 repo**：fork 若發 release 會嘗試走 npm trusted publishing；該信任綁在 `hypit-ai/hypit`，在 fork 只會失敗而不會發出去。要不要像 `sync-hypihub-docs.yml` 一樣加 `if: github.repository == 'hypit-ai/hypit'` 取決於 fork 是否可能自行發佈，未改。
+- **`publish-npm.yml` 未限定在上游 repo**：fork 若發 release 會嘗試走 npm trusted publishing；該信任綁在 `hypit-ai/hypit`，在 fork 只會失敗而不會發出去。要不要像 `sync-hypihub-docs.yml` 一樣加 `if: github.repository == 'hypit-ai/hypit'` 取決於 fork 是否可能自行發佈，未改。（**已由 2026-11-07 的決定處理**。）
 - **`packages/markup/test/reference.test.ts` 的 50ms 牆鐘上限**：病態輸入修前要約 13 秒，50ms 在極重負載下理論上會誤報，但這次整套測試並行跑時穩定通過，沒有可重現的失敗，不動。
 - **整套測試中兩個偶發失敗**（`credential-store-os/test/windows.test.ts`、`runtime-local/test/programs.test.ts`）：整套並行時一次逾時、一次 `EBUSY` 清理暫存目錄；單獨重跑都通過，判定為負載造成，與本批無關。
 
@@ -453,3 +453,14 @@ PR 內容裡沒有本線也存在的安全或資料遺失問題，所以不另�
 
 - AWS Lambda／S3 3.1161.0 → 3.1162.0、koffi 3.3.6 → 3.3.7、rollup 4.67.2 → 4.67.5、vite 8.3.5 → 8.3.6；同步所有直接宣告與 pnpm lockfile。
 - 移除上述五個套件及已更新的 CodeQL init／analyze 4.39.3、pnpm/action-setup 6.1.1 的 deferral；保留 Hyperframes、Node 型別與 TypeScript 的既有技術理由。
+
+## 2026-11-07：fork 不自行發佈 npm
+
+**決定**：本 fork 不發佈 `@hypit/hypit` 到 npm；npm 版本由上游 `hypit-ai/hypit` 發佈，fork 追隨上游而不是另立發佈線。理由：npm trusted publishing 的信任綁在 `hypit-ai/hypit` 的 `publish-npm.yml`，在 fork 發 release 只會讓 `publish` job 失敗；fork 的交付是 Windows 維護線與原始碼（`FORK.md`），不是套件。
+
+**實作**：`.github/workflows/publish-npm.yml` 的 `version` 與 `publish` 兩個 job 加 `github.repository == 'hypit-ai/hypit' &&`，與原條件以括號合併（檔內標 `Fork patch`，與 `sync-hypihub-docs.yml`、`repository-analysis.yml` 既有的同款閘門一致）。`checks`、`package` 靠 `needs: version` 連帶 skipped，`release-assets` 靠 `needs: [package, publish]` 連帶 skipped；在 fork 觸發或發 release 時五個 job 全部 skipped。`FORK.md` 差異表已列出。
+
+**重看條件**：維護者決定由 fork 發佈自己的 npm 套件（需改套件 scope／名稱、在 npm 設定指向 `SanHsien/hypit` 的 trusted publisher），或上游改變發佈方式（例如不再用 trusted publishing）。到時移除或改寫這個閘門。
+
+**驗證**：YAML 解析後各 job 的 `if` 與上述一致；閘門的實際效果（fork 上五個 job 全 skipped）只能在 GitHub 上觸發 workflow 才看得到，本機未驗證。
+

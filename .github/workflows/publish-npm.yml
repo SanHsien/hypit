@@ -24,7 +24,9 @@ concurrency:
 
 jobs:
   version:
-    if: github.event_name == 'release' || github.ref == 'refs/heads/main'
+    # Fork patch: npm trusted publishing is bound to hypit-ai/hypit; the fork does not publish (docs/fork/DECISIONS.md 2026-11-07).
+    # checks, package and release-assets are skipped through needs.
+    if: github.repository == 'hypit-ai/hypit' && (github.event_name == 'release' || github.ref == 'refs/heads/main')
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.version.outputs.version }}
@@ -72,7 +74,8 @@ jobs:
     uses: ./.github/workflows/npm-package.yml
 
   publish:
-    if: github.event_name == 'release' || inputs.publish
+    # Fork patch: see the version job.
+    if: github.repository == 'hypit-ai/hypit' && (github.event_name == 'release' || inputs.publish)
     needs: package
     runs-on: ubuntu-latest
     permissions:

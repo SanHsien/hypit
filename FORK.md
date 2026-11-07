@@ -25,6 +25,7 @@
 | `tools/check_dependency_freshness.py` | 每月依賴下限與 Actions 釘選新鮮度檢查 |
 | `tools/tests/` | 上述兩支 Python 檢查腳本的 `unittest`；由 `test/fork-tools.test.ts` 掛進 `pnpm test` |
 | `hypit.cmd` | Windows 啟動器（取代上游的 POSIX `hypit` 腳本）；`test/hypit-cmd.test.ts` 驗證含 `(`、`)`、`&` 的安裝路徑 |
+| `.github/workflows/publish-npm.yml`（Fork patch） | `version`、`publish` job 限定 `github.repository == 'hypit-ai/hypit'`；fork 不發佈 npm（見 DECISIONS 2026-11-07） |
 | `.github/workflows/upstream-check.yml` | 每週對 `upstream/main` 檢查新 commit 與 ticket |
 | `docs/fork/DECISIONS.md`、`docs/fork/UPSTREAM.md` | fork 維護決策與同步指引 |
 | `.cursor/rules/no-upstream-pr.mdc` | 防呆規則：禁止誤對上游開 PR 或推送 |
