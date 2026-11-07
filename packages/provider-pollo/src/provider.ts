@@ -63,11 +63,18 @@ class PolloClient {
   async json(path: string, key: string, init: RequestInit = {}): Promise<Record<string, unknown>> {
     const deadline = requestDeadline(this.timeout, () => new EndpointTransportError("Pollo request timed out"));
     try {
-      const response = await transport(deadline.wait(this.fetcher(`${this.baseUrl}${path}`, {
-        ...init, signal: deadline.signal, headers: { "x-api-key": key, ...(init.headers ?? {}) },
+      // Fetch strips `authorization` on a cross-origin redirect but forwards custom headers such as
+      // `x-api-key`, so a followed redirect would hand the key to whatever host it names.
+      const url = `${this.baseUrl}${path}`;
+      const response = await transport(deadline.wait(this.fetcher(url, {
+        ...init, signal: deadline.signal, redirect: "manual", headers: { "x-api-key": key, ...(init.headers ?? {}) },
       })));
       const text = await transport(deadline.wait(response.text()));
-      if (!response.ok) throw new PolloHttpError(response.status, text, { method: init.method ?? "GET", path });
+      if (!response.ok) {
+        throw new PolloHttpError(response.status, text, {
+          method: init.method ?? "GET", path, url, location: response.headers.get("location"),
+        });
+      }
       let body: unknown;
       try { body = text.length === 0 ? {} : JSON.parse(text); } catch { throw new EndpointResponseError(`Pollo returned invalid JSON (${response.status})`); }
       return object(body, "Pollo response");

@@ -523,3 +523,13 @@ packages/studio/src/ui/main.ts(19,8): error TS2882: Cannot find module or type d
 
 `reviewed_pr_through` 推到 475、`reviewed_issue_through` 推到 474、`reviewed_date` 2026-11-07；`reviewed_through`／`reviewed_release` 不動（無新 release）。延後的 5 個 PR（#464、#466、#467、#469、#471）釘進 `tools/upstream_baseline.json` 的 `monitored`（head 與 state=open），上游合併或改動時 `Upstream check` 會再提醒；#473 沒有 PR，只列在 ROADMAP。重看條件寫在上表，後續工作列在 ROADMAP 中期表「移植等上游合併的修正」。
 **判斷備註**：#466、#467、#471 都符合 ROADMAP「能由外部輸入觸發的安全修正可在上游合併前先移植」，本輪的範圍是分流與水位，沒有提前移植；是否提前由維護者決定。
+
+## 2026-11-07：上游尚未合併的修正，先行移植（外部輸入可觸發）
+
+依 ROADMAP「能由外部輸入觸發的安全修正可在上游合併前先移植」，維護者派工方指示移植 #466、#467、#471、#469。每一筆都標 **ported before upstream merge (external-input reachable)**，上游 PR 仍是 OPEN；**重看條件：上游合併該 PR 後，改用上游版本取代本移植**（`monitored` 的釘選保留，PR 一合併或改動 `Upstream check` 就會提醒）。上方同日分流表中這幾筆的「延後」裁決，以本節為準。
+
+### #466（Pollo 轉址不帶 API key）
+
+- **上游**：PR #466，head `1e8102c1c3c6cd4411d5a1657344f1de7e0c0a7c`，OPEN。
+- **移植**：`packages/provider-pollo/src/provider.ts` 的 `PolloClient.json()` 加 `redirect: "manual"`；3xx 走既有 `PolloHttpError` 路徑（`POLLO_HTTP_ERROR`，不重試），`packages/provider-pollo/src/errors.ts` 新增只報轉址目標 origin（不含路徑與查詢，避免簽名網址外洩）的說明。與上游 diff 的差異：fork 的 `PolloHttpError(status, bodyText, request)` 沒有 `response` 參數，改由呼叫端把 `Location` 放進 `request.location`；`download()` 不帶憑證，不動。
+- **測試**：`packages/provider-pollo/test/redirect.test.ts` 取自上游（輪詢與送出各一筆，兩個 loopback 伺服器，第二個記錄收到的 `x-api-key`）。修前 2 筆失敗（轉址目標收到 `POLLO_SECRET_KEY`），修後 `packages/provider-pollo/test/*.test.ts` 5 筆全過。
