@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { mkdir, mkdtemp, open, readFile, readdir, rm, stat, utimes, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, open, readFile, readdir, rm, stat, symlink, utimes, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import test from "node:test";
@@ -252,6 +252,125 @@ test("filesystem repository streams one normalized byte range", async () => {
     assert.equal(new TextDecoder().decode(Uint8Array.from(chunks)), "defg");
   } finally {
     await rm(root, { recursive: true, force: true });
+  }
+});
+
+// Ported from upstream PR #467 before it was merged (tests adapted: directory links are junctions so they
+// need no privilege on Windows; file symbolic links need Developer Mode or elevation and are skipped
+// when the OS refuses them, which is reported, not hidden).
+async function linkDirectory(target: string, path: string): Promise<void> {
+  await symlink(target, path, "junction");
+}
+async function linkFile(target: string, path: string): Promise<boolean> {
+  try {
+    await symlink(target, path, "file");
+    return true;
+  } catch (error) {
+    if (process.platform === "win32" && error instanceof Error && "code" in error && error.code === "EPERM") return false;
+    throw error;
+  }
+}
+async function readAll(stream: AsyncIterable<Uint8Array>): Promise<string> {
+  const chunks: number[] = [];
+  for await (const chunk of stream) chunks.push(...chunk);
+  return new TextDecoder().decode(Uint8Array.from(chunks));
+}
+
+test("filesystem repository refuses Result files that resolve outside their Result", async (t) => {
+  const root = await mkdtemp(join(tmpdir(), "hypit-result-symlink-"));
+  const outside = await mkdtemp(join(tmpdir(), "hypit-result-outside-"));
+  const build = "bld_20260902T100000012Z_0000000001";
+  try {
+    const directory = buildResultDirectory(root, build);
+    await mkdir(join(directory, "files"), { recursive: true });
+    await writeFile(join(outside, "secret.txt"), "not part of the Result");
+    await mkdir(join(outside, "nested"));
+    await writeFile(join(outside, "nested", "video.mp4"), "outside");
+    await writeFile(join(directory, "files", "inside.mp4"), "inside");
+    await linkDirectory(join(outside, "nested"), join(directory, "linked"));
+    const fileLinks = await linkFile(join(outside, "secret.txt"), join(directory, "files", "video.mp4"))
+      && await linkFile("inside.mp4", join(directory, "files", "alias.mp4"));
+    const repository = new FileBuildResultRepository(root);
+    const file = (path: string) => ({ kind: "build-file" as const, path, size: 6, mediaType: "video/mp4" });
+    await assert.rejects(repository.openFile(build, file("linked/video.mp4")), /leaves/u);
+    assert.equal(await repository.openFile(build, file("files/missing.mp4")), undefined);
+    if (!fileLinks) {
+      t.diagnostic("file symbolic links are not permitted here (EPERM); only the directory-link cases ran");
+      return;
+    }
+    await assert.rejects(repository.openFile(build, file("files/video.mp4")), /leaves/u);
+    await assert.rejects(repository.openFile(build, file("files/video.mp4"), { start: 0, endExclusive: 1 }), /leaves/u);
+    const stream = await repository.openFile(build, file("files/alias.mp4"));
+    assert.notEqual(stream, undefined);
+    assert.equal(await readAll(stream!), "inside");
+  } finally {
+    await rm(root, { recursive: true, force: true });
+    await rm(outside, { recursive: true, force: true });
+  }
+});
+
+test("filesystem repository refuses Result files under a Build or date directory linked outside the root", async () => {
+  const root = await mkdtemp(join(tmpdir(), "hypit-result-linked-build-"));
+  const outside = await mkdtemp(join(tmpdir(), "hypit-result-linked-outside-"));
+  const linkedBuild = "bld_20260902T100000013Z_0000000001";
+  const linkedBucketBuild = "bld_20260903T100000013Z_0000000001";
+  try {
+    await mkdir(join(outside, ".ssh"), { recursive: true });
+    await writeFile(join(outside, ".ssh", "id_rsa"), "secret");
+    await mkdir(join(outside, linkedBucketBuild, ".ssh"), { recursive: true });
+    await writeFile(join(outside, linkedBucketBuild, ".ssh", "id_rsa"), "secret");
+    const buildDirectory = buildResultDirectory(root, linkedBuild);
+    await mkdir(join(buildDirectory, ".."), { recursive: true });
+    await linkDirectory(outside, buildDirectory);
+    const bucketDirectory = join(buildResultDirectory(root, linkedBucketBuild), "..");
+    await linkDirectory(outside, bucketDirectory);
+    const repository = new FileBuildResultRepository(root);
+    const file = (build: string) => ({
+      kind: "build-file" as const,
+      build,
+      path: ".ssh/id_rsa",
+      size: 6,
+      mediaType: "application/octet-stream",
+    });
+    await assert.rejects(repository.openFile(linkedBuild, file(linkedBuild)), /leaves/u);
+    await assert.rejects(repository.openFile(linkedBucketBuild, file(linkedBucketBuild)), /leaves/u);
+    const other = "bld_20260904T100000013Z_0000000001";
+    await mkdir(buildResultDirectory(root, other), { recursive: true });
+    await assert.rejects(repository.openFile(other, file(linkedBuild)), /leaves/u);
+  } finally {
+    await rm(root, { recursive: true, force: true });
+    await rm(outside, { recursive: true, force: true });
+  }
+});
+
+test("filesystem repository reads Result files when the Result root is itself a symbolic link", async () => {
+  const parent = await mkdtemp(join(tmpdir(), "hypit-result-linked-root-"));
+  const build = "bld_20260902T100000014Z_0000000001";
+  try {
+    const real = join(parent, "real");
+    const root = join(parent, "results");
+    await mkdir(real);
+    await linkDirectory(real, root);
+    const directory = buildResultDirectory(root, build);
+    await mkdir(join(directory, "files"), { recursive: true });
+    await writeFile(join(directory, "files", "video.mp4"), "inside");
+    const repository = new FileBuildResultRepository(root);
+    const stream = await repository.openFile(build, {
+      kind: "build-file",
+      path: "files/video.mp4",
+      size: 6,
+      mediaType: "video/mp4",
+    });
+    assert.notEqual(stream, undefined);
+    assert.equal(await readAll(stream!), "inside");
+    assert.equal(await repository.openFile(build, {
+      kind: "build-file",
+      path: "files/video.mp4/child",
+      size: 6,
+      mediaType: "video/mp4",
+    }), undefined);
+  } finally {
+    await rm(parent, { recursive: true, force: true });
   }
 });
 

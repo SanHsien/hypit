@@ -533,3 +533,9 @@ packages/studio/src/ui/main.ts(19,8): error TS2882: Cannot find module or type d
 - **上游**：PR #466，head `1e8102c1c3c6cd4411d5a1657344f1de7e0c0a7c`，OPEN。
 - **移植**：`packages/provider-pollo/src/provider.ts` 的 `PolloClient.json()` 加 `redirect: "manual"`；3xx 走既有 `PolloHttpError` 路徑（`POLLO_HTTP_ERROR`，不重試），`packages/provider-pollo/src/errors.ts` 新增只報轉址目標 origin（不含路徑與查詢，避免簽名網址外洩）的說明。與上游 diff 的差異：fork 的 `PolloHttpError(status, bodyText, request)` 沒有 `response` 參數，改由呼叫端把 `Location` 放進 `request.location`；`download()` 不帶憑證，不動。
 - **測試**：`packages/provider-pollo/test/redirect.test.ts` 取自上游（輪詢與送出各一筆，兩個 loopback 伺服器，第二個記錄收到的 `x-api-key`）。修前 2 筆失敗（轉址目標收到 `POLLO_SECRET_KEY`），修後 `packages/provider-pollo/test/*.test.ts` 5 筆全過。
+
+### #467（Result 檔案讀取不經 symlink 離開 Result）
+
+- **上游**：PR #467，head `e0468cec7493604c040b0867415c73eb6559fbf5`，OPEN。上游只處理 `build-file`；`external-file` 的 `file:` URI 仍可讀任意本機檔，上游自己標為另案，**本移植同樣不處理**。
+- **移植**：`packages/build-result/src/store.ts`（上游檔案是 `packages/result/src/node/store.ts`）新增 `physicalResultPath`，以 `realpath` 比對實體路徑是否仍在「Result 根的實體路徑＋Build 相對位置」之內；只對 Result 根做實體解析，所以根本身是連結（例如指向別的磁碟）仍可用。`openFile` 與 `resolveBuildResultOutput` 讀 value 文件兩處改用它；不存在（`ENOENT`／`ENOTDIR`／`ELOOP`）回 `undefined`。
+- **測試**：上游 3 個測試移到 `packages/build-result/test/result.test.ts`。修前 2 筆失敗（讀到 Result 外的檔案），修後該檔 13 筆全過。**調整**：目錄連結在 Windows 改用 junction（不需特權）；檔案符號連結需要開發人員模式或提升權限，這台機器 `EPERM`，測試偵測到就略過檔案連結的斷言並以 `t.diagnostic` 說明，其餘（連結的子目錄、被連結的 Build／日期目錄、根為連結）都有實跑。**已知限度**：檔案符號連結的情況在本機沒有實跑，只靠 junction 目錄情況與同一份 `realpath` 比對邏輯；在有權限的環境（Linux CI、開發人員模式）才會跑到。
