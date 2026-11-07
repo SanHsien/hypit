@@ -464,3 +464,21 @@ PR 內容裡沒有本線也存在的安全或資料遺失問題，所以不另�
 
 **驗證**：YAML 解析後各 job 的 `if` 與上述一致；閘門的實際效果（fork 上五個 job 全 skipped）只能在 GitHub 上觸發 workflow 才看得到，本機未驗證。
 
+## 2026-11-07：Hyperframes 升到 0.9.20；TypeScript 7 試升失敗，維持延後
+
+**上游**：`hypit-ai/hypit` `main`（`2d31e887`）仍是 `typescript` 5.9.3，且沒有 `@hyperframes/*` 相依，沒有可跟的版本。
+
+**`@hyperframes/engine`／`producer` 0.7.101 → 0.9.20（已升，deferral 已移除）**：ROADMAP 寫 0.9.16，但 registry 在 11-07 已是 0.9.20，deferral 的 `deferredLatest`（0.9.16）因此失效，月報會對 0.9.20 轉紅，所以直接升到當天最新。兩者精確釘版，鎖檔重產（pnpm 10.33.0）。Node 要求 >=22，與 `engines` `>=22.15.0` 相容。
+- 驗收（同一台機器、同一個受管 Chrome Headless Shell 152.0.7928.2、`HYPIT_BROWSER_TESTS=1`、`--test-concurrency=1`、`packages/provider-hyperframes-local/test/*.test.ts` 全部）：升級前基線 53 項、通過 49、失敗 0、略過 4；升級後 53 項、通過 49、失敗 0、略過 4。略過的 4 項是 Windows 專屬 skip（`process.platform === "win32"`），不是瀏覽器閘門；ROADMAP 說的「13 項略過」是未設 `HYPIT_BROWSER_TESTS` 時的狀態，現在都有實跑，含 `local HyperFrames Provider really renders a silent frame-exact MP4 with parallel workers` 與 `explicit browser renders without installing a managed replacement`。`pnpm check` exit 0。
+- 已知限度：沒有逐幀比對 0.7.101 與 0.9.20 的像素輸出，驗收是測試自身的斷言（幀數、時間軸、取樣）。
+
+**`typescript` 5.9.3 → 7.0.2（試升失敗，已還原，deferral 改寫）**：全部釘版（根、`packages/cli`、`packages/package-loader-node`、`examples/*/packages/*`）升 7.0.2 後 `pnpm check` 失敗：
+```
+packages/package-loader-node/src/module-scope.ts(8,10): error TS2305: Module '"typescript"' has no exported member 'transpileModule'.
+packages/package-loader-node/src/module-scope.ts(8,27): error TS2305: ... no exported member 'ModuleKind'.
+packages/package-loader-node/src/module-scope.ts(8,39): error TS2305: ... no exported member 'ScriptTarget'.
+packages/package-loader-node/src/module-scope.ts(8,53): error TS2305: ... no exported member 'JsxEmit'.
+packages/studio/src/ui/main.ts(19,8): error TS2882: Cannot find module or type declarations for side-effect import of '../style.css'.
+```
+10-31 的判斷（只缺 CSS 宣告）不完整：TS2305 是真的相容性問題，不是型別宣告。`typescript@7.0.2` 的 `exports["."]` 是 `lib/version.cjs`，只匯出 `version`／`versionMajorMinor`；編譯器 API 在 `unstable/*` 子路徑。`package-loader-node` 在執行期用 `transpileModule` 轉譯專案套件的 `.ts`／`.tsx`，這是 `typescript` 在本 repo 唯一的 API 使用處（`grep` 全 repo），所以升級會讓載入器壞掉，不只是型別檢查。只升型別檢查用的根 devDependency 不可行：根 `typescript` 在 `dependencies` 內、也是載入器的執行期相依。
+**重看條件**：`typescript` 發佈穩定（非 `unstable/`）的 transpile API，或維護者決定讓 `package-loader-node` 改用別的轉譯器（屬行為變更，不在依賴升級範圍）。條件成立才補 CSS 宣告並一起升所有釘版。

@@ -1,21 +1,13 @@
 {
   "_comment": "Reviewed-but-not-now decisions for tools/check_dependency_freshness.py. A deferral is for a floor that would genuinely break something if raised right now, with the reason recorded here; it is not a place to park 'waiting for upstream to move first'. Each entry needs deferredLatest so it expires by itself once the registry moves past the release it was reviewed against; a permanent policy belongs on the declaring line as `# freshness-hold:` instead. A not-yet-verified major or dependency change may also be parked here, but the reason must name the verification that is missing.",
   "deferrals": {
-    "@hyperframes/engine": {
-      "deferredLatest": "0.9.16",
-      "reason": "Reviewed npm metadata on 2026-11-05: 0.9.16 requires Node >=22, puppeteer ~25.11.0 and the 0.9.16 Hyperframes family; producer pins its internal packages exactly. Keep 0.7.101 pending the existing ROADMAP acceptance: a complete provider-hyperframes-local Chromium render including the 13 previously skipped tests, plus the full Windows gate. No 0.9.x render or compatibility test has passed; the earlier 0.8.221 trial is not evidence for 0.9.16. Compared with 0.9.15, engines and external dependencies are unchanged; only internal Hyperframes versions advance. Re-review when that verification is available or the registry advances."
-    },
-    "@hyperframes/producer": {
-      "deferredLatest": "0.9.16",
-      "reason": "Reviewed npm metadata on 2026-11-05: 0.9.16 requires Node >=22, puppeteer ~25.11.0 and the 0.9.16 Hyperframes family; producer pins its internal packages exactly. Keep 0.7.101 pending the existing ROADMAP acceptance: a complete provider-hyperframes-local Chromium render including the 13 previously skipped tests, plus the full Windows gate. No 0.9.x render or compatibility test has passed; the earlier 0.8.221 trial is not evidence for 0.9.16. Compared with 0.9.15, engines and external dependencies are unchanged; only internal Hyperframes versions advance. Re-review when that verification is available or the registry advances."
-    },
     "@types/node": {
       "deferredLatest": "26.6.6",
       "reason": "major above the supported Node 22/24 runtimes (declared 24.10.1); types must match the runtime, so raising to 26.x would type APIs the runtime does not have. Cannot be raised until the supported runtime moves to Node 26."
     },
     "typescript": {
       "deferredLatest": "7.0.2",
-      "reason": "Trial on 2026-10-31 with the root typescript at 7.0.2: pnpm check fails with TS2882 in packages/studio/src/ui/main.ts(19,8) (side-effect import of '../style.css' has no type declarations). Missing before it can be raised: an ambient declaration for CSS side-effect imports, then a clean pnpm check and test run with 7.x, and the same for the typescript pins in packages/cli, packages/package-loader-node and the examples/*/packages/* manifests (not tried)."
+      "reason": "Trial on 2026-11-07 with every typescript pin at 7.0.2 (root, packages/cli, packages/package-loader-node, examples/*/packages/*): pnpm check fails with 4 x TS2305 in packages/package-loader-node/src/module-scope.ts(8,10..53) (\"Module 'typescript' has no exported member 'transpileModule' / 'ModuleKind' / 'ScriptTarget' / 'JsxEmit'\") and TS2882 in packages/studio/src/ui/main.ts(19,8) (side-effect import of '../style.css' has no type declarations). The TS2305 errors are real: typescript 7.0.2's only public entry point exports version and versionMajorMinor (node_modules/typescript/package.json exports '.' -> lib/version.cjs), the compiler API lives under the unstable/* subpaths, and package-loader-node transpiles project .ts/.tsx files at runtime with transpileModule. Re-review when typescript publishes a stable (non-unstable/) transpile API, or when the maintainer decides to give package-loader-node a different transpiler; only then add the CSS side-effect declaration for TS2882 and move every pin together."
     }
   }
 }

@@ -22,8 +22,8 @@
     }
   },
   "dependencies": {
-    "@hyperframes/engine": "0.7.101",
-    "@hyperframes/producer": "0.7.101",
+    "@hyperframes/engine": "0.9.20",
+    "@hyperframes/producer": "0.9.20",
     "@hypit/endpoint-kit": "workspace:*",
     "@hypit/hyperframes": "workspace:*",
     "@hypit/media": "workspace:*",
