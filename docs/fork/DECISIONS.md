@@ -466,7 +466,7 @@ PR 內容裡沒有本線也存在的安全或資料遺失問題，所以不另�
 
 ## 2026-11-07：Hyperframes 升到 0.9.20；TypeScript 7 試升失敗，維持延後
 
-**上游**：`hypit-ai/hypit` `main`（`2d31e887`）仍是 `typescript` 5.9.3，且沒有 `@hyperframes/*` 相依，沒有可跟的版本。
+**上游**：`hypit-ai/hypit` `main`（`2d31e887`）仍是 `typescript` 5.9.3，沒有可跟的版本；上游沒有 `@hyperframes/*` 相依，是因為它在 `589062ef`（"own HTML programs and local frame rasterization"，2026-10-07，已在審核基線 `8efbac03` 內）整個刪掉了 `packages/provider-hyperframes-local`，改由自有的 `html-program` 等套件處理。本 fork 的基底仍是 v0.2.8 加移植，保留並升級這個套件，所以 `@hyperframes/*` 是本 fork 自己的相依。
 
 **`@hyperframes/engine`／`producer` 0.7.101 → 0.9.20（已升，deferral 已移除）**：ROADMAP 寫 0.9.16，但 registry 在 11-07 已是 0.9.20，deferral 的 `deferredLatest`（0.9.16）因此失效，月報會對 0.9.20 轉紅，所以直接升到當天最新。兩者精確釘版，鎖檔重產（pnpm 10.33.0）。Node 要求 >=22，與 `engines` `>=22.15.0` 相容。
 - 驗收（同一台機器、同一個受管 Chrome Headless Shell 152.0.7928.2、`HYPIT_BROWSER_TESTS=1`、`--test-concurrency=1`、`packages/provider-hyperframes-local/test/*.test.ts` 全部）：升級前基線 53 項、通過 49、失敗 0、略過 4；升級後 53 項、通過 49、失敗 0、略過 4。略過的 4 項是 Windows 專屬 skip（`process.platform === "win32"`），不是瀏覽器閘門；ROADMAP 說的「13 項略過」是未設 `HYPIT_BROWSER_TESTS` 時的狀態，現在都有實跑，含 `local HyperFrames Provider really renders a silent frame-exact MP4 with parallel workers` 與 `explicit browser renders without installing a managed replacement`。`pnpm check` exit 0。

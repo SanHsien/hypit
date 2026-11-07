@@ -24,6 +24,7 @@
 | `tools/upstream_baseline.json` | 上游已審核水位紀錄 |
 | `tools/check_dependency_freshness.py` | 每月依賴下限與 Actions 釘選新鮮度檢查 |
 | `tools/tests/` | 上述兩支 Python 檢查腳本的 `unittest`；由 `test/fork-tools.test.ts` 掛進 `pnpm test` |
+| `packages/provider-hyperframes-local`、`@hyperframes/engine`／`producer` | 上游在 `589062ef` 刪除該套件（改為自有 `html-program` 等），本 fork 仍保留並自行升級其 `@hyperframes/*` 相依；是否續留見 ROADMAP |
 | `hypit.cmd` | Windows 啟動器（取代上游的 POSIX `hypit` 腳本）；`test/hypit-cmd.test.ts` 驗證含 `(`、`)`、`&` 的安裝路徑 |
 | `.github/workflows/publish-npm.yml`（Fork patch） | `version`、`publish` job 限定 `github.repository == 'hypit-ai/hypit'`；fork 不發佈 npm（見 DECISIONS 2026-11-07） |
 | `.github/workflows/upstream-check.yml` | 每週對 `upstream/main` 檢查新 commit 與 ticket |
