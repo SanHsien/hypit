@@ -482,3 +482,44 @@ packages/studio/src/ui/main.ts(19,8): error TS2882: Cannot find module or type d
 ```
 10-31 的判斷（只缺 CSS 宣告）不完整：TS2305 是真的相容性問題，不是型別宣告。`typescript@7.0.2` 的 `exports["."]` 是 `lib/version.cjs`，只匯出 `version`／`versionMajorMinor`；編譯器 API 在 `unstable/*` 子路徑。`package-loader-node` 在執行期用 `transpileModule` 轉譯專案套件的 `.ts`／`.tsx`，這是 `typescript` 在本 repo 唯一的 API 使用處（`grep` 全 repo），所以升級會讓載入器壞掉，不只是型別檢查。只升型別檢查用的根 devDependency 不可行：根 `typescript` 在 `dependencies` 內、也是載入器的執行期相依。
 **重看條件**：`typescript` 發佈穩定（非 `unstable/`）的 transpile API，或維護者決定讓 `package-loader-node` 改用別的轉譯器（屬行為變更，不在依賴升級範圍）。條件成立才補 CSS 宣告並一起升所有釘版。
+
+## 2026-11-07：上游 PR #463–#475、issue #460–#474 分流
+
+**範圍與結果**：release 軌沒有新版（`v0.3.1` 之後 `upstream/main` 是 `2d31e887`，領先 21 個 commit，沒有 `v0.3.2` tag）。PR #463–#472、#475 全部 OPEN、沒有一筆已合併，所以**沒有可 cherry-pick 的項目，採納 0**；先查缺陷在 fork 是否存在，再分流。PR 11 筆：延後 5、不適用 6；issue 5 筆：延後 1、不適用 4。已取 11 個 PR 現行 head 的全 diff 掃描隱藏內容（判準八：行內長空白、`eval(`、`new Function(`、`globalThis`、200 字元以上 base64、120 字元以上 hex、超過 600 字元單行），命中只有 #475 日文 README 的 5 行長行，無隱藏內容。
+
+**commit（21 個，release 軌不逐筆審）**：`8efbac03..2d31e887` 全是 0.3.2 線的內容：Bach model package 與 HypiHub provider（#390）、可嵌入 HTML 文件輸出（#387）、`media-local` 影格重用效能（#389）、0.3.2 發版準備、遷移指南與 README、微信 QR／合作夥伴行銷、發佈與範例相依（`7a0952ae`、`8a9c0538`、`a3824065`）。沒有針對 v0.2.8 基底可套用的安全、CI 壞掉或 Windows 修正，也沒有已合併的 PR 可提前取；等上游打 `v0.3.2` tag 再整批審，併入「升到上游 0.3」。
+
+**PR #464 的 npm 釘版**：不適用。`publish-npm.yml` 的 `version`、`publish` 兩個 job 在 fork 已被 `b641cce1` 限定 `github.repository == 'hypit-ai/hypit'`（檔內第 29、78 行），fork 上這兩個 job 永遠 skipped，`npm install --global npm@11`（第 90 行）不會執行；釘版屬上游發佈線，fork 不跟。同一 PR 的另一半（`persist-credentials: false`）對 fork 成立，見下表。
+
+### PR
+
+「缺陷在 fork 存在」指讀 fork 原始碼確認同一路徑存在，未在 fork 上實機重現上游的重現步驟。
+
+| PR | head | 裁決 | 一行理由（fork 實況） |
+|---|---|---|---|
+| #463 yt-dlp 執行期相依安全更新 | `24234b27` | 不適用 | 只改 `uv.lock`；fork 的 `services/yt-dlp/uv.lock` 已是 brotli 1.2.1、brotlicffi 1.2.1.0、certifi 2026.10.19（修補版 2026.10.18） |
+| #464 移除 checkout 持久 token、釘 npm | `cb3d7657` | **延後**（已釘 monitored） | `ci.yml:25`、`sync-hypihub-docs.yml:20` 的 `actions/checkout` 沒有 `persist-credentials: false`，縱深防禦、無已知利用；npm 釘版部分不適用（見上）。觸發：上游合併，或下次動這兩個 workflow |
+| #465 vite、sharp、puppeteer-core、tsx 安全更新 | `9742c989` | 不適用 | fork 鎖檔已在或超過修補版：sharp 0.35.5、vite 8.3.6／docs 用 6.4.5、puppeteer-core 25.16.0、tsx 4.23.15、zod 4.6.7、esbuild 0.28.2／0.25.12、source-map-js 1.2.2；fork 的 Dependabot open alert 沒有這些套件。其套件版本號 0.2.1 的調整屬上游發佈線 |
+| #466 Pollo 不帶 API key 跟隨轉址 | `1e8102c1` | **延後**（已釘 monitored） | 缺陷在 fork 存在：`packages/provider-pollo/src/provider.ts:67` 以 `x-api-key` 呼叫 `fetch`，沒有 `redirect` 選項，預設跟隨轉址，自訂標頭會帶往轉址目標（依 PR 說明，undici 只丟 `authorization`／`cookie`）。需要設定的 Pollo origin 回 3xx 才觸發；影響是計費憑證外洩。觸發：上游合併，或 fork 設了非官方 `baseUrl`。移植時 diff 路徑不同（fork 單檔 `provider.ts`），要補修前失敗的測試 |
+| #467 Result 檔案讀取不經 symlink 離開 Result | `e0468cec` | **延後**（已釘 monitored） | 缺陷在 fork 存在：`packages/build-result/src/store.ts:275`、`:542` 只做字面包含檢查（`containedResultPath`），沒有 `realpath`，symlink 或被連結的 Build 目錄會讀到 Result 外。需要使用者解壓他人提供的 Result 封存才觸發。上游 diff 檔案在 `packages/result/src/node/store.ts`，路徑不同，要依判準四移植。觸發：上游合併，或 fork 開始匯入他人的 Result 封存 |
+| #468 範例鎖檔安全更新 | `97f7b62f` | 不適用 | 只動 `examples/*/package-lock.json`；fork 範例走 pnpm workspace，只有 `examples/complex-explainer/package-lock.json` 一個鎖檔，且其中沒有 esbuild、zod 條目 |
+| #469 移除多項多項式回溯 | `907758ce` | **延後**（已釘 monitored） | 11 個告警逐筆對照：fork 存在的只有兩處且輸入都是自己寫的／設定的。`packages/comment-sticker/src/surface.ts:64` 的 `/\n\s*$/u` 為二次方（實測 20000 個換行後接字元 192 ms、40000 個 768 ms）；`packages/provider-hypihub/src/provider.ts:86`、`upload.ts:47` 的 `/\/+$/u` 為設定的 base URL。其餘 fork 沒有（`visual-track`、`text-fine`、`runtime-local/src/node.ts` 不存在）或已修（markup `REFERENCE` 為線性，2026-10-24）。觸發：上游合併，或實際遇到 sticker 文字／base URL 卡住 |
+| #470 WhisperX 執行期相依安全更新 | `d46a4363` | 不適用 | 路徑是 `packages/provider-whisperx-local/runtime`，fork 在 `services/whisperx`：鎖檔已有 pillow 13.0.0、urllib3 2.8.0、nltk 3.10.4、certifi 2026.10.19、lightning 2.6.6，`requires-python` 已是 `>=3.11,<3.14`，`resources.py:58` 已處理 `LookupError`；fork 在該檔案的 open alert 只剩 torch、transformers，正是 PR 自己「刻意不修」的那一組。aiohttp 3.14.4、mako 1.4.2、setuptools 84.1.0 比 PR 略舊但沒有對應 open alert |
+| #471 Studio 以沙箱文件提供素材與 Result | `fc696ccc` | **延後**（已釘 monitored） | 缺陷在 fork 存在：`packages/studio/src/server.ts:717-760` 的 `/__studio/material/*`、`/__studio/artifact` 以檔案自帶的 media type 回應（含 `image/svg+xml`），沒有 CSP sandbox 或 `nosniff`；`packages/studio/start.ts:155` 的 `fs.allow` 含工作區。在 Studio 來源開啟惡意 SVG 即可執行腳本並打 `/__studio/source` 等修改端點，需使用者以文件開啟素材網址、來源是他人提供的素材。本機 Studio，非遠端可達。觸發：上游合併，或 fork 開始載入他人提供的專案／素材。移植要含 `/@fs` 中介層與測試 |
+| #472 html-local 只回應自己的 loopback host | `494cd0dd` | 不適用 | `packages/provider-html-local` 在 fork 不存在（0.3 才有，fork 用 `provider-hyperframes-local`）；該套件的本機伺服器在 `@hyperframes/producer` 內，不是這份程式 |
+| #475 日文 README | `f10188ec` | 不適用 | 新增 `README.ja.md` 並改 `README.md`／`README.zh-CN.md` 的語言切換列；fork 的 README 是繁中主檔加 `README.en.md`、已刪簡中版，語言列結構不同，不引入 |
+
+### Issue
+
+| Issue | 狀態 | 裁決 | 一行理由 |
+|---|---|---|---|
+| #460 inline `visual:Pose` 編譯失敗 | open | 不適用 | `@hypit/visual-track` 是 0.3 套件，fork 沒有（`packages/` 無 `visual-track`） |
+| #461 提案：Skill 版本與相容性唯讀 preflight | open | 不適用 | 設計提案，沒有修正；其觀察的 `@hypit/html-video@1`、`@hypit/markup/run@1` 是 0.3 識別字 |
+| #462 重用 whisper.cpp 做 Apple Silicon Metal 轉錄 | open | 不適用 | 新功能，目標平台是 macOS／Metal；fork 是 Windows 專屬 |
+| #473 含付費影片組件的已完成工程 Studio projection unresolved | open | **延後** | fork 有同一段程式（`packages/studio/src/execute.ts`、`programme.ts:162`）與 `minimax-h3` 套件，缺陷可能存在，但報告基於 0.3.1、需要付費生成才能重現，fork 未重現，上游也沒有修正 PR。觸發：上游出修正 PR，或 fork 使用者遇到 |
+| #474 #473 的簡中版 | closed（重複，已指向 #473） | 不適用 | 重複 |
+
+### 水位與後續
+
+`reviewed_pr_through` 推到 475、`reviewed_issue_through` 推到 474、`reviewed_date` 2026-11-07；`reviewed_through`／`reviewed_release` 不動（無新 release）。延後的 5 個 PR（#464、#466、#467、#469、#471）釘進 `tools/upstream_baseline.json` 的 `monitored`（head 與 state=open），上游合併或改動時 `Upstream check` 會再提醒；#473 沒有 PR，只列在 ROADMAP。重看條件寫在上表，後續工作列在 ROADMAP 中期表「移植等上游合併的修正」。
+**判斷備註**：#466、#467、#471 都符合 ROADMAP「能由外部輸入觸發的安全修正可在上游合併前先移植」，本輪的範圍是分流與水位，沒有提前移植；是否提前由維護者決定。

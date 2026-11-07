@@ -3,15 +3,40 @@
   "branch": "main",
   "reviewed_through": "8efbac03ed10929b0f4a3c79fe2b3f77b6479daf",
   "reviewed_release": "v0.3.1",
-  "reviewed_date": "2026-11-02",
-  "reviewed_pr_through": 459,
-  "reviewed_issue_through": 456,
+  "reviewed_date": "2026-11-07",
+  "reviewed_pr_through": 475,
+  "reviewed_issue_through": 474,
   "track": "release",
   "decision_log": "docs/fork/DECISIONS.md",
   "monitored": [
     {
       "item": "pr#458",
       "head": "dbabd8c3fe7d30d44461830ace9fe8627ff3d4ae",
+      "state": "open"
+    },
+    {
+      "item": "pr#464",
+      "head": "cb3d765765cebd1804ac9b938ac4ff32b953eefd",
+      "state": "open"
+    },
+    {
+      "item": "pr#466",
+      "head": "1e8102c1c3c6cd4411d5a1657344f1de7e0c0a7c",
+      "state": "open"
+    },
+    {
+      "item": "pr#467",
+      "head": "e0468cec7493604c040b0867415c73eb6559fbf5",
+      "state": "open"
+    },
+    {
+      "item": "pr#469",
+      "head": "907758ce8742b5e2864eb9fc0b5dedf7bc42102f",
+      "state": "open"
+    },
+    {
+      "item": "pr#471",
+      "head": "fc696ccce02f54e4c59bdcd8964921e528f1f183",
       "state": "open"
     }
   ]
