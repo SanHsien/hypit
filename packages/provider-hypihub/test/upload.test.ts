@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { HypiHubUploader } from "../src/upload.js";
+import { HypiHubUploader, trimTrailingSlashes } from "../src/upload.js";
 
 const input = { bytes: new Uint8Array([1, 2, 3, 4]), mediaType: "video/mp4" };
 const retry = (status: number, code = "rate_limited") => Response.json({ error: { code } }, { status, headers: { "retry-after": "0" } });
@@ -290,4 +290,25 @@ test('large uploads sign at most 128 parts per request and complete every part',
   });
   await f.uploader().upload({ ...input, bytes: new Uint8Array(129) }, 'test-key');
   assert.deepEqual(batches, [128, 1]);
+});
+
+// Ported from upstream PR hypit-ai/hypit#469 before it was merged.
+test("trailing slashes are trimmed from base URLs in linear time", async () => {
+  assert.equal(trimTrailingSlashes("https://hub.test/v1///"), "https://hub.test/v1");
+  assert.equal(trimTrailingSlashes("https://hub.test/v1"), "https://hub.test/v1");
+  assert.equal(trimTrailingSlashes("///"), "");
+  assert.equal(trimTrailingSlashes("a//b"), "a//b");
+  const startedAt = performance.now();
+  assert.equal(trimTrailingSlashes(`${"/".repeat(100_000)}x`).length, 100_001);
+  assert.ok(performance.now() - startedAt < 1_000, "pathological base URL took too long");
+  const calls: string[] = [];
+  const uploader = new HypiHubUploader({
+    baseUrl: " https://hub.test/v1// ", requestTimeoutMs: 5000, uploadPartAttempts: 1,
+    fetch: async (resource) => {
+      calls.push(String(resource));
+      return Response.json({ upload_mode: "single_put", upload_id: "up_test" }, { status: 400 });
+    },
+  });
+  await assert.rejects(uploader.upload(input, "test-key"));
+  assert.equal(calls[0], "https://hub.test/v1/files/uploads");
 });

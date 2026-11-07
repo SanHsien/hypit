@@ -200,3 +200,30 @@ test("Track Surface lowers mixed program and semantic Stickers to a finite expli
   ].sort());
   assert.equal(result.components.find((component) => component.outputs.track !== undefined)?.outputs.track, "comments.track");
 });
+
+// Ported from upstream PR hypit-ai/hypit#469 before it was merged (fixtures adapted to this fork's test file).
+test("body comment text is dedented and a long trailing newline run stays linear", async () => {
+  const refs = new Map<string, SurfaceResolvedReference>([
+    ["video.canvas", authored("video.canvas", spatialTypes.canvas, canvas)],
+    ["video.timeline", authored("video.timeline", timelineTypes.track, semantic)],
+    ["layout.comment", authored("layout.comment", spatialTypes.frame, frame)],
+    ["social", authored("social", commentStickerTypes.style, style)],
+  ]);
+  const decode = (body: string) => decodeCommentStickerTrackSurface({
+    sourceName: "fixture.svml",
+    element: parsed(`<comment:Track id="comments" canvas={video.canvas} timeline={video.timeline}><comment:Sticker id="one" frame={layout.comment} style={social} during="program">${body}</comment:Sticker></comment:Track>`),
+    resolveReference: (path) => refs.get(path),
+    resolveAsset: noAsset,
+  });
+  const comment = (result: Awaited<ReturnType<typeof decode>>) => {
+    const record = result.records.find((entry) => entry.id === "comments.item.0001.comment");
+    assert.equal(record?.value.kind, "inline");
+    return (record.value.value as unknown as { readonly value: string }).value;
+  };
+  assert.equal(comment(await decode("\n      First line\n        indented\n      ")), "First line\n  indented");
+  assert.equal(comment(await decode("Same line  \n \t\n  ")), "Same line");
+  const startedAt = performance.now();
+  const long = await decode(`\n  Hello${"\n".repeat(200_000)}  x\n  `);
+  assert.ok(performance.now() - startedAt < 1_000, "pathological comment body took too long");
+  assert.equal(comment(long), `Hello${"\n".repeat(200_000)}x`);
+});
