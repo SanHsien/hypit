@@ -559,3 +559,34 @@ packages/studio/src/ui/main.ts(19,8): error TS2882: Cannot find module or type d
 **處理**：`pnpm-workspace.yaml` 的 `overrides` 加 `undici: ^7.30.1`（留在 7.x 主版內，與 `hono`、`@hono/node-server` 的前例一致），鎖檔以 pnpm 10.33.0 重產，解到 `undici@7.30.2`，鎖檔只動這一個套件三行；`pnpm install --frozen-lockfile` 通過。
 
 **驗證**：`HYPIT_BROWSER_TESTS=1`、`--test-concurrency=1` 跑 `packages/provider-hyperframes-local/test/*.test.ts`（真實受管 Chrome）：53 項、通過 49、失敗 0、略過 4，與 2026-11-07 Hyperframes 升級時的基線相同。**限度**：告警要推送後 GitHub 重掃才會轉 fixed，本機只能確認鎖檔解到 7.30.2（高於所有告警列的修補版 7.28.0／7.29.0／7.29.1／7.30.1）；`@hyperframes/engine` 自己用 undici 的路徑（下載、HTTP 請求）沒有專屬測試，只靠上述算圖測試涵蓋。**重看條件**：`@hyperframes/engine` 改成範圍宣告或不再相依 undici 時移除此 override。
+
+## 2026-11-10：上游 PR #485–#486、issue #476–#484 分流
+
+**範圍與結果**：release 軌沒有新版（`v0.3.1` 之後仍無 `v0.3.2` tag，`git ls-remote --tags upstream` 最新為 `v0.3.1`）；`upstream/main` 由 `2d31e887` 前進到 `3e49a974`，領先 `8efbac03` 共 23 個 commit，多出的兩個是 #485（`2ca4e5d2`）與 #486（`3e49a974`），均已於 2026-11-09 合併。PR 2 筆：延後 1、不適用 1；issue 9 筆：全部不適用或已由前輪裁決涵蓋（#476–#478、#480、#481、#482 對應前輪已分流的 PR，#479、#483、#484 不適用）。**採納 0、無程式碼改動。**
+
+**隱藏內容掃描**：取 #485（head `877a7a19`，+909/-0，15 檔）與 #486（head `6fb828a4`，+22/-0，4 檔）的全 diff，掃描 `eval(`、`new Function(`、`globalThis`、200 字元以上 base64、120 字元以上 hex、超過 600 字元單行、行內 40 字元以上空白。命中只有 #485 三行 `globalThis.fetch`（型別與預設 fetcher，無動態執行）；其餘無命中。
+
+### PR
+
+| PR | head | 狀態 | 裁決 | 一行理由（fork 實況） |
+|---|---|---|---|---|
+| #485 Sume 提供者（`@hypit/provider-sume`） | `877a7a19` | MERGED（`2ca4e5d2`） | **延後**（併入「升到上游 0.3」） | 新增第三方服務的提供者套件，不是安全或壞掉修正，release 軌不逐筆審。移植不可行：它建在 0.3 的端點 API（`@hypit/hypit/endpoint`、`@hypit/hypit/endpoint/http`、`defineEndpoint`、`credentialRef`），fork 現行套件（`provider-tokendance`、`provider-pollo`、`provider-hiapi`）用的是 `@hypit/endpoint-kit`，兩者不相容；另需 `scripts/check-independent-runtime-packages.mjs`（fork 沒有此檔）。觸發：上游打 `v0.3.2` 以上並升 0.3 時一併取得，屆時再決定是否保留 |
+| #486 README 加 Sume 為發行夥伴 | `6fb828a4` | MERGED（`3e49a974`） | 不適用 | 只改 `README.md`、`README.zh-CN.md` 的夥伴表並加兩張 logo 圖；fork 的 README 是繁中主檔加 `README.en.md`、已刪簡中版，夥伴行銷屬上游，不引入（同 #475 的處理） |
+
+### Issue
+
+| Issue | 狀態 | 裁決 | 一行理由 |
+|---|---|---|---|
+| #476 Pollo API key 隨 3xx 轉址外送 | open | 已涵蓋 | 就是 #466 的缺陷；fork 已於 2026-11-07 移植（`redirect: "manual"`）。#466 仍 OPEN、`monitored` 保留 |
+| #477 Result 內 symlink 讀到 Result 外 | open | 已涵蓋 | 就是 #467 的缺陷；fork 已於 2026-11-07 移植（`physicalResultPath`）。同一 issue 提到的 `external-file` 另案，fork 沿用 #467 不處理的範圍 |
+| #478 Studio 提供的 SVG 在 Studio 來源執行腳本 | open | 已涵蓋 | 就是 #471 的缺陷；fork 已於 2026-11-07 移植（`inertMedia()`、`/@fs` 中介層） |
+| #479 本機算圖伺服器接受任意 Host（DNS rebinding） | open | 不適用 | 缺陷在 `packages/provider-html-local/src/server.ts`；該套件在 fork 不存在（`packages/` 無 `provider-html-local`），與 #472 的裁決相同 |
+| #480 Dependabot 告警（npm、yt-dlp、WhisperX 鎖檔） | open | 已涵蓋 | 總覽 issue，指向 #463、#465、#468、#470，四筆已於 2026-11-07 裁決「不適用」（fork 鎖檔已在或超過修補版）；fork 的 torch、transformers 告警維持延後（見 2026-10-26 條目，不以 override、dismiss 或移除 WhisperX 處理） |
+| #481 CodeQL 告警分流 | open | 已涵蓋 | 指向 #469，fork 已移植存在的兩處（`dedent`、`apiBaseUrl`）；visual-track、runtime-local 的條目 fork 沒有；#445 與 #439 是 markup、text-fine 的既有修正 |
+| #482 CI 移除持久 checkout token、釘 npm | open | 已涵蓋（延後） | 就是 #464；`ci.yml:25`、`sync-hypihub-docs.yml:20` 的 `actions/checkout` 仍沒有 `persist-credentials: false`（`grep persist-credentials .github/workflows` 其餘 7 個 workflow 都有），縱深防禦、無已知利用；觸發條件不變：#464 上游合併，或下次動這兩個 workflow。npm 釘版不適用（`publish-npm.yml` 在 fork 永遠 skipped） |
+| #483 服務夥伴提案：Sidera | open | 不適用 | 向上游提的夥伴與提供者收錄提案，沒有缺陷、沒有修正；提供者是作者自己的 npm 套件，不屬 fork。fork 不收錄新的第三方服務夥伴 |
+| #484 `[Bug]` 標題空白 | open | 不適用 | 內文是一份 3D 動畫影片腳本 JSON 與越南語分鏡表，沒有重現步驟、版本、日誌，也沒有描述任何程式缺陷 |
+
+### 水位與後續
+
+`reviewed_pr_through` 推到 486、`reviewed_issue_through` 推到 484、`reviewed_date` 2026-11-10；`reviewed_through`／`reviewed_release` 不動（無新 release）。`monitored` 六筆（#458、#464、#466、#467、#469、#471）head 與 state 逐筆重查，皆仍 OPEN、head 未變，不動。#485 的後續併入 ROADMAP 中期表「升到上游 0.3」。
