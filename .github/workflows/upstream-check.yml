@@ -47,7 +47,8 @@ jobs:
 
       - name: Publish report
         if: always()
-        run: cat upstream-review-report.md >> "$GITHUB_STEP_SUMMARY"
+        run: |
+          if [ -f upstream-review-report.md ]; then cat upstream-review-report.md >> "$GITHUB_STEP_SUMMARY"; fi
 
       - name: Require review when upstream changed
         if: steps.upstream.outcome == 'failure'

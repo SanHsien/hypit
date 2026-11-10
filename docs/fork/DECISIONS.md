@@ -334,7 +334,7 @@ Alert 編號的來源：雲端工作環境查詢時回 `403 Resource not accessi
 
 ### 刻意不修
 
-- **`upstream-review-report.md` 被追蹤進 git**：`check_upstream_updates.py` 預設把報告寫到 repo 根目錄，每次 `dev_check.ps1` 都會改動這個被追蹤的檔，內容（HEAD、數字）永遠過期，也讓「保持乾淨工作目錄」做不到。正解是 `git rm --cached` 並加進 `.gitignore`，但那是從 repo 移除檔案，需要維護者決定；沒有動它。
+- **`upstream-review-report.md` 被追蹤進 git**：`check_upstream_updates.py` 預設把報告寫到 repo 根目錄，每次 `dev_check.ps1` 都會改動這個被追蹤的檔，內容（HEAD、數字）永遠過期，也讓「保持乾淨工作目錄」做不到。正解是 `git rm --cached` 並加進 `.gitignore`，但那是從 repo 移除檔案，需要維護者決定；沒有動它。（**已由 2026-11-10 的決定推翻**，見文末該節。）
 - **`check_dependency_freshness.py` 只讀根目錄 `package.json`**：`packages/*/package.json` 的 registry 相依（`@hyperframes/engine`、`@hyperframes/producer`、`@aws-sdk/*`、約 100 個 `@fontsource*`）完全不在月報裡。補上會一次出現大量新紅燈，其中字型套件是刻意精確釘版，需要先決定哪些要 hold／deferral，不是機械修正；留給維護者。（**已由 2026-10-30 的改動補上**：檢查器現在讀所有 workspace manifest，見文末「2026-10-30」一節。）
 - **`publish-npm.yml` 未限定在上游 repo**：fork 若發 release 會嘗試走 npm trusted publishing；該信任綁在 `hypit-ai/hypit`，在 fork 只會失敗而不會發出去。要不要像 `sync-hypihub-docs.yml` 一樣加 `if: github.repository == 'hypit-ai/hypit'` 取決於 fork 是否可能自行發佈，未改。（**已由 2026-11-07 的決定處理**。）
 - **`packages/markup/test/reference.test.ts` 的 50ms 牆鐘上限**：病態輸入修前要約 13 秒，50ms 在極重負載下理論上會誤報，但這次整套測試並行跑時穩定通過，沒有可重現的失敗，不動。
@@ -590,3 +590,11 @@ packages/studio/src/ui/main.ts(19,8): error TS2882: Cannot find module or type d
 ### 水位與後續
 
 `reviewed_pr_through` 推到 486、`reviewed_issue_through` 推到 484、`reviewed_date` 2026-11-10；`reviewed_through`／`reviewed_release` 不動（無新 release）。`monitored` 六筆（#458、#464、#466、#467、#469、#471）head 與 state 逐筆重查，皆仍 OPEN、head 未變，不動。#485 的後續併入 ROADMAP 中期表「升到上游 0.3」。
+
+## 2026-11-10：`upstream-review-report.md` 改為不追蹤
+
+決定：`git rm --cached upstream-review-report.md` 並加進 `.gitignore`。推翻 2026-10-27「刻意不修」的理由是當時只卡在「移除檔案需要維護者決定」；現由規劃長決定。
+
+- 為什麼：檢查器每次跑都改寫這個檔，內容（HEAD、數字）永遠過期，也讓工作目錄無法保持乾淨。
+- 為什麼安全：內容可隨時用 `python tools/check_upstream_updates.py` 重產，git 歷史保留舊版。
+- 相依檢查：全 repo grep，只有 `upstream-check.yml` 的 `Publish report` 步驟（同一個 job 先跑檢查器寫出報告再 cat，不依賴追蹤）、`docs/fork/UPSTREAM.md` 的說明文字與檢查器的預設輸出路徑引用它，沒有檔案連結指向它。該步驟加上檔案存在判斷，檢查器在寫報告前就失敗時不會讓步驟多報一個錯。
