@@ -598,3 +598,11 @@ packages/studio/src/ui/main.ts(19,8): error TS2882: Cannot find module or type d
 - 為什麼：檢查器每次跑都改寫這個檔，內容（HEAD、數字）永遠過期，也讓工作目錄無法保持乾淨。
 - 為什麼安全：內容可隨時用 `python tools/check_upstream_updates.py` 重產，git 歷史保留舊版。
 - 相依檢查：全 repo grep，只有 `upstream-check.yml` 的 `Publish report` 步驟（同一個 job 先跑檢查器寫出報告再 cat，不依賴追蹤）、`docs/fork/UPSTREAM.md` 的說明文字與檢查器的預設輸出路徑引用它，沒有檔案連結指向它。該步驟加上檔案存在判斷，檢查器在寫報告前就失敗時不會讓步驟多報一個錯。
+
+## 2026-11-13：`hono` override 下限 ^4.13.5 → ^4.13.18、`@hono/node-server` ^2.1.3 → ^2.1.6
+
+決定：提高 `pnpm-workspace.yaml` 兩個安全 override 的下限，鎖檔解析為 `hono` 4.13.18、`@hono/node-server` 2.1.6。
+
+- 為什麼：Hono 在 2026-11-12 發了一批通報，影響 <4.13.16，包括 GHSA-4m76-xfj5-7975（`mount()` 轉送的路徑可繞過 mount 前綴內的 middleware）、GHSA-46wx-v44x-9hh2、GHSA-4h7h-rv7c-7m2v、GHSA-h7mg-cq63-vhpq、GHSA-3gg2-335m-rxc6。原本的鎖檔是 4.13.12。`@hono/node-server` 2.1.6 修了 GHSA-qv5m-9pm6-hqp3 與 GHSA-jpvv-r467-5p4w；鎖檔原本已經是 2.1.6，這次只把下限對齊，避免日後退回。
+- 範圍：兩者都在原 major 內，鎖檔只動 `hono` 的版本與 integrity 兩處。
+- 證據：`pnpm install --lockfile-only` 完成；`pnpm audit --prod` 結果為 No known vulnerabilities found。`tools/dev_check.ps1` 全套 1070 pass、1 fail：`file-credentials` 的 CLI 登入測試在同機另有大型檢查並行時，子程序 55 秒逾時被砍，沒有任何輸出。單獨重跑兩次都通過（約 18 秒），與 hono 無關。
