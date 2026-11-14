@@ -606,3 +606,109 @@ packages/studio/src/ui/main.ts(19,8): error TS2882: Cannot find module or type d
 - 為什麼：Hono 在 2026-11-12 發了一批通報，影響 <4.13.16，包括 GHSA-4m76-xfj5-7975（`mount()` 轉送的路徑可繞過 mount 前綴內的 middleware）、GHSA-46wx-v44x-9hh2、GHSA-4h7h-rv7c-7m2v、GHSA-h7mg-cq63-vhpq、GHSA-3gg2-335m-rxc6。原本的鎖檔是 4.13.12。`@hono/node-server` 2.1.6 修了 GHSA-qv5m-9pm6-hqp3 與 GHSA-jpvv-r467-5p4w；鎖檔原本已經是 2.1.6，這次只把下限對齊，避免日後退回。
 - 範圍：兩者都在原 major 內，鎖檔只動 `hono` 的版本與 integrity 兩處。
 - 證據：`pnpm install --lockfile-only` 完成；`pnpm audit --prod` 結果為 No known vulnerabilities found。`tools/dev_check.ps1` 全套 1070 pass、1 fail：`file-credentials` 的 CLI 登入測試在同機另有大型檢查並行時，子程序 55 秒逾時被砍，沒有任何輸出。單獨重跑兩次都通過（約 18 秒），與 hono 無關。
+
+## 2026-11-15：依賴新鮮度與 OpenTelemetry 修補版
+
+- 升級：`@puppeteer/browsers` 3.2.6 → 3.2.7、`puppeteer-core` 25.16.0 → 25.17.0，所有直接宣告同步；`koffi` 3.3.7 → 3.3.8、`rollup` 4.68.0 → 4.68.3、`vite` 8.3.6 → 8.3.8。維持各自的 major，並以 pnpm 10.33.0 重產鎖檔。Puppeteer 要求 Node >=22.12，Vite 要求 Node ^20.19 或 >=22.12，均符合本 fork 的 Node >=22.15。
+- 升級理由：Puppeteer browsers 修正 Firefox 版本比較、重新導向錯誤傳遞與已安裝版本別名；puppeteer-core 25.17 增加事件與回應串流 API；Koffi 降低同步／非同步呼叫準備與釋放的開銷、延後回收暫時 trampoline、在 x86 32 位元平台強制 16 位元組堆疊對齊，並改用 MSVC v143 工具組；Rollup 修正非 ESM 輸出與陣列長度賦值的最佳化，並拒絕以 Windows 磁碟機相對路徑寫到輸出目錄外的檔名（4.68.2）；Vite 8.3.7 更新 Rolldown，8.3.8 修正 inline worker 引用的資產、`build.cssCodeSplit: false` 下的 CSS 進入點與設定載入檢查，並延後 Windows UNC 路徑的 `net use` 查詢（同版列出的 build `magicString` 修正已在同版還原）。
+- AWS：`@aws-sdk/client-lambda`（`packages/transport-aws-lambda`）、`@aws-sdk/client-s3`（`packages/build-result-s3`、`packages/resource-store-s3`）3.1164.0 → 3.1169.0，照 2026-10-31、11-06 的前例直接升級，不記延後。兩版之間的相依差異只有 `@smithy/*`、`@aws-sdk/*` 間接相依的 caret 下限小幅前進，engines 仍是 Node >=20。初稿曾以「缺少真實 AWS 驗證」記延後，與前例及 `dependency-deferrals.json` 的 `_comment` 不符，而且 AWS SDK 每個工作日發版（11-09 到 11-13 連五天），`deferredLatest` 隔一個工作日就失效，所以改為升級。**已知限度不變**：沒有連真實 AWS 測過 Lambda 呼叫與 S3 上傳／下載。
+- HyperFrames：engine／producer 成對 0.9.20 → 0.9.47，不記延後。相依變更：`puppeteer` `~25.11.0` → `~25.13.0`（仍由 `puppeteer@<25.16.0: ^25.16.0` override 提到 25.16.0）、`puppeteer-core` `^25.11.0` → `^25.13.0`、`undici` 精確釘 7.25.0 → 7.30.1（`undici: ^7.30.1` override 仍解到 7.30.2）、`hono` `^4.6.0` → `^4.13.16`、`@hono/node-server` `^2.0.5` → `^2.1.6`；engines 仍是 Node >=22。初稿記的延後所缺的驗證（Windows 真實瀏覽器 MP4 渲染）在本機跑得動，實跑通過（見下方驗證），所以直接升級。這不替代 ROADMAP 的套件去留決定。**已知限度**：與 2026-11-07 相同，沒有逐幀比對 0.9.20 與 0.9.47 的像素輸出，驗收是測試自身的斷言（幀數、時間軸、取樣、平行 worker）。
+- `undici` override 的現況：engine 0.9.47 自己釘的 7.30.1 已是 2026-11-07 那批告警的最高修補版，override 現在只是把它再提到 7.30.2；engine 仍是精確釘版，2026-11-07 寫的移除條件（改成範圍宣告或不再相依 undici）尚未成立，override 的值（`^7.30.1`）沒有動；`pnpm-workspace.yaml` 的註解本次改寫為「2026-11-07 加入時 engine 0.9.20 釘 7.25.0、engine 0.9.47 自己釘 7.30.1，override 留作下限」。
+- rolldown 1.2.19 新列出選用相依 `@rolldown/binding-wasm32-wasi`，鎖檔因此多了 `@emnapi/core`、`@emnapi/runtime`（2.0.0-beta.2，由該 binding 精確釘住的預發佈版）、`@emnapi/wasi-threads`、`@napi-rs/wasm-runtime`、`@tybys/wasm-util`；它們是選用相依，win32-x64 不會安裝使用。
+- 發布時間只作審查資訊，不新增固定天數的冷卻規則（repo 內沒有 `minimumReleaseAge` 或 Dependabot cooldown 設定）。本批最新的是 `@hyperframes/*` 0.9.47（2026-11-14 發佈）與 `koffi` 3.3.8、`rollup` 4.68.3、AWS 3.1169.0（皆 2026-11-13 發佈）。
+- [Dependabot #16](https://github.com/SanHsien/hypit/pull/16)：採用其 `1e42d90b9199087a56081ad3cbf534bc9ef2eb3a` 的鎖檔變更，只升 `opentelemetry-api`／`opentelemetry-sdk` 1.45.1 → 1.45.2 與 `opentelemetry-semantic-conventions` 0.66b1 → 0.66b2。此版限制 traceparent 標頭長度為 512 字元；該 PR 沒有先前 #7 的 onnxruntime 降級。不更動 torch、transformers、WhisperX 釘版與既有延後條件。
+
+**驗證**（2026-11-15，Windows 11、Node 26.12.1、pnpm 10.33.0、uv 0.12.17；除另外註明者，都在全部升級到位後的最終狀態跑）：
+
+| 指令 | exit | 結果 |
+| --- | --- | --- |
+| `pnpm install --frozen-lockfile` | 0 | 鎖檔與所有 manifest 一致 |
+| `pnpm check` | 0 | 型別檢查通過 |
+| `node test/run.mjs` | 0 | 1103 項、通過 1071、失敗 0、略過 32 |
+| `HYPIT_BROWSER_TESTS=1`、`HYPIT_CAPTURE_TEST_BROWSER=<本機 Chrome 157.0.8103.79>`、`node --import tsx --test --test-concurrency=1 packages/provider-hyperframes-local/test/*.test.ts packages/browser-capture/test/*.test.ts` | 0 | 57 項、通過 53、失敗 0、略過 4。`provider-hyperframes-local` 49 過／4 略過（Windows 專屬 skip），與 2026-11-07 的基線相同；`browser-capture` 4 項全過（不設 `HYPIT_CAPTURE_TEST_BROWSER` 時其中 3 項因快取沒有受管 Chrome 而略過） |
+| `node --import tsx --test` 跑 `packages/build-result-s3`、`packages/resource-store-s3`、`packages/transport-aws-lambda` 的測試 | 0 | 20 項全過（AWS 升級後、HyperFrames 升級前跑；之後的完整測試也含這三個檔） |
+| `python tools/check_dependency_freshness.py --strict` | 0 | 只剩 `@types/node`、`typescript` 兩筆既有延後，其餘 OK |
+| `pnpm audit --prod` | 0 | No known vulnerabilities found |
+| `uv lock --check`（`services/whisperx`） | 0 | Resolved 123 packages |
+| `pnpm test:whisperx-service` | 0 | 19 項全過；venv 實裝 `opentelemetry-api`／`sdk` 1.45.2、`semantic-conventions` 0.66b2、`torch` 2.8.0、`transformers` 4.57.6、`whisperx` 3.8.6（AWS 與 HyperFrames 升級前跑；之後 `uv.lock` 沒有再變） |
+| `pnpm build:public-types` | 0 | rollup 4.68.3 產出型別包（AWS 與 HyperFrames 升級前跑；之後 `rollup` 沒有再變） |
+| `gh pr diff 16 -R SanHsien/hypit` 對照本機 `uv.lock` 差異 | 0 | 增刪行逐行相同（+9／-9，只有三個 OpenTelemetry 套件） |
+
+沒跑、或紅燈與本批無關的：
+- `tools/dev_check.ps1` 整體 exit 1：型別檢查與完整測試都通過，紅在最後的 `check_upstream_updates.py --strict`（上游發了 v0.3.2，另有新 PR／issue 未分流）。上游分流另案處理，本節不涵蓋。
+- 沒有連真實 AWS；沒有實跑 WhisperX 對齊模型或任何需要 GPU 的測試；沒有跑 `pnpm docs:build`（vitepress 用的 vite 6.x 本批未動）；沒有逐幀比對算圖輸出。
+
+## 2026-11-15：上游 v0.3.2 審查（commit 25 筆、PR #487–#496、issue #489–#490）
+
+**範圍與結果**：上游打了 `v0.3.2`（`25454bed40bbb09eaf675e217ed9901fa8ef4f2a`）。release 軌 `8efbac03..25454bed` 共 25 個 commit；新 PR 8 筆（#487、#488、#491–#496）、新 issue 2 筆（#489、#490）。**採納 0、無程式碼改動**：commit 延後 9、不適用 16；PR 延後 1、不適用 6、不採用 1（#492）；issue 延後 2。tag 之後 `upstream/main` 另有 2 個 commit（`47bfe6e9` 微信 QR、`6bacce09` #495），release 軌不審。
+
+**為什麼沒有可採納的**：25 筆裡 21 筆在 2026-11-07 已看過（當時結論是「全是 0.3.2 線的內容，等打 tag 再整批審，併入升到上游 0.3」），這次逐筆對照 fork 的檔案確認結論不變；新增的 4 筆是 #485、#486（2026-11-10 已裁決）與 #487、#488。fork 的程式基底是 v0.2.8 加移植，這 25 筆動到的若不是 fork 沒有的套件／腳本，就是上游發佈線、行銷與 0.3 遷移文件。
+
+**「升到上游 0.3」的觸發條件**（ROADMAP 中期表）：兩項中「上游出 0.3.2 以上」已成立；「issue #388、#433 已修」未成立（2026-11-15 `gh issue view` 兩筆仍 OPEN）。所以這輪仍不升 0.3。
+
+**隱藏內容掃描**：對 `git diff 8efbac03..v0.3.2`（117 檔、+23765／-523）與 8 個 PR 現行 head 的全 diff，掃新增行的 `eval(`、`new Function(`、`globalThis`、200 字元以上 base64、120 字元以上 hex、超過 600 字元單行、行內 40 字元以上空白、零寬與雙向控制字元（U+200B–200F、U+202A–202E、U+2060–2064、U+FEFF、U+E0000–E007F）。命中只有：`globalThis.fetch`（range 3 行在 `provider-sume`，#491 4 行、#493／#494 各 1 行，都是預設 fetcher 或型別）、#494 一行 772 字元的 Markdown 表格列、#495 兩個 SVG 各 7 行約 1253 字元的 path 資料（該 diff 內沒有 `<script`、事件屬性或 `javascript:`）。零寬／雙向字元、`eval`、長 base64、長 hex 皆無命中。range 內 5 個二進位檔（`agentsky-*.png`、`sume-*.png`、`wechat_group.jpg`）無法以文字掃描，全屬不引入的行銷素材。
+
+### Commit（25 筆）
+
+「延後」一律併入 ROADMAP「升到上游 0.3」，重審條件即該列的觸發條件；「不適用」不重審。
+
+| Commit | 主題 | 裁決 | 理由（fork 實況） |
+| --- | --- | --- | --- |
+| `8a9c0538` | fix(release): load build tooling only when packing | 不適用 | 改 `scripts/release-candidate.mjs` 與其測試；fork 的 `scripts/` 沒有這支腳本，也不自行發佈（2026-11-07） |
+| `7a0952ae` | ci: publish tested artifacts without rebuilding | 不適用 | 上游發佈線：`publish-npm.yml` 在 fork 永遠 skipped，`select-release-run.mjs` 是發佈用。fork 有的兩支腳本只各動一處（`check-distribution.mjs` 可沿用 npm 快取、`pack-distribution.mjs` 加 `--types-built`），是配合新發佈流程的選項，不是缺陷修正 |
+| `03dc6a5e` | docs: add the 0.3 project migration guide | 延後 | 0.3 遷移指南；fork 還在 0.2 線，升 0.3 時才用得到（簡中版不引入） |
+| `62c372d6` | docs: move migration links to README help tables | 不適用 | 只改上游 `README.md`／`README.zh-CN.md`；fork 的 README 是繁中主檔加 `README.en.md` |
+| `56826802` | docs: add Chinese migration guides and README links | 不適用 | 簡中遷移指南與簡中 README；ROADMAP「刻意不做」 |
+| `847f43c5` | docs: link both migration guides from English README | 不適用 | 只改上游 README 連結 |
+| `4400f336` | chore(packages): record initial ecosystem releases | 不適用 | 把 9 個套件的版號由 `0.0.0-dev` 改成 `0.1.0` 並在 README 加 npm 安裝說明；上游發佈線，fork 的對應套件維持 `0.0.0-dev`（其中 `provider-beatapi`、`depth-stack` 在 fork 不存在） |
+| `a3824065` | fix(examples): install published ecosystem dependencies | 延後 | 讓範例改裝已發佈的 `^0.1.0`／`^0.3.1` 套件並加入 6 個 `package-lock.json`（+20516 行）；前提是上游已發佈的 0.3 套件，fork 範例走 pnpm workspace |
+| `6c9e274b` | Merge remote-tracking branch 'origin/main' | 不適用 | 合併 commit，沒有自己的內容 |
+| `8260cdc1` | docs: clarify optional component and partner provider installation | 延後 | 0.3 的選用套件安裝說明與遷移指南 |
+| `85e01c76` | docs: show optional package installation commands | 延後 | 同上 |
+| `7f22f0e3` | docs: add AgentSky as a launch partner | 不適用 | 合作夥伴行銷；ROADMAP「刻意不做」 |
+| `398ce9c6` | feat: add embeddable HTML document output (#387) | 延後 | 新套件 `html-document`，0.3 新功能（2026-10-25 已略過 #387） |
+| `ee423df5` `0d36de9a` `e26d9142` `0762c6be` `67c15455` | docs: update WeChat group QR code（5 筆） | 不適用 | 微信群 QR；fork 已移除該區塊 |
+| `dc2b7a8f` | perf(media-local): reuse video frames that meet normalization requirements (#389) | 延後 | 改 `packages/media-local`；fork 沒有這個套件（fork 是 `provider-media-local`），效能改善不是缺陷修正 |
+| `9b7a9772` | feat(bach): add model package and HypiHub provider support (#390) | 延後 | 新模型套件 `bach`；fork 沒有 |
+| `2d31e887` | chore(release): prepare 0.3.2 with Bach as a default dependency | 不適用 | 版號 commit |
+| `2ca4e5d2` | feat(sume): serve the installed video and image models on Sume (#485) | 延後 | 2026-11-10 已裁決，結論不變 |
+| `3e49a974` | docs: add Sume to the launch partners (#486) | 不適用 | 2026-11-10 已裁決，結論不變 |
+| `0294a9fb` | fix(hypihub): map PixVerse V6 and Bach fields the service accepts (#487) | 延後 | 見下方 PR #487 |
+| `25454bed` | chore(release): include PixVerse 0.2.1 in 0.3.2 (#488) | 不適用 | 版號 commit |
+
+### Pull requests（8 筆，`reviewed_pr_through` 推到 496）
+
+| PR | head | 狀態 | 裁決 | 理由（fork 實況） |
+| --- | --- | --- | --- | --- |
+| #487 fix(hypihub): map PixVerse V6 and Bach fields | `1046e507` | MERGED（`0294a9fb`） | 延後（併入升 0.3） | 四項改動在 fork 都沒有對應的程式：(1) HypiHub 的 PixVerse 對應加 `seed`、`multi_clip`——fork 的 `packages/provider-hypihub/src/mapping.ts` 沒有任何 PixVerse 對應；(2) `aspect-ratio="auto"` 需要 reference video、`multiClip` 不可與 reference video 並用——fork 的 `packages/pixverse/src/index.ts` 沒有 `referenceVideo` port，長寬比列舉也沒有 `auto`，`validation.ts` 不存在；(3)(4) Bach 的 reference video 與 `start_time`——fork 沒有 `bach` 套件。同一缺陷在 fork 不存在 |
+| #488 chore(release): include PixVerse 0.2.1 in 0.3.2 | `612111dc` | MERGED（`25454bed`） | 不適用 | 版號 |
+| #491 feat(contrib): Meta Model API Providers | `d8956b78` | OPEN | 不適用 | 新增 `contrib/providers/meta-model-api`（+822），第三方服務的新 Provider，不是修正；fork 不收錄新的第三方服務 |
+| #492 chore: enable esbuild and koffi build scripts via onlyBuiltDependencies | `da7e792b` | OPEN | **不採用** | 見下方 |
+| #493 feat(sam-cutout) | `0c6816f8` | OPEN | 不適用 | 新套件 `sam-cutout` 與 contrib provider（+2488），新功能 |
+| #494 feat(media): subject-layer composite and z-band occlusion passes | `b16ce03b` | OPEN | 不適用 | 改 `html-program`、`html-video`、`media-local`、`media-operations`、`sam-cutout`（+4148），這些套件在 fork 都不存在，且是新功能 |
+| #495 docs: add Video Rebirth launch partner | `cfc3c902` | MERGED（`6bacce09`，tag 之後） | 不適用 | 合作夥伴行銷 |
+| #496 docs: serve README assets via free-imgbed CDN | `5bb7e689` | OPEN | 不適用 | 把上游 `README.md`／`README.zh-CN.md` 的圖片改指向第三方圖床並刪一份範例 README；fork 的 README 結構不同，也不把素材改掛第三方主機 |
+
+**#492 為什麼不採用**：它在 `pnpm-workspace.yaml` 加 `onlyBuiltDependencies: [esbuild, koffi]`，說明寫「本機安裝所需」。在 fork 不成立：pnpm 10 預設不跑相依套件的 build script，本 fork 每次 `pnpm install` 都印出 `Ignored build scripts: esbuild, koffi, puppeteer`，而在這個狀態下 `koffi` 3.3.8 可載入（`require('koffi').version`）、`esbuild` 0.28.2 可轉譯（`transformSync`），完整測試 1071 項通過（含用 koffi 的 `file-io-node`、`runtime-local`）。兩者的原生檔來自各自的平台選用套件（`@koromix/koffi-win32-x64`、`@esbuild/win32-x64`），不需要 install script。開啟它只會讓第三方套件在安裝時多一個執行程式的機會，與本 fork 2026-10-24 起用 `--ignore-scripts` 重產鎖檔的做法相反。重審條件：某個 `koffi` 或 `esbuild` 版本不再附 Windows x64 預編譯檔，以致不跑 build script 就無法載入。
+
+### Issues（2 筆，`reviewed_issue_through` 推到 490）
+
+| Issue | 狀態 | 裁決 | 理由 |
+| --- | --- | --- | --- |
+| #489 `runtime up` on Windows：受管程式起不來，`program.log` 被占用 | open | 延後（ROADMAP 中期表） | 見下方 |
+| #490 `typo:Flow` `wrap="word"` 在字中斷行 | open | 延後（ROADMAP 中期表） | 見下方 |
+
+**#489**：回報的程式在 fork 一模一樣——`packages/runtime-local/src/programs.ts:383` 以 `open(logPath, "a")` 開著 `program.log`，第 400 行在 Windows 走 `startWithOwnConsole`，把同一路徑交給 `Start-Process -RedirectStandardOutput`；Windows 分支確實不用 `log.fd`。但**在本機不重現**：`packages/runtime-local/test/programs.test.ts` 的「up preserves installation logs through service startup and down stops it」沒有 mock，會真的經這條路徑以 `Start-Process` 起一個 node 行程，2026-11-15 單獨重跑通過（1 項、通過 1），完整測試也通過。環境是 Windows 11 10.0.26300、Windows PowerShell 5.1.26100.9711；回報者是 Windows 10 Pro 19045、PowerShell 5.1。兩邊差在作業系統與 PowerShell 的組建，是否因此不同**未查證**。回報者建議的改法（Windows 不開那個 handle）看起來無害，但 fork 寫不出修前會紅的測試，上游也還沒有修正 PR，所以這輪不改。重審條件：上游出修正 PR，或在任何一台 Windows（尤其 Windows 10）重現。
+
+**#490**：缺陷在 fork 存在。上游指的是 `packages/html-program/src/text.ts` 的 `renderDocument`；fork 的對應檔是 `packages/hyperframes/src/text.ts`，結構相同：每個字位是 `display:inline-grid` 的 span（第 527 行），字的外層 span 只有 `position:relative`（第 548–552 行），Flow 設 `white-space:pre-wrap; overflow-wrap:break-word`（第 431–432 行）。以同樣的標記結構在真實 Chrome 157.0.8103.79 量測（300px 寬、64px Arial、`SIGNS YOU'RE AN OVERTHINKER`）：`YOU'RE` 寬 240px、放得進一行，卻被拆成 2 行；`OVERTHINKER` 拆成 3 行。回報者建議在字的 span 加 `white-space:nowrap`，同一量測下 `YOU'RE` 回到 1 行，但 `OVERTHINKER`（462px，比容器寬）改成整個溢出、不再斷行——也就是把「比 Frame 寬的字仍會斷」這個 `break-word` 行為換掉了，回報者自己也註明字級／字位級 `Sequence` 動畫未測。上游沒有修正 PR，正確的修法需要取捨與算圖驗證，不屬於本輪「採納上游修正」的範圍，所以不改。**限度**：量測用的是手寫的同結構 HTML，沒有經 fork 的完整算圖管線重現。重審條件：上游出修正 PR（移植時對應到 `packages/hyperframes/src/text.ts`），或 fork 使用者遇到；維護者也可以決定由 fork 自行修。
+
+### 水位與後續
+
+`tools/upstream_baseline.json`：`reviewed_through` → `25454bed40bbb09eaf675e217ed9901fa8ef4f2a`、`reviewed_release` → `v0.3.2`、`reviewed_pr_through` → 496、`reviewed_issue_through` → 490、`reviewed_date` → 2026-11-15。`monitored` 六筆（#458、#464、#466、#467、#469、#471）檢查器回報 head 與 state 都沒變，不動；這輪沒有新增釘選（延後的 PR 只有已合併的 #487，#489、#490 是 issue，`monitored` 只收 PR）。#489、#490 加進 ROADMAP 中期表「移植等上游合併的修正」；「升到上游 0.3」一列補上觸發條件現況與 v0.3.2 帶入的項目。
+
+### 驗證
+
+- `python tools/check_upstream_updates.py --strict`：exit 0（commit 無待審、PR 審到 #496、issue 審到 #490、`monitored` 無變動）。
+- `pwsh -NoProfile -File tools/dev_check.ps1`：exit 0，`WINDOWS DEV CHECK GREEN`；其中完整測試 1103 項、通過 1071、失敗 0、略過 32。
+- 另外單獨跑 `node test/run.mjs` 兩次：第一次 exit 1（1070 通過、1 失敗），失敗的是 `packages/credential-store-os/test/windows.test.ts` 的「an oversized bridge response terminates the child and keeps secret output out of the error」（第 33 行 `child.killed` 為 `false`）；該檔單獨重跑 5 次都通過，第二次完整執行 exit 0（1071 通過、0 失敗）。這一輪沒有動到該套件；2026-10-27 已記過同一個測試檔在整套並行時偶發失敗。這次沒有查出根因，只能說是偶發，不能說與負載有關已被證實。
+- `python tools/check_dependency_freshness.py --strict`：不帶 token 時因匿名 `api.github.com` 每小時 60 次的額度用完，8 個 GitHub Actions 列全部 CHECK FAILED、exit 1（同一天反覆執行造成，與依賴無關）；設 `GH_TOKEN` 後 exit 0。

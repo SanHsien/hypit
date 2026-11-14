@@ -21,6 +21,8 @@ overrides:
   # @hyperframes/engine and producer ask for ^2.0.5, which the old lockfile resolved to 2.0.12
   # (alert #116); 2.1.3 is the fixed 2.x. 2.1.6 also fixes GHSA-qv5m-9pm6-hqp3 / GHSA-jpvv-r467-5p4w.
   "@hono/node-server": ^2.1.6
-  # @hyperframes/engine pins undici to exactly 7.25.0, so no in-range update reaches the fixes
-  # (alerts #118-#146; the newest patched release is 7.30.1). Stay inside the 7.x major.
+  # @hyperframes/engine pins undici to an exact version, so no in-range update can reach a fix.
+  # Added 2026-11-07 when engine 0.9.20 pinned 7.25.0 (alerts #118-#146; the newest patched
+  # release was 7.30.1). Engine 0.9.47 (2026-11-15) pins exactly 7.30.1 itself, so today this only
+  # lifts it to the newest 7.x; it stays as the floor while the pin is exact. Stay inside 7.x.
   undici: ^7.30.1
