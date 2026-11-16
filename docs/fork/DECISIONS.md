@@ -712,3 +712,7 @@ packages/studio/src/ui/main.ts(19,8): error TS2882: Cannot find module or type d
 - `pwsh -NoProfile -File tools/dev_check.ps1`：exit 0，`WINDOWS DEV CHECK GREEN`；其中完整測試 1103 項、通過 1071、失敗 0、略過 32。
 - 另外單獨跑 `node test/run.mjs` 兩次：第一次 exit 1（1070 通過、1 失敗），失敗的是 `packages/credential-store-os/test/windows.test.ts` 的「an oversized bridge response terminates the child and keeps secret output out of the error」（第 33 行 `child.killed` 為 `false`）；該檔單獨重跑 5 次都通過，第二次完整執行 exit 0（1071 通過、0 失敗）。這一輪沒有動到該套件；2026-10-27 已記過同一個測試檔在整套並行時偶發失敗。這次沒有查出根因，只能說是偶發，不能說與負載有關已被證實。
 - `python tools/check_dependency_freshness.py --strict`：不帶 token 時因匿名 `api.github.com` 每小時 60 次的額度用完，8 個 GitHub Actions 列全部 CHECK FAILED、exit 1（同一天反覆執行造成，與依賴無關）；設 `GH_TOKEN` 後 exit 0。
+
+## 2026-11-16：typescript 7.x 維持延後，不換轉譯器
+
+主人授權小瑪裁決。`package-loader-node` 不改用其他轉譯器，`typescript` 維持釘 5.9.3；等 7.x 發佈穩定（非 `unstable/*`）的 transpile API 再升，屆時一併補 CSS side-effect import 的 ambient 宣告。理由：換轉譯器會改變執行期轉譯行為，收益只是提早升版。`.github/dependency-deferrals.json` 的這組 deferral 保留。
