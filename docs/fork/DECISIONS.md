@@ -766,6 +766,8 @@ packages/studio/src/ui/main.ts(19,8): error TS2882: Cannot find module or type d
 
 **#498**：缺陷在 fork 存在，且本機重現。`packages/script/src/lexical.ts` 的 `openingAt`（第 20 行）只把 Unicode `Ps`／`Pi`／`Sc` 當開頭標點，`¿` `¡` 屬 `Po`。實跑 `analyzeProse("Antes. ¿Cuál tienes tú?")` 的 `surfaces` 得 `["Antes. ¿","Cuál","tienes","tú?"]`，`"Antes. ¡Mira esto!"` 得 `["Antes. ¡","Mira","esto!"]`；預期是 `¿` `¡` 跟著後面的字。影響字幕 Cue 把 `¿` 顯示在前一個 Cue。回報者的修法（把 `¿¡` 明確視為開頭標點）看起來直接，上游尚無修正 PR。本輪依分流範圍不改程式碼；列入 ROADMAP 近期表，驗收要有修前紅的測試（含 Dual Text 邊界與手寫空白後）。
 
+**#498 已採納（2026-11-19，commit `b1bedfdf`）**：`openingAt` 明確把 `¿`（U+00BF）`¡`（U+00A1）視為開頭標點，其他標點行為不變。測試在 `packages/script/test/prose-boundaries.test.ts`（基本、`¡`、Dual Text 邊界後、手寫空白後共 4 項，修前全紅、修後全綠）。上游日後出修正 PR 時改用上游版本。
+
 **#500**：fork 有同一測試（`packages/caption-fine/test/layout.browser.test.ts`）。2026-11-19 用本機已有的 Chrome 154.0.8037.57（`HYPIT_CAPTURE_TEST_BROWSER` 指定）在 Windows 11 跑：2 項全過、0 失敗。回報環境是 macOS、Chrome for Testing 153.0.8010.12（arm64），失敗是否與平台或瀏覽器版本有關**未查證**。因此不重現、不改；重審條件是 fork 在 Windows 的瀏覽器測試開始失敗，或上游修正的根因是 `packages/caption-fine/src` 的算圖而非測試樣本。
 
 **#502**：fork 的 `packages/runtime-local/test/execution-process.test.ts` 第 82、70 行以非原子的 `writeFile`／`appendFile` 寫標記檔，第 133、155 行 `exists()` 後 `JSON.parse`，與回報完全相同的寫法，所以同一個競態在 fork 理論上存在。但這只在測試，runtime 無缺陷；fork 完整測試在本機沒有觀察到它失敗。不改；重審條件是 fork 看到該測試出現 `Unexpected end of JSON input`（屆時用回報者的兩個修法之一，擇一即可）。
