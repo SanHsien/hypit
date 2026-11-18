@@ -729,3 +729,49 @@ packages/studio/src/ui/main.ts(19,8): error TS2882: Cannot find module or type d
   - 「升到上游 0.3」的觸發條件成立（#388、#433 修好）。
   - 或者 `@hyperframes/*` 有一次升級，讓上述驗證無法回到基線，修補成本又高於提前升 0.3。
 
+
+## 2026-11-19：上游 v0.3.3 審查（commit 3 筆、PR #497–#528、issue #498–#513）
+
+**範圍與結果**：上游打了 `v0.3.3`（`9a6f688c39829857d50dc596fa1218565585a9da`）。release 軌 `25454bed..9a6f688c` 共 3 個 commit；新 PR 27 筆、新 issue 5 筆。**採納 0、無程式碼改動**；fork 實測確認有缺陷且待修的 1 筆（issue #498）記為採納待辦、進 ROADMAP 近期表。fork 的程式基底是 v0.2.8 加移植，`bach`、`nle-studio`、`visual-track`、`html-program` 等 0.3 套件在 fork 都不存在。
+
+### Commit（3 筆）
+
+| Commit | 主題 | 裁決 | 理由（fork 實況） |
+| --- | --- | --- | --- |
+| `47bfe6e9` | docs: update WeChat group QR code | 不適用 | 微信群 QR；fork 已移除該區塊 |
+| `6bacce09` | docs: add Video Rebirth launch partner (#495) | 不適用 | 合作夥伴行銷；2026-11-15 已裁決 |
+| `9a6f688c` | fix: restrict Bach to 1080p and prepare 0.3.3 release (#499) | 延後 | 動 `packages/bach`（fork 沒有）、`provider-hypihub` 的 Bach 路由（fork 的 `routes.ts` 沒有 Bach）與版號；併入升 0.3，同 2026-11-15 的 #390、#487 |
+
+### Pull requests（27 筆，`reviewed_pr_through` 推到 528）
+
+| PR | 狀態 | 裁決 | 理由（fork 實況） |
+| --- | --- | --- | --- |
+| #497 fix(visual-track): declare VisualClipMotion as a Track Surface output | OPEN | 不適用 | `packages/visual-track` 在 fork 不存在 |
+| #499 fix: restrict Bach to 1080p and prepare 0.3.3 release | MERGED（`9a6f688c`） | 延後 | 見上，併入升 0.3 |
+| #503 test(caption-fine): keep the joined-background fixture visible across its seeks | OPEN | 不適用 | 只改 `packages/caption-fine/test/layout.browser.test.ts` 的固定樣本，對應 issue #500；fork 的同一測試在 Windows 實跑通過（見 #500），無失敗可修 |
+| #504 test: run capture-browser tests as an explicit serial suite | OPEN | 不適用 | 把 browser-capture、caption-fine、studio 的瀏覽器測試拆成序列套件，並改 `test/run.mjs` 與測試文件；對應 issue #501（macOS 並行逾時）。fork 的 `test/run.mjs` 結構不同，完整測試在本機穩定通過，沒有該問題 |
+| #505–#512、#515–#527（共 20 筆）NLE Studio 介面調整：編輯流程、軌道高度、時間軸尾端、預覽陰影、拖放高亮、接縫、播放頭等 | 全部 MERGED | 延後 | 全部只動 `packages/nle-studio`（#521 另動 `packages/nle`），這兩個套件在 fork 不存在，且都是介面功能與樣式，不是缺陷修正；併入升 0.3 |
+| #514 fix(runtime-local): launch the Windows Worker from a .ps1 file, not -EncodedCommand | OPEN（head `bc0b8bd5`） | 延後（釘 `monitored`） | 見 issue #513 |
+| #528 feat(studio): add stage drag and resize handles for spatial frames | OPEN | 不適用 | 新功能（+ `frame-edit.ts` 等），fork 的 `packages/studio/src` 沒有 `frame-edit.ts`，不是缺陷修正 |
+
+### Issues（5 筆，`reviewed_issue_through` 推到 513）
+
+| Issue | 狀態 | 裁決 | 理由 |
+| --- | --- | --- | --- |
+| #498 Script：西班牙文開頭標點 `¿` `¡` 黏到前一個字 | open | **採納待辦**（ROADMAP 近期表） | 見下方 |
+| #500 caption-fine：joined active-box 背景沒畫（SVG 量到 0×0） | open | 延後 | 見下方 |
+| #501 瀏覽器測試在整套並行下撞 30 秒逾時 | open | 不適用 | 回報環境 macOS M1，10 核並行啟動多個 Chrome；fork 的完整測試在 Windows 穩定通過（2026-11-15 完整測試 1071 通過、0 失敗）。對應修正 PR #504 同樣不適用 |
+| #502 execution-process 測試讀到寫到一半的標記檔 | open | 延後 | 見下方 |
+| #513 Windows：Worker 用 `-EncodedCommand` 啟動後 8–19 秒死亡 | open | 延後（釘 PR #514） | 見下方 |
+
+**#498**：缺陷在 fork 存在，且本機重現。`packages/script/src/lexical.ts` 的 `openingAt`（第 20 行）只把 Unicode `Ps`／`Pi`／`Sc` 當開頭標點，`¿` `¡` 屬 `Po`。實跑 `analyzeProse("Antes. ¿Cuál tienes tú?")` 的 `surfaces` 得 `["Antes. ¿","Cuál","tienes","tú?"]`，`"Antes. ¡Mira esto!"` 得 `["Antes. ¡","Mira","esto!"]`；預期是 `¿` `¡` 跟著後面的字。影響字幕 Cue 把 `¿` 顯示在前一個 Cue。回報者的修法（把 `¿¡` 明確視為開頭標點）看起來直接，上游尚無修正 PR。本輪依分流範圍不改程式碼；列入 ROADMAP 近期表，驗收要有修前紅的測試（含 Dual Text 邊界與手寫空白後）。
+
+**#500**：fork 有同一測試（`packages/caption-fine/test/layout.browser.test.ts`）。2026-11-19 用本機已有的 Chrome 154.0.8037.57（`HYPIT_CAPTURE_TEST_BROWSER` 指定）在 Windows 11 跑：2 項全過、0 失敗。回報環境是 macOS、Chrome for Testing 153.0.8010.12（arm64），失敗是否與平台或瀏覽器版本有關**未查證**。因此不重現、不改；重審條件是 fork 在 Windows 的瀏覽器測試開始失敗，或上游修正的根因是 `packages/caption-fine/src` 的算圖而非測試樣本。
+
+**#502**：fork 的 `packages/runtime-local/test/execution-process.test.ts` 第 82、70 行以非原子的 `writeFile`／`appendFile` 寫標記檔，第 133、155 行 `exists()` 後 `JSON.parse`，與回報完全相同的寫法，所以同一個競態在 fork 理論上存在。但這只在測試，runtime 無缺陷；fork 完整測試在本機沒有觀察到它失敗。不改；重審條件是 fork 看到該測試出現 `Unexpected end of JSON input`（屆時用回報者的兩個修法之一，擇一即可）。
+
+**#513**：fork 有同一條路徑——`packages/runtime-local/src/programs.ts` 的 `startWithOwnConsole`（第 250 行）以 `powershell.exe -NoProfile -NonInteractive -EncodedCommand` 啟動，`worker-process.ts` 第 219 行的 Worker 也走這裡。**實測不重現**：2026-11-19 在本機以 fork 的 `startWithOwnConsole` 起一個 `node -e "setInterval(()=>{},1000)"`，每 5 秒探測一次，40 秒內都存活（8 次探測全為 alive）。環境是 Windows 11 10.0.26300、Windows PowerShell 5.1.26100；回報者環境未寫明版本，差異**未查證**。回報者建議的改法（寫 `<log>.start.ps1` 用 `-File`）在 `Restricted` 執行原則下會失敗，是取捨，不是無害替換；同一路徑上游另有 PR #443（強化啟動，仍用 `-EncodedCommand`），尚未合併。不改；PR #514 釘進 `monitored`。重審條件：上游合併 #514 或 #443，或在任何一台 Windows 重現 Worker 在啟動後數秒到十數秒死亡。
+
+### 水位與後續
+
+`tools/upstream_baseline.json`：`reviewed_through` → `9a6f688c39829857d50dc596fa1218565585a9da`、`reviewed_release` → `v0.3.3`、`reviewed_pr_through` → 528、`reviewed_issue_through` → 513、`reviewed_date` → 2026-11-19；`monitored` 新增 `pr#514`（head `bc0b8bd5a5b92b37b43dc825eb1bea163bf6e318`、open）。ROADMAP 近期表新增 #498 一列；中期表「移植等上游合併的修正」補 #513／PR #514、#500、#502；「升到上游 0.3」一列補 v0.3.3 帶入的 Bach 1080p 限制（#499）與 `nle-studio` 介面調整。
