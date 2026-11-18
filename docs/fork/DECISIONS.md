@@ -716,3 +716,16 @@ packages/studio/src/ui/main.ts(19,8): error TS2882: Cannot find module or type d
 ## 2026-11-16：typescript 7.x 維持延後，不換轉譯器
 
 主人授權小瑪裁決。`package-loader-node` 不改用其他轉譯器，`typescript` 維持釘 5.9.3；等 7.x 發佈穩定（非 `unstable/*`）的 transpile API 再升，屆時一併補 CSS side-effect import 的 ambient 宣告。理由：換轉譯器會改變執行期轉譯行為，收益只是提早升版。`.github/dependency-deferrals.json` 的這組 deferral 保留。
+
+## 2026-11-19: `packages/provider-hyperframes-local` 續留到升上游 0.3
+
+- **決定**：續留，不在現在跟進上游 `589062ef` 的刪除。等到 ROADMAP 中期列「升到上游 0.3」執行時，再一起移除這個套件，以及 `@hyperframes/*` 相依。（維護者已授權規劃長代決；由艦隊規劃長 6 代決定。）
+- **理由**：
+  - 上游刪掉這個套件後，改用 `html-program`、`provider-html-local` 等自有套件算圖。但那些套件是 0.3 重寫後才有的，本 fork 的基底是 v0.2.8 加逐筆移植，裡面沒有這些套件。
+  - 現在跟進刪除，就等於拿掉 fork 唯一能用的本機算圖路線，又沒有替代品。
+  - 要換成上游路線，本身就是 0.3 升級的工作內容。單獨先做，只會把同一份移植工作拆成兩次。
+- **續留期間的升級驗證方式**：每次升 `@hyperframes/*`，都用受管 Chrome 跑 `HYPIT_BROWSER_TESTS=1 node --import tsx --test --test-concurrency=1 packages/provider-hyperframes-local/test/*.test.ts`。結果要與基線相同：53 項、通過 49、失敗 0、略過 4（Windows 專屬 skip）。結果記在該次 DECISIONS 條目。
+- **重審條件**：
+  - 「升到上游 0.3」的觸發條件成立（#388、#433 修好）。
+  - 或者 `@hyperframes/*` 有一次升級，讓上述驗證無法回到基線，修補成本又高於提前升 0.3。
+
