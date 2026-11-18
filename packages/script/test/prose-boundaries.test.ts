@@ -75,3 +75,23 @@ test("explicit groups keep internal speech anchors while display separators stay
   assert.equal(parsed.moments[0]!.anchorId, parsed.tokens[1]!.startAnchorId);
   assert.equal(document.words.map(word => word.separatorBefore + word.text).join(''), '组件化 3D 한글');
 });
+
+const captionWords = (text: string) => captionDocument(parse(text), "caption", "story").words.map(word => word.text);
+
+test("Spanish inverted opening marks attach to the following word, not the previous one", () => {
+  assert.deepEqual(captionWords("Antes. ¿Cuál tienes tú?"), ["Antes.", "¿Cuál", "tienes", "tú?"]);
+});
+
+test("Spanish inverted exclamation opens the next word like the inverted question mark", () => {
+  assert.deepEqual(captionWords("Antes. ¡Mira esto!"), ["Antes.", "¡Mira", "esto!"]);
+});
+
+test("Spanish inverted marks after a Dual Text boundary stay with the following word", () => {
+  assert.deepEqual(captionWords("<Hola.|hola> ¿Cuál tienes?"), ["Hola.", "¿Cuál", "tienes?"]);
+  assert.deepEqual(captionWords("<Hola.|hola>¿Cuál tienes?"), ["Hola.", "¿Cuál", "tienes?"]);
+  assert.deepEqual(captionWords("Antes <¿Cuál|cual> tienes?"), ["Antes", "¿Cuál", "tienes?"]);
+});
+
+test("Spanish inverted marks after a hand-written space stay with the following word", () => {
+  assert.deepEqual(captionWords("Antes, ¿Cuál tienes? ¡Mira!"), ["Antes,", "¿Cuál", "tienes?", "¡Mira!"]);
+});

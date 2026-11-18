@@ -13,11 +13,12 @@ const LEXICAL_UNIT = new RegExp([
 ].join("|"), "gu");
 
 // Unicode owns bracket/quote categories. ASCII symmetric quotes need local context;
-// they have no opening/closing category. This is prose analysis, not marker syntax.
+// they have no opening/closing category. Spanish inverted marks (U+00BF, U+00A1) are
+// category Po yet open the clause, so they are named explicitly. Not marker syntax.
 function openingAt(gap: string, hasPrevious: boolean, beforeWord = true): number {
   for (const match of gap.matchAll(/./gu)) {
     const character = match[0];
-    if (/[\p{Ps}\p{Pi}\p{Sc}]/u.test(character)
+    if (/[\p{Ps}\p{Pi}\p{Sc}¿¡]/u.test(character)
       || ((/["'`]/u.test(character) || (beforeWord && /\p{Pf}/u.test(character))) && (!hasPrevious || /\s$/u.test(gap.slice(0, match.index))))) return match.index;
   }
   return gap.length;
