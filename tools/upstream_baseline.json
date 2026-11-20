@@ -3,9 +3,9 @@
   "branch": "main",
   "reviewed_through": "9a6f688c39829857d50dc596fa1218565585a9da",
   "reviewed_release": "v0.3.3",
-  "reviewed_date": "2026-11-19",
-  "reviewed_pr_through": 528,
-  "reviewed_issue_through": 513,
+  "reviewed_date": "2026-11-20",
+  "reviewed_pr_through": 537,
+  "reviewed_issue_through": 533,
   "track": "release",
   "decision_log": "docs/fork/DECISIONS.md",
   "monitored": [
@@ -42,6 +42,21 @@
     {
       "item": "pr#514",
       "head": "bc0b8bd5a5b92b37b43dc825eb1bea163bf6e318",
+      "state": "open"
+    },
+    {
+      "item": "pr#534",
+      "head": "1b1a9ecab8e59cccb7df74e50df7c0606e8bed34",
+      "state": "open"
+    },
+    {
+      "item": "pr#535",
+      "head": "64459a3cb237d2b60f9998b45c62cd6e419a5084",
+      "state": "open"
+    },
+    {
+      "item": "pr#536",
+      "head": "957e846c7911dd9c793d79a1eda02859219b3f18",
       "state": "open"
     }
   ]

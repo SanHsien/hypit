@@ -777,3 +777,25 @@ packages/studio/src/ui/main.ts(19,8): error TS2882: Cannot find module or type d
 ### 水位與後續
 
 `tools/upstream_baseline.json`：`reviewed_through` → `9a6f688c39829857d50dc596fa1218565585a9da`、`reviewed_release` → `v0.3.3`、`reviewed_pr_through` → 528、`reviewed_issue_through` → 513、`reviewed_date` → 2026-11-19；`monitored` 新增 `pr#514`（head `bc0b8bd5a5b92b37b43dc825eb1bea163bf6e318`、open）。ROADMAP 近期表新增 #498 一列；中期表「移植等上游合併的修正」補 #513／PR #514、#500、#502；「升到上游 0.3」一列補 v0.3.3 帶入的 Bach 1080p 限制（#499）與 `nle-studio` 介面調整。
+
+## 2026-11-20：上游 PR #534–#537、issue #529–#533 分流（無新 release）
+
+**範圍與結果**：上游沒有新 release（仍是 `v0.3.3`）；新 PR 4 筆（#534–#537）、新 issue 5 筆（#529–#533），全部 OPEN。**採納 0、無程式碼改動**。分析由 Antigravity 在獨立 clone 做（只讀），Claude 逐筆抽查行號與上游狀態後寫入。5 個 issue 描述的缺陷在 fork 都存在（fork 用 0.2 的套件名），但修正 PR 都還沒合併或根本還沒有 PR，依本檔慣例不提前移植 open PR。
+
+| 項目 | 狀態 | 裁決 | 理由（fork 實況） |
+| --- | --- | --- | --- |
+| issue #529＋PR #534 typography 多段落無 id 時報 `repeats run-1` | OPEN（PR head `1b1a9eca`） | 延後（釘 `monitored`） | fork 的 `packages/typography-track/src/surface.ts:570` 把 `inlineIndex` 宣告在段落內，`program.ts:61` 以全文件共用的 id 集合檢查，同一缺陷。移植要手工改到 `typography-track`（上游已改名 `text-fine`） |
+| issue #530＋PR #535 Script 語法錯誤只報字元偏移 | OPEN（PR head `64459a3c`） | 延後（釘 `monitored`） | `packages/script/src/error.ts:7` 只格式化 `(${sourceName}:${offset})`。移植時要連 fork 獨有的 `packages/script-studio/src/index.ts` 一起改（上游已併成 `packages/script/src/studio.ts`） |
+| issue #530＋PR #536 Recipe（fork 為 SVS）語法錯誤只報字元偏移 | OPEN（PR head `957e846c`） | 延後（釘 `monitored`） | `packages/svs/src/parser.ts:20` 格式化 `${sourceName}:${offset}`。單檔實跑 `parseSvs` 把第 3 行第 3 欄報成 `:59`（Antigravity 實跑，未在完整依賴環境複驗） |
+| issue #531 `hypit check` 遇到第一個錯誤就停 | open，無 PR | 延後 | fork 的 `compiler-node`、`elaborator`、`markup` 一路直接 `throw`，同一結構限制；跨多層的錯誤回復管線，上游未定案前不自行分岔 |
+| issue #532 `audio:Clip` 接受 `audio="none"` 正規化的媒體，到 Build 才報錯 | open，無 PR | 延後 | `packages/audio-track/src/program.ts:83` 的執行期斷言與上游錯誤訊息逐字相同；編譯期只檢查 `synchronized` 型別。跨套件型別合約，等上游 |
+| issue #533 Producer 失敗訊息沒帶 authoring 元素與屬性 | open，無 PR | 延後 | `packages/driver-node/src/driver.ts:494` 只包 Producer 名稱；provenance 在編譯期有算，但 protocol 的 `InvokeProducerCommand` 不帶。要改 protocol 契約，等上游 |
+| PR #537 nle-studio UI 翻新 | OPEN，base `codex/reconstituted-core` | 不適用 | `packages/nle-studio` 在 fork 不存在；是 UI 新功能原型，不是缺陷修正；併入升 0.3 時再看 |
+
+**重審條件**：PR #534／#535／#536 任一合併進 upstream/main（`monitored` 會變紅），或 fork 實際踩到該缺陷；#531–#533 等上游出對應 PR。
+
+**未驗證**：#529、#531–#533 沒有在裝好依賴的環境實跑重現，只讀程式碼比對；#530 只單檔實跑。
+
+### 水位
+
+`tools/upstream_baseline.json`：`reviewed_pr_through` → 537、`reviewed_issue_through` → 533、`reviewed_date` → 2026-11-20；`monitored` 新增 `pr#534`、`pr#535`、`pr#536`。ROADMAP 中期表「移植等上游合併的修正」補這三筆。
