@@ -1,11 +1,28 @@
 name: npm package execution
 
 on:
+  # Fork patch (docs/fork/DECISIONS.md 2026-11-22, Actions usage): not a required check, so pull
+  # requests that only touch fork maintenance files (tools, notes, Dependabot and deferral config,
+  # fork-only workflows) skip the Windows + Linux package run.
   pull_request:
     paths-ignore:
       - "docs/**"
       - "skills/**"
       - "design/**"
+      - "tools/**"
+      - "ROADMAP.md"
+      - "AGENTS.md"
+      - "FORK.md"
+      - "NOTICE.md"
+      - "CONTRIBUTING.md"
+      - "CONTRIBUTING.en.md"
+      - "upstream-review-report.md"
+      - ".github/dependabot.yml"
+      - ".github/dependency-deferrals.json"
+      - ".github/workflows/upstream-check.yml"
+      - ".github/workflows/dependency-freshness.yml"
+      - ".github/workflows/codeql.yml"
+      - ".github/workflows/automation-check.yml"
   workflow_dispatch:
   workflow_call:
     outputs:

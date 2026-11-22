@@ -806,3 +806,33 @@ packages/studio/src/ui/main.ts(19,8): error TS2882: Cannot find module or type d
 - **決定**：在 `WhisperXRequestHandler` 對所有方法先檢查：`Host` 必須是 `127.0.0.1:<port>`、`localhost:<port>` 或 `[::1]:<port>`（port 取自 listener 實際埠）；有送 `Origin` 時必須是 `http://` 加上述其中一個。不符回 403 `FORBIDDEN_HOST`。沒有 `Origin` 的請求（本機 Node provider、curl）不受影響；provider 的 `baseUrl` 本來就限定這三個主機名。
 - **與上游的分岔**：這是 fork 獨有的修補，上游尚未有同等檢查（未查到對應 PR）；依本檔慣例「能由外部輸入觸發的安全修正可在上游合併前先移植」，上游若自己補了就改用上游版本。已登記在 `FORK.md`「與上游的差異」。
 - **驗證**：`test_service.py` 的 `HostGuardTests` 起真實 `WhisperXHttpServer`（port 0），壞 Host／壞 Origin／POST 壞 Host 皆 403，`127.0.0.1`、`localhost` Host 回 200；`pnpm test:whisperx-service` 20 項通過。
+
+## 2026-11-22：GitHub 在 fork 上暫停 Actions，削減用量
+
+- **背景**：Actions 頁出現「Workflows are not currently being run on this fork due to the scale of GitHub Actions usage」；API 的 `actions/permissions` 仍是 `enabled:true`、所有 workflow `active`，最後一次成功的 run 是 2026-11-21 05:20Z。做法與 SkillSpector、Skill_Seekers（`f24d7cb`）相同：量測 → 去掉 fork 用不到的 → 縮 push 觸發 → 必要檢查不加路徑過濾。
+- **量測**（`gh api repos/SanHsien/hypit/actions/runs?created=>=2026-10-23` 加每個 run 的 `/jobs`；計費分鐘＝job 時長進位到整分；加權 Linux ×1、Windows ×2、macOS ×10；10-23～11-21，約 4.2 週）：
+
+  | workflow | run 數（事件） | 加權分鐘 | runner |
+  | --- | --- | --- | --- |
+  | `CI`（必要檢查 `Windows CI`） | 55（push 37／PR 18） | 414 | Windows，單 job 約 3.8 分 |
+  | `npm package execution` | 19（PR 18／dispatch 1） | 219 | Windows 89 分 ×2＋Linux 41 |
+  | `CodeQL` | 62（push 40／PR 18／排程 4） | 177 | Linux |
+  | `Upstream check` | 26（push 22／排程 4） | 26 | Linux |
+  | `Dependency freshness` | 13 | 13 | Linux |
+  | Dependabot（dynamic，uv／npm 安全更新為主，多數因 torch／transformers 解不出而失敗） | 約 40 | 約 45 | Linux |
+  | `Notify HypiHub…`（上游專用，job 有 `github.repository` guard） | 25（全 skipped） | 0 | — |
+  | **合計** | **239** | **≈896（≈215／週）** | macOS 0 |
+
+  10-23、10-24 兩天（維護者的 PR 分支連推）占 486；扣掉後穩定期約 105／週。37 次 push CI 裡約 15 次只改 `ROADMAP.md`、`AGENTS.md`、`FORK.md`、`NOTICE.md`、`upstream-review-report.md`、`tools/upstream_baseline.json` 等 fork 紀錄；40 次 push CodeQL 只有約 6 次動到 JS／TS。用量本來就小、沒有 macOS 與排程重型 job，所以停用很可能不只看算力（同 claude-skill-social-post 的觀察），這次只能盡量縮，不能保證不再被停。
+- **必要檢查**：`branches/main/protection` 只要求 `Windows CI`；rulesets 為空。`ci.yml` 原本的 `pull_request` 帶 `paths-ignore: docs/**`，只改文件的 PR 會讓必要檢查永遠停在 Expected——這次一併拿掉。
+- **改動**：
+  1. `ci.yml`：push 的 `paths-ignore` 加 `skills/**`、`design/**` 與上列 fork 紀錄檔、`.github/dependabot.yml`；`tools/**`、`.github/workflows/**`、`.github/dependency-deferrals.json` 刻意**不**排除（`test/fork-tools.test.ts` 會跑 `tools/tests`，後者讀真實的 workflow 釘選與 npm manifest）。`pull_request` 不再過濾。checkout 加 `persist-credentials: false`（上游 PR #464 的那一處，DECISIONS 寫的觸發條件「下次動這個 workflow」成立）。
+  2. `codeql.yml`：push 只在 JS／TS／HTML 原始檔或本檔變動時跑；PR 與每週一排程不過濾，所以任何改動最遲一週內仍會被掃到。
+  3. `npm-package.yml`（非必要檢查，只在 PR）：`paths-ignore` 加 `tools/**`、fork 紀錄檔、Dependabot／deferral 設定與 fork 自己的四支 workflow。
+  4. 刪除 `sync-hypihub-docs.yml`：需要上游專用的 `HYPIHUB_SYNC_TOKEN`，在 fork 永遠 skipped，卻每次 docs push 產生一個 run（30 天 25 個）。這也解掉 #464 的另一處 `persist-credentials`。`repository-analysis.yml` 只有 `workflow_dispatch`、不產生 run，保留。
+  5. `dependabot.yml`：npm 加 `applies-to: security-updates` 的群組，安全更新合成一個 PR，不再一則 advisory 一個 PR（每個 PR 都會跑 CI、CodeQL、npm package）。
+  - 沒動：`upstream-check.yml`、`dependency-freshness.yml`（fork 自己的 gate，合計約 9／週）、`automation-check.yml`（只在 automation 路徑變動時跑）、`publish-npm.yml`（已有 fork guard）。所有 workflow 原本都有 `concurrency` cancel-in-progress（`publish-npm` 刻意 false），`uses:` 仍全部釘 40 位 SHA。
+- **預估**：push CI 少約 15 次（−113）、push CodeQL 少約 34 次（−97）、HypiHub 少 25 個 skipped run；npm package 與 Dependabot 依 PR 組成而定，未計入。合計約 896 → 686 加權分鐘／30 天（≈215 → 165／週，−23%），run 數 239 → 約 155（−35%）。穩定期（扣 10-23／24）約 105 → 60／週。
+- **怎麼還原**：`git revert <本 commit>`；只想恢復某一項就把對應 workflow 的 `paths`／`paths-ignore` 段刪掉、或 `git checkout <本 commit>~1 -- .github/workflows/sync-hypihub-docs.yml`。上游若改 `sync-hypihub-docs.yml`，合併時的 modify/delete 衝突一律保持刪除。
+- **重新啟用與觀察**：推送後由維護者在 `https://github.com/SanHsien/hypit/actions` 按啟用；之後兩週每天看 `gh run list -R SanHsien/hypit -L 1` 的最新時間（API 的 `active` 不能當健康訊號）。
+- **驗證**：本機 YAML 解析 8 支 workflow 與 `dependabot.yml` 成功、`uses:` 全為 SHA；`tools/dev_check.ps1` 綠。Actions 暫停中，GitHub 上沒有實跑。

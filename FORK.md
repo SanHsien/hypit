@@ -29,6 +29,7 @@
 | `hypit.cmd` | Windows 啟動器（取代上游的 POSIX `hypit` 腳本）；`test/hypit-cmd.test.ts` 驗證含 `(`、`)`、`&` 的安裝路徑 |
 | `.github/workflows/publish-npm.yml`（Fork patch） | `version`、`publish` job 限定 `github.repository == 'hypit-ai/hypit'`；fork 不發佈 npm（見 DECISIONS 2026-11-07） |
 | `.github/workflows/upstream-check.yml` | 每週對 `upstream/main` 檢查新 commit 與 ticket |
+| `.github/workflows/ci.yml`、`codeql.yml`、`npm-package.yml`（Fork patch）；刪除 `sync-hypihub-docs.yml` | 為降低 Actions 用量：push 跳過只改 fork 紀錄的 CI、只在 JS／TS 變動時跑 CodeQL、npm package 跳過 fork 維護檔；必要檢查 `Windows CI` 的 PR 觸發不過濾；HypiHub 同步需上游專用 secret，刪除（`docs/fork/DECISIONS.md` 2026-11-22 Actions 用量） |
 | `docs/fork/DECISIONS.md`、`docs/fork/UPSTREAM.md` | fork 維護決策與同步指引 |
 | `.cursor/rules/no-upstream-pr.mdc` | 防呆規則：禁止誤對上游開 PR 或推送 |
 

@@ -1,8 +1,22 @@
 name: CodeQL
 
 on:
+  # Fork patch (docs/fork/DECISIONS.md 2026-11-22, Actions usage): pushes scan only when
+  # JavaScript/TypeScript sources or this workflow change. Pull requests and the weekly
+  # schedule stay unfiltered, so every change is still scanned at least weekly.
   push:
     branches: ["main"]
+    paths:
+      - "**/*.ts"
+      - "**/*.tsx"
+      - "**/*.mts"
+      - "**/*.cts"
+      - "**/*.js"
+      - "**/*.jsx"
+      - "**/*.mjs"
+      - "**/*.cjs"
+      - "**/*.html"
+      - ".github/workflows/codeql.yml"
   pull_request:
     branches: ["main"]
   schedule:

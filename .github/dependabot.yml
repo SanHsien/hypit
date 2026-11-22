@@ -25,3 +25,8 @@ updates:
     groups:
       npm:
         patterns: ["*"]
+      # Security updates are not covered by the version-update group above; without this each
+      # advisory opens its own PR, and every PR runs CI, CodeQL and the npm package check.
+      npm-security:
+        applies-to: security-updates
+        patterns: ["*"]
