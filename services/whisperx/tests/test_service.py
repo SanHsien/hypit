@@ -211,5 +211,43 @@ class ApplicationTests(unittest.TestCase):
         self.assertEqual(raised.exception.code, "BUSY")
 
 
+class HostGuardTests(unittest.TestCase):
+    def test_foreign_host_or_origin_gets_403_and_loopback_host_works(self) -> None:
+        import http.client
+        import threading
+
+        from hypit_whisperx_service.server import WhisperXHttpServer
+
+        with tempfile.TemporaryDirectory() as directory:
+            application = WhisperXApplication(config(Path(directory)), FakeEngine())
+            server = WhisperXHttpServer(("127.0.0.1", 0), application)
+            port = server.server_address[1]
+            thread = threading.Thread(target=server.serve_forever, kwargs={"poll_interval": 0.05}, daemon=True)
+            thread.start()
+
+            def call(method: str, host: str, origin: str | None = None) -> int:
+                connection = http.client.HTTPConnection("127.0.0.1", port, timeout=5)
+                headers = {"Host": host, "Content-Length": "0"}
+                if origin is not None:
+                    headers["Origin"] = origin
+                connection.request(method, "/health", headers=headers)
+                response = connection.getresponse()
+                response.read()
+                connection.close()
+                return response.status
+
+            try:
+                self.assertEqual(call("GET", f"127.0.0.1:{port}"), 200)
+                self.assertEqual(call("GET", f"localhost:{port}"), 200)
+                self.assertEqual(call("GET", f"evil.example:{port}"), 403)
+                self.assertEqual(call("GET", "evil.example"), 403)
+                self.assertEqual(call("POST", f"evil.example:{port}"), 403)
+                self.assertEqual(call("GET", f"127.0.0.1:{port}", "http://evil.example"), 403)
+            finally:
+                server.shutdown()
+                server.server_close()
+                thread.join(timeout=5)
+
+
 if __name__ == "__main__":
     unittest.main()

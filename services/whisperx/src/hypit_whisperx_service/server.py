@@ -40,7 +40,28 @@ class WhisperXRequestHandler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(body)
 
+    def _allowed_hosts(self) -> set[str]:
+        port = self.server.server_address[1]
+        return {f"127.0.0.1:{port}", f"localhost:{port}", f"[::1]:{port}"}
+
+    def _is_local_request(self) -> bool:
+        """DNS-rebinding guard: Host (and Origin, when sent) must be this loopback server."""
+        hosts = self._allowed_hosts()
+        host = (self.headers.get("Host") or "").strip().lower()
+        origin = self.headers.get("Origin")
+        if host not in hosts:
+            return False
+        return origin is None or origin.strip().lower() in {f"http://{item}" for item in hosts}
+
+    def _refuse_foreign(self) -> bool:
+        if self._is_local_request():
+            return False
+        self._send(403, b'{"error":{"code":"FORBIDDEN_HOST","message":"request is not from this local server"}}')
+        return True
+
     def do_GET(self) -> None:  # noqa: N802
+        if self._refuse_foreign():
+            return
         if self.path != "/health":
             self._send(404, b'{"error":{"code":"NOT_FOUND","message":"not found"}}')
             return
@@ -48,6 +69,8 @@ class WhisperXRequestHandler(BaseHTTPRequestHandler):
         self._send(response.status, response.body)
 
     def do_POST(self) -> None:  # noqa: N802
+        if self._refuse_foreign():
+            return
         if self.path != "/transcribe":
             self._send(404, b'{"error":{"code":"NOT_FOUND","message":"not found"}}')
             return

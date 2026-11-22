@@ -799,3 +799,10 @@ packages/studio/src/ui/main.ts(19,8): error TS2882: Cannot find module or type d
 ### 水位
 
 `tools/upstream_baseline.json`：`reviewed_pr_through` → 537、`reviewed_issue_through` → 533、`reviewed_date` → 2026-11-20；`monitored` 新增 `pr#534`、`pr#535`、`pr#536`。ROADMAP 中期表「移植等上游合併的修正」補這三筆。
+
+## 2026-11-22：WhisperX 服務加 Host／Origin 檢查（DNS rebinding），先於上游移植
+
+- **背景**：艦隊稽核發現 `services/whisperx/src/hypit_whisperx_service/server.py` 綁 `127.0.0.1:8765`，但 `do_GET`／`do_POST` 不看 `Host`，也不看 `Origin`。任何網頁經 DNS rebinding 能對本機的 `/transcribe` 發請求（可指定允許根目錄內的音檔路徑）。
+- **決定**：在 `WhisperXRequestHandler` 對所有方法先檢查：`Host` 必須是 `127.0.0.1:<port>`、`localhost:<port>` 或 `[::1]:<port>`（port 取自 listener 實際埠）；有送 `Origin` 時必須是 `http://` 加上述其中一個。不符回 403 `FORBIDDEN_HOST`。沒有 `Origin` 的請求（本機 Node provider、curl）不受影響；provider 的 `baseUrl` 本來就限定這三個主機名。
+- **與上游的分岔**：這是 fork 獨有的修補，上游尚未有同等檢查（未查到對應 PR）；依本檔慣例「能由外部輸入觸發的安全修正可在上游合併前先移植」，上游若自己補了就改用上游版本。已登記在 `FORK.md`「與上游的差異」。
+- **驗證**：`test_service.py` 的 `HostGuardTests` 起真實 `WhisperXHttpServer`（port 0），壞 Host／壞 Origin／POST 壞 Host 皆 403，`127.0.0.1`、`localhost` Host 回 200；`pnpm test:whisperx-service` 20 項通過。
